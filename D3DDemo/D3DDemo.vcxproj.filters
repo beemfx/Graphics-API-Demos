@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="code">
+      <UniqueIdentifier>{74c0c2b4-2850-4439-9109-cbc69a1960b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\GFX3D9">
+      <UniqueIdentifier>{2a847411-a326-463f-b55c-584b440517ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\MD3Base">
+      <UniqueIdentifier>{d3ed65ea-738f-4214-abae-25b9e190b1a6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="code\directx.ico">
+      <Filter>code</Filter>
+    </Image>
+    <Image Include="code\GFX3D9\BeemConsole.jpg">
+      <Filter>code\GFX3D9</Filter>
+    </Image>
+    <Image Include="code\GFX3D9\BeemFont.dib">
+      <Filter>code\GFX3D9</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="code\Main.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GFX3D9\BeemConsole.c">
+      <Filter>code\GFX3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GFX3D9\D3DFont.c">
+      <Filter>code\GFX3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GFX3D9\D3DImage.c">
+      <Filter>code\GFX3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GFX3D9\D3DInit.c">
+      <Filter>code\GFX3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GFX3D9\Vertex.cpp">
+      <Filter>code\GFX3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\Functions.c">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3Animation.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3Data.c">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3File.c">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3Mesh.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3ObjectMesh.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3PlayerMesh.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3PlayerObject.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3Skin.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3TexDB.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="code\resource.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\GFX3D9\GFX3D9.h">
+      <Filter>code\GFX3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\defines.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\Functions.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3File.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3TexDB.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="code\resource.rc">
+      <Filter>code</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="code\GFX3D9\GFX3D9.dsp">
+      <Filter>code\GFX3D9</Filter>
+    </None>
+    <None Include="code\GFX3D9\GFX3D9.vcproj">
+      <Filter>code\GFX3D9</Filter>
+    </None>
+    <None Include="code\MD3Base\MD3Base.dsp">
+      <Filter>code\MD3Base</Filter>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="code\MD3Base\ToDo.txt">
+      <Filter>code\MD3Base</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,5 @@
+#include "resource.h"
+
+IDI_DXICON              ICON    DISCARDABLE     "directx.ico"
+IDR_CONSOLEIMG          BINARY  DISCARDABLE     "BeemConsole.jpg"
+IDB_DEFFONT             BITMAP  DISCARDABLE     "BeemFont.dib"

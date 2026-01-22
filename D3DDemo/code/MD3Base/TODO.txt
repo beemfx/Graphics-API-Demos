@@ -1,0 +1,17 @@
+The following needs to be completed in the MD3 library
+
+Functions that need to be completed:
+FindMD3Header()
+
+I need to do the following:
+
+Also need the ability for an MD3 to look up and down, and rotate
+the torso left and right.  Need to be able to load only the default
+skin, and load the rest of the skins on demand.
+
+MD3's should be mirrored from right to left.
+
+Need to make it so animation stops for non-looping animations.  Unless 
+forceloop was specified.
+
+Ability to pause MD3 Objects.
