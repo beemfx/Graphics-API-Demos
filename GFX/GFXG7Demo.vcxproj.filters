@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="GFXG7Demo">
+      <UniqueIdentifier>{fa270b2e-1639-4cde-a1bd-d196a80291eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GFXG7">
+      <UniqueIdentifier>{f30e1542-d842-4037-9af3-8a74af357d38}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="GFXG7Demo\directx.ico">
+      <Filter>GFXG7Demo</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GFXG7Demo\resource.h">
+      <Filter>GFXG7Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXG7\Defines.h">
+      <Filter>GFXG7</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXG7\GFXG7.h">
+      <Filter>GFXG7</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GFXG7Demo\Main.cpp">
+      <Filter>GFXG7Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXG7\DDFunc.c">
+      <Filter>GFXG7</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXG7\imageDD.cpp">
+      <Filter>GFXG7</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GFXG7Demo\resource.rc">
+      <Filter>GFXG7Demo</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="GFXG8Demo">
+      <UniqueIdentifier>{cae2cf94-bc0c-4c93-a314-5d5c38cb2562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GFXG8">
+      <UniqueIdentifier>{ba731bf4-bfc8-4533-a2ef-89722d178213}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="GFXG8Demo\directx.ico">
+      <Filter>GFXG8Demo</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GFXG8Demo\Main.cpp">
+      <Filter>GFXG8Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXG8\D3DSetup.c">
+      <Filter>GFXG8</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXG8\Direct3DImage.cpp">
+      <Filter>GFXG8</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GFXG8Demo\resource.h">
+      <Filter>GFXG8Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXG8\GFXG8.h">
+      <Filter>GFXG8</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GFXG8Demo\resource.rc">
+      <Filter>GFXG8Demo</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
