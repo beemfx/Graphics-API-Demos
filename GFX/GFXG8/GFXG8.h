@@ -3,7 +3,7 @@
 
 	Copyright (c) 2003, Blaine Myers.
 */
-#include <d3d8.h>
+#include <d3d9.h>
 #include <windows.h>
 
 #ifdef __cplusplus
@@ -18,18 +18,18 @@ GFXG8_EXPORTS HRESULT InitD3D(
 	DWORD dwHeight,
 	BOOL bWindowed,
 	D3DFORMAT Format,
-	LPDIRECT3D8 lpD3D,
-	LPDIRECT3DDEVICE8 * lpDevice,
+	LPDIRECT3D9 lpD3D,
+	LPDIRECT3DDEVICE9 * lpDevice,
 	D3DPRESENT_PARAMETERS * lpSavedPP,
-	LPDIRECT3DSURFACE8 * lpBackBuffer);
+	LPDIRECT3DSURFACE9 * lpBackBuffer);
 
 /* ValidateDevice validates the device and restores backbuffer.  It
    also calls a RestoreGraphics function if one is specified. */
 typedef BOOL ( * POOLFN)();
 
 GFXG8_EXPORTS BOOL ValidateDevice(
-	LPDIRECT3DDEVICE8 * lppDevice, 
-	LPDIRECT3DSURFACE8 * lppBackSurface,
+	LPDIRECT3DDEVICE9 * lppDevice, 
+	LPDIRECT3DSURFACE9 * lppBackSurface,
 	D3DPRESENT_PARAMETERS d3dpp,
 	POOLFN fpReleasePool,
 	POOLFN fpRestorePool);
@@ -42,27 +42,27 @@ GFXG8_EXPORTS BOOL CorrectWindowSize(
 	HMENU hMenu);
 
 GFXG8_EXPORTS HRESULT CopySurfaceToSurface(
-	LPDIRECT3DDEVICE8 lpDevice,
+	LPDIRECT3DDEVICE9 lpDevice,
 	RECT * lpSourceRect, 
-	LPDIRECT3DSURFACE8 lpSourceSurf,
+	LPDIRECT3DSURFACE9 lpSourceSurf,
 	POINT * lpDestPoint,
-	LPDIRECT3DSURFACE8 lpDestSurf,
+	LPDIRECT3DSURFACE9 lpDestSurf,
 	BOOL bTransparent,
 	D3DCOLOR ColorKey);
 
 GFXG8_EXPORTS HRESULT CopySurfaceToSurface32(
 	RECT * lpSourceRect, 
-	LPDIRECT3DSURFACE8 lpSourceSurf,
+	LPDIRECT3DSURFACE9 lpSourceSurf,
 	POINT * lpDestPoint,
-	LPDIRECT3DSURFACE8 lpDestSurf,
+	LPDIRECT3DSURFACE9 lpDestSurf,
 	BOOL bTransparent,
 	D3DCOLOR ColorKey);
 
 GFXG8_EXPORTS HRESULT CopySurfaceToSurface16(
 	RECT * lpSourceRect, 
-	LPDIRECT3DSURFACE8 lpSourceSurf,
+	LPDIRECT3DSURFACE9 lpSourceSurf,
 	POINT * lpDestPoint,
-	LPDIRECT3DSURFACE8 lpDestSurf,
+	LPDIRECT3DSURFACE9 lpDestSurf,
 	BOOL bTransparent,
 	D3DCOLOR ColorKey);
 
@@ -79,7 +79,7 @@ GFXG8_EXPORTS HRESULT CopySurfaceToSurface16(
 class GFXG8_EXPORTS CImage8
 {
 protected:
-	LPDIRECT3DSURFACE8 m_lpImage;
+	LPDIRECT3DSURFACE9 m_lpImage;
 	DWORD m_dwWidth;
 	DWORD m_dwHeight;
 

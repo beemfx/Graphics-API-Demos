@@ -4,7 +4,7 @@
 	Copyright (c) 2003, Blaine Myers
 */
 
-#include <d3d8.h>
+#include <d3d9.h>
 #include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -12,19 +12,21 @@
 #include "resource.h"
 
 
-#pragma comment(lib, "d3d8.lib")
-#pragma comment(lib, "d3dx8.lib")
-#pragma comment(lib, "legacy_stdio_definitions.lib")
-
+#pragma comment(lib, "d3d9.lib")
+#if defined(_DEBUG)
+#pragma comment(lib, "d3dx9d.lib")
+#else
+#pragma comment(lib, "d3dx9.lib")
+#endif
 
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 //DirectDraw globals
-LPDIRECT3D8 g_lpD3D=NULL;
-LPDIRECT3DDEVICE8 g_lpDevice=NULL;
-LPDIRECT3DSURFACE8 g_lpBackBuffer=NULL;
+LPDIRECT3D9 g_lpD3D=NULL;
+LPDIRECT3DDEVICE9 g_lpDevice=NULL;
+LPDIRECT3DSURFACE9 g_lpBackBuffer=NULL;
 D3DPRESENT_PARAMETERS g_SavedPP;
 
 //Necessary globals
@@ -140,7 +142,7 @@ BOOL GameInit(HWND hwnd, BOOL bWindowed)
 	//We create Direct3D then create the device
 	//and obtain the back buffer with the function:
 	//InitD3D.
-	g_lpD3D=Direct3DCreate8(D3D_SDK_VERSION);
+	g_lpD3D=Direct3DCreate9(D3D_SDK_VERSION);
 
 	if(!g_lpD3D)
 		return FALSE;

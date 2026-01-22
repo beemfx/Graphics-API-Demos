@@ -4,7 +4,7 @@
 
 These are 2D drawing libraries for DirectX 7 and DirectX 8. They are not very interesting at this point. The DirectX 7 version is used to power ScrollGIN (though now ScrollGIN also has a DirectX 11 renderer).
 
-GFXG8Demo requires the DirectX 8 SDK to build, this is not included in installations of Visual Studio and must be acquired separately.
+GFXG8Demo has been updated to use DirectX 9 (it was formerly DirectX 8) that way it can be built with Visual Studio 2022 which still included DirectX 9.
 
 LICENSE
 

@@ -37,4 +37,7 @@
       <Filter>GFXG8Demo</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-#include <d3dx8.h>
+#include <d3dx9.h>
 #include "GFXG8.h"
 
 CImage8::CImage8()
@@ -30,11 +30,13 @@ HRESULT CImage8::CreateSurface(
 	DWORD dwHeight)
 {
 	if(lpDevice)
-		return ((LPDIRECT3DDEVICE8)lpDevice)->CreateImageSurface(
+		return ((LPDIRECT3DDEVICE9)lpDevice)->CreateOffscreenPlainSurface(
 			dwWidth, 
-			dwHeight, 
+			dwHeight,
 			Format, 
-			&m_lpImage);
+			D3DPOOL_DEFAULT,
+			&m_lpImage,
+			NULL);
 	else
 		return E_FAIL;
 }
@@ -193,11 +195,11 @@ HRESULT CImage8::DrawImage(
 
 	
 	return CopySurfaceToSurface(
-		(LPDIRECT3DDEVICE8)lpDevice,
+		(LPDIRECT3DDEVICE9)lpDevice,
 		&rcSrc,
 		m_lpImage,
 		&pDest,
-		(LPDIRECT3DSURFACE8)lpBuffer,
+		(LPDIRECT3DSURFACE9)lpBuffer,
 		TRUE,
 		0x00FF00FF);
 	
@@ -205,7 +207,7 @@ HRESULT CImage8::DrawImage(
 	//	m_lpImage,                                     
 	//	&rcSrc,                                        
 	//	1,                                             
-	//	((LPDIRECT3DSURFACE8)lpBuffer),                
+	//	((LPDIRECT3DSURFACE9)lpBuffer),                
 	//	&pDest);
 }
 
@@ -221,7 +223,7 @@ HRESULT CImage8::DrawClippedImage(
 	POINT psDest;
 	//we get a description for the buffer
 	D3DSURFACE_DESC d3dsDesc;
-	((LPDIRECT3DSURFACE8)lpBuffer)->GetDesc(&d3dsDesc);
+	((LPDIRECT3DSURFACE9)lpBuffer)->GetDesc(&d3dsDesc);
 	
 	//store buffer dimensions
 	int nBufferWidth=d3dsDesc.Width;
@@ -279,11 +281,11 @@ HRESULT CImage8::DrawClippedImage(
 
 	//Copy the rects.
 	return CopySurfaceToSurface(
-		(LPDIRECT3DDEVICE8)lpDevice,
+		(LPDIRECT3DDEVICE9)lpDevice,
 		&rcSrc, 
 		m_lpImage, 
 		&psDest, 
-		(LPDIRECT3DSURFACE8)lpBuffer, 
+		(LPDIRECT3DSURFACE9)lpBuffer, 
 		TRUE, 
 		0x00FF00FF);
 }

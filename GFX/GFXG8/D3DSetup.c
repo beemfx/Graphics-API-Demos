@@ -2,8 +2,8 @@
 #include "GFXG8.h"
 
 BOOL ValidateDevice(
-	LPDIRECT3DDEVICE8 * lppDevice, 
-	LPDIRECT3DSURFACE8 * lppBackSurface,
+	LPDIRECT3DDEVICE9 * lppDevice, 
+	LPDIRECT3DSURFACE9 * lppBackSurface,
 	D3DPRESENT_PARAMETERS d3dpp,
 	POOLFN fpReleasePool,
 	POOLFN fpRestorePool)
@@ -11,28 +11,29 @@ BOOL ValidateDevice(
 	HRESULT hr=0;
 
 	if(!*lppDevice)return FALSE;
-	if(FAILED(hr=IDirect3DDevice8_TestCooperativeLevel((*lppDevice)))){
+	if(FAILED(hr=IDirect3DDevice9_TestCooperativeLevel((*lppDevice)))){
 		if(hr == D3DERR_DEVICELOST)return TRUE;
 		if(hr == D3DERR_DEVICENOTRESET){
 			if(*lppBackSurface){
-				IDirect3DSurface8_Release((*lppBackSurface));
+				IDirect3DSurface9_Release((*lppBackSurface));
 				*lppBackSurface=NULL;
 			}
 			if(fpReleasePool)
 				fpReleasePool();
 
-			if(FAILED(IDirect3DDevice8_Reset((*lppDevice), &d3dpp))){
+			if(FAILED(IDirect3DDevice9_Reset((*lppDevice), &d3dpp))){
 				return FALSE;
 			}
 
-			if(FAILED(IDirect3DDevice8_GetBackBuffer(
-				(*lppDevice),  
+			if(FAILED(IDirect3DDevice9_GetBackBuffer(
+				(*lppDevice),
+				0,
 				0, 
 				D3DBACKBUFFER_TYPE_MONO, 
 				lppBackSurface )))return FALSE;
 
 
-			IDirect3DDevice8_Clear(
+			IDirect3DDevice9_Clear(
 				(*lppDevice), 
 				0, 
 				NULL, 
@@ -55,21 +56,21 @@ HRESULT InitD3D(
 	DWORD dwHeight,
 	BOOL bWindowed,
 	D3DFORMAT Format,
-	LPDIRECT3D8 lpD3D,
-	LPDIRECT3DDEVICE8 * lpDevice,
+	LPDIRECT3D9 lpD3D,
+	LPDIRECT3DDEVICE9 * lpDevice,
 	D3DPRESENT_PARAMETERS * lpSavedPP,
-	LPDIRECT3DSURFACE8 * lpBackBuffer)
+	LPDIRECT3DSURFACE9 * lpBackBuffer)
 {
 	D3DPRESENT_PARAMETERS d3dpp;
 	D3DDISPLAYMODE d3ddm;
 	HRESULT hr=0;
 
 	if((*lpDevice))
-		IDirect3DDevice8_Release((*lpDevice));
+		IDirect3DDevice9_Release((*lpDevice));
 
 	ZeroMemory(&d3dpp, sizeof(d3dpp));
 
-	hr=IDirect3D8_GetAdapterDisplayMode(
+	hr=IDirect3D9_GetAdapterDisplayMode(
 		lpD3D,
 		D3DADAPTER_DEFAULT,
 		&d3ddm);
@@ -89,11 +90,11 @@ HRESULT InitD3D(
 	d3dpp.EnableAutoDepthStencil=TRUE;
 	d3dpp.AutoDepthStencilFormat=D3DFMT_D16;
 	d3dpp.FullScreen_RefreshRateInHz=0;
-	d3dpp.FullScreen_PresentationInterval =
+	d3dpp.PresentationInterval =
 		bWindowed ? 0 : D3DPRESENT_INTERVAL_IMMEDIATE;
 	d3dpp.Flags=D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 
-	hr=IDirect3D8_CreateDevice(
+	hr=IDirect3D9_CreateDevice(
 		lpD3D,
 		D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,
@@ -108,8 +109,9 @@ HRESULT InitD3D(
 
 	*lpSavedPP=d3dpp;
 
-	if(FAILED(IDirect3DDevice8_GetBackBuffer(
+	if(FAILED(IDirect3DDevice9_GetBackBuffer(
 		(*lpDevice),
+		0,
 		0,
 		D3DBACKBUFFER_TYPE_MONO,
 		lpBackBuffer)))
@@ -164,9 +166,9 @@ BOOL CorrectWindowSize(
 
 HRESULT CopySurfaceToSurface16(
 	RECT * lpSourceRect, 
-	LPDIRECT3DSURFACE8 lpSourceSurf,
+	LPDIRECT3DSURFACE9 lpSourceSurf,
 	POINT * lpDestPoint,
-	LPDIRECT3DSURFACE8 lpDestSurf,
+	LPDIRECT3DSURFACE9 lpDestSurf,
 	BOOL bTransparent,
 	D3DCOLOR ColorKey)
 {
@@ -275,9 +277,9 @@ HRESULT CopySurfaceToSurface16(
 
 HRESULT CopySurfaceToSurface32(
 	RECT * lpSourceRect, 
-	LPDIRECT3DSURFACE8 lpSourceSurf,
+	LPDIRECT3DSURFACE9 lpSourceSurf,
 	POINT * lpDestPoint,
-	LPDIRECT3DSURFACE8 lpDestSurf,
+	LPDIRECT3DSURFACE9 lpDestSurf,
 	BOOL bTransparent,
 	D3DCOLOR ColorKey)
 {
@@ -386,19 +388,19 @@ HRESULT CopySurfaceToSurface32(
 
 
 HRESULT CopySurfaceToSurface(
-	LPDIRECT3DDEVICE8 lpDevice,
+	LPDIRECT3DDEVICE9 lpDevice,
 	RECT * lpSourceRect, 
-	LPDIRECT3DSURFACE8 lpSourceSurf,
+	LPDIRECT3DSURFACE9 lpSourceSurf,
 	POINT * lpDestPoint,
-	LPDIRECT3DSURFACE8 lpDestSurf,
+	LPDIRECT3DSURFACE9 lpDestSurf,
 	BOOL bTransparent,
 	D3DCOLOR ColorKey)
 {
 	D3DSURFACE_DESC descSrc, descDest;
-	IDirect3DSurface8_GetDesc(
+	IDirect3DSurface9_GetDesc(
 		lpSourceSurf,
 		&descSrc);
-	IDirect3DSurface8_GetDesc(
+	IDirect3DSurface9_GetDesc(
 		lpDestSurf,
 		&descDest);
 
@@ -423,12 +425,21 @@ HRESULT CopySurfaceToSurface(
 				bTransparent, 
 				ColorKey);
 	}else{
-		return IDirect3DDevice8_CopyRects(
-			lpDevice,
-			lpSourceSurf,
-			lpSourceRect,
-			1,
-			lpDestSurf,
-			lpDestPoint);
+		if (descDest.Format == D3DFMT_R5G6B5)
+			return CopySurfaceToSurface16(
+				lpSourceRect,
+				lpSourceSurf,
+				lpDestPoint,
+				lpDestSurf,
+				FALSE,
+				0);
+		else
+			return CopySurfaceToSurface32(
+				lpSourceRect,
+				lpSourceSurf,
+				lpDestPoint,
+				lpDestSurf,
+				FALSE,
+				0);
 	}
 }
