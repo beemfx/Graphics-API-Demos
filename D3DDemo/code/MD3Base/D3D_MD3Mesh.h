@@ -8,13 +8,13 @@
 
 class CMD3SkinFile;
 
-static constexpr DWORD D3DMD3VERTEX_TYPE = (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1);
+static constexpr DWORD D3DMD3VERTEX_TYPE = (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
 
 struct d3d_md3_vertex
 {
-	D3DVECTOR Postion; /* Position of vertex. */
-	D3DVECTOR Normal; /* The normal of the vertex. */
-	FLOAT tu, tv; /* Texture coordinates. */
+	D3DVECTOR Postion = { }; /* Position of vertex. */
+	D3DVECTOR Normal = { }; /* The normal of the vertex. */
+	FLOAT tu = { }, tv = { }; /* Texture coordinates. */
 };
 
 enum class d3d_md3_detail
@@ -26,53 +26,66 @@ enum class d3d_md3_detail
 
 class CD3D_MD3Mesh
 {
+public:
+	static constexpr md3_uint32 MD3TEXRENDER_NOCULL = (1 << 0);
+
+private:
+	class CBuffers
+	{
+	public:
+		IDirect3DVertexBuffer9* VB = nullptr;
+		IDirect3DIndexBuffer9* IB = nullptr;
+
+		CBuffers() = default;
+		CBuffers(const CBuffers& Other);
+		CBuffers(CBuffers&& Other);
+		~CBuffers();
+
+		CBuffers& operator = (const CBuffers& Other);
+		CBuffers& operator = (CBuffers&& Other);
+	};
+
+	class CMeshData
+	{
+	public:
+		CBuffers Buffers;
+		std::vector<md3Vector> Normals;
+		mutable std::vector<d3d_md3_vertex> TempVerts;
+	};
+
 protected:
 	CMD3File m_md3File;
+	std::vector<CMeshData> m_MeshDatas;
+	IDirect3DDevice9* m_Dev = nullptr;
 
-	LPDIRECT3DVERTEXBUFFER9* m_lppVB;
-	d3d_md3_vertex* m_lpVertices;
-	LPDIRECT3DINDEXBUFFER9* m_lppIB;
+	bool m_bMD3Loaded = false; /* Whether or not MD3 is loaded. */
+	bool m_bValid = false; /* Whether or not the MD3 is valid for D3D usage. */
+	md3_uint32 m_dwNumSkins = 0; /* Total number of skins in the mesh. */
+	D3DPOOL m_Pool = D3DPOOL_DEFAULT; /* The Pool Direct3D objects should be created in. */
 
-	LPDIRECT3DDEVICE9 m_lpDevice;
+	bool CreateVB();
+	bool CreateIB();
+	bool CreateNormals();
 
-	md3Vector** m_lppNormals;
-
-	BOOL m_bMD3Loaded; /* Whether or not MD3 is loaded. */
-	BOOL m_bValid; /* Whether or not the MD3 is valid for D3D usage. */
-	DWORD m_dwNumSkins; /* Total number of skins in the mesh. */
-	D3DPOOL m_Pool; /* The Pool Direct3D objects should be created in. */
-
-	HRESULT CreateVB();
-	HRESULT DeleteVB();
-
-	HRESULT CreateIB();
-	HRESULT DeleteIB();
-
-	HRESULT CreateNormals();
-
-	HRESULT CreateModel();
-	HRESULT DeleteModel();
+	md3_bool CreateModel();
+	void DeleteModel();
 
 public:
 	CD3D_MD3Mesh();
 	~CD3D_MD3Mesh();
 
-	HRESULT LoadMD3(
-		const std::filesystem::path& Filename,
-		LPDWORD lpBytesRead,
-		LPDIRECT3DDEVICE9 lpDevice,
-		D3DPOOL Pool);
+	md3_bool LoadMD3(const std::filesystem::path& Filename, IDirect3DDevice9* lpDevice, D3DPOOL Pool);
 
-	HRESULT ClearMD3();
+	void ClearMD3();
 
-	HRESULT Render(
+	void Render(
 		CMD3SkinFile* lpSkin,
 		FLOAT fTime,
 		LONG lFirstFrame,
 		LONG lNextFrame,
 		DWORD dwFlags);
 
-	HRESULT RenderWithTexture(
+	void RenderWithTexture(
 		LPDIRECT3DTEXTURE9 lpTexture,
 		LONG lMesh,
 		FLOAT fTime,
@@ -80,11 +93,10 @@ public:
 		LONG lNextFrame,
 		DWORD dwFlags);
 
-	HRESULT Invalidate();
-	HRESULT Validate();
+	void Invalidate();
+	bool Validate();
 
-	HRESULT SetSkinRefs(
-		CMD3SkinFile* lpSkin);
+	void SetSkinRefs(CMD3SkinFile& Skin);
 
 	HRESULT GetTagTranslation(
 		DWORD dwTagRef,

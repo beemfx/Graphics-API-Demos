@@ -146,7 +146,8 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_
 	szFileName[i]=0;
 	strcat(szFileName, szExt);
 
-	if(FAILED(m_meshObject.LoadMD3(szFileName, NULL, lpDevice, D3DPOOL_DEFAULT))){
+	if(!m_meshObject.LoadMD3(szFileName, lpDevice, D3DPOOL_DEFAULT))
+	{
 		if(nDetail== d3d_md3_detail::Medium || nDetail== d3d_md3_detail::Low)
 			return Load(lpDevice, szFile, d3d_md3_detail::High);
 		return E_FAIL;
@@ -175,18 +176,18 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_
 	return S_OK;
 }
 
-HRESULT CMD3ObjectMesh::Invalidate()
+void CMD3ObjectMesh::Invalidate()
 {
 	if(!m_bLoaded)
-		return S_FALSE;
+		return;
 
-	return m_meshObject.Invalidate();
+	m_meshObject.Invalidate();
 }
 
-HRESULT CMD3ObjectMesh::Validate(LPDIRECT3DDEVICE9 lpDevice)
+bool CMD3ObjectMesh::Validate(LPDIRECT3DDEVICE9 lpDevice)
 {
 	if(!m_bLoaded)
-		return S_FALSE;
+		return false;
 
 	return m_meshObject.Validate();
 }

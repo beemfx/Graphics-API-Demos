@@ -89,8 +89,6 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_d
 
 	size_t dwLen = 0;
 
-	HRESULT hr = 0;
-
 	Clear();
 
 	m_lpDevice = lpDevice;
@@ -132,9 +130,8 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_d
 	sprintf(szHandPath, "%s%s_hand.md3", szPath, WeaponName.c_str());
 
 	//Attempt to load the weapon mesh.
-	hr = m_meshWeapon.LoadMD3(szWeaponPath, NULL, lpDevice, D3DPOOL_DEFAULT);
-
-	if (FAILED(hr)) {
+	if (!m_meshWeapon.LoadMD3(szWeaponPath, lpDevice, D3DPOOL_DEFAULT))
+	{
 		if (nDetail != d3d_md3_detail::High)
 		{
 			SAFE_RELEASE(m_lpDevice);
@@ -145,10 +142,14 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_d
 	}
 
 	//Load the hand and flash meshes.
-	hr = m_meshHand.LoadMD3(szHandPath, NULL, lpDevice, D3DPOOL_DEFAULT);
-	hr |= m_meshFlash.LoadMD3(szFlashPath, NULL, lpDevice, D3DPOOL_DEFAULT);
+	const md3_bool bLoadedHandAndFlash 
+		= 
+		m_meshHand.LoadMD3(szHandPath, lpDevice, D3DPOOL_DEFAULT)
+		&&
+		m_meshFlash.LoadMD3(szFlashPath, lpDevice, D3DPOOL_DEFAULT);
 
-	if (FAILED(hr)) {
+	if (!bLoadedHandAndFlash)
+	{
 		m_meshHand.ClearMD3();
 		m_meshFlash.ClearMD3();
 		m_meshWeapon.ClearMD3();
@@ -157,9 +158,8 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_d
 	}
 
 	//Load the barrel, if success then we set barrel to true.
-	hr = m_meshBarrel.LoadMD3(szBarrelPath, NULL, lpDevice, D3DPOOL_DEFAULT);
-
-	if (SUCCEEDED(hr)) {
+	if (m_meshBarrel.LoadMD3(szBarrelPath, lpDevice, D3DPOOL_DEFAULT))
+	{
 		m_bBarrel = TRUE;
 	}
 	//Load the textures.
@@ -443,7 +443,7 @@ HRESULT CMD3WeaponMesh::Render(BOOL bFlash, const D3DMATRIX& SavedWorldMatrix)
 				0.0f,
 				0,
 				0,
-				MD3TEXRENDER_NOCULL);
+				CD3D_MD3Mesh::MD3TEXRENDER_NOCULL);
 		}
 		//Should restore alpha blending values.
 		WorldMatrix = Temp;

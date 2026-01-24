@@ -25,6 +25,6 @@ public:
 
 	HRESULT Clear();
 
-	HRESULT Invalidate();
-	HRESULT Validate(LPDIRECT3DDEVICE9 lpDevice);
+	void Invalidate();
+	bool Validate(LPDIRECT3DDEVICE9 lpDevice);
 };

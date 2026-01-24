@@ -378,10 +378,11 @@ HRESULT CMD3PlayerMesh::GetSkinsA(char szDir[])
 
 
 	//Set all the skin references for the model.
-	for (i = 0; i < m_dwNumSkins; i++) {
-		m_meshHead.SetSkinRefs(&m_skinHead[i]);
-		m_meshUpper.SetSkinRefs(&m_skinUpper[i]);
-		m_meshLower.SetSkinRefs(&m_skinLower[i]);
+	for (i = 0; i < m_dwNumSkins; i++)
+	{
+		m_meshHead.SetSkinRefs(m_skinHead[i]);
+		m_meshUpper.SetSkinRefs(m_skinUpper[i]);
+		m_meshLower.SetSkinRefs(m_skinLower[i]);
 	}
 
 	return S_OK;
@@ -450,11 +451,16 @@ HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_
 		break;
 	};
 
-	hr = m_meshHead.LoadMD3(szHead, NULL, lpDevice, D3DPOOL_DEFAULT);
-	hr |= m_meshUpper.LoadMD3(szUpper, NULL, lpDevice, D3DPOOL_DEFAULT);
-	hr |= m_meshLower.LoadMD3(szLower, NULL, lpDevice, D3DPOOL_DEFAULT);
+	const md3_bool bLoadedMeshes
+	=
+	m_meshHead.LoadMD3(szHead, lpDevice, D3DPOOL_DEFAULT)
+	&&
+	m_meshUpper.LoadMD3(szUpper, lpDevice, D3DPOOL_DEFAULT)
+	&&
+	m_meshLower.LoadMD3(szLower, lpDevice, D3DPOOL_DEFAULT);
 
-	if (FAILED(hr)) {
+	if (!bLoadedMeshes)
+	{
 		m_meshHead.ClearMD3();
 		m_meshUpper.ClearMD3();
 		m_meshLower.ClearMD3();

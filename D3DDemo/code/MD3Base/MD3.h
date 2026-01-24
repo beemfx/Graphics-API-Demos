@@ -5,12 +5,7 @@
 	Portions Copyright (c) 1999 ID Software
 */
 
-#ifndef __MD3_H__
-#define __MD3_H__
-
-#ifdef __cplusplus 
-extern "C" {
-#endif /* __cplusplus */
+#pragma once
 
 #include "MD3File.h"
 #include "MD3AnimConfig.h"
@@ -18,45 +13,11 @@ extern "C" {
 #include "D3D_MD3Mesh.h"
 #include "GFX3D9/GFX3D9TextureDB.h"
 
-#ifdef D3D_MD3
 #include <d3d9.h>
 #include "MD3TexDB.h"
-#endif /* D3D_MD3 */
 
 class CMD3SkinFile;
 class CMD3WeaponMesh;
-
-
-/* 
-	The following is MD3 implementation for Direct3D.
-*/
-#ifdef D3D_MD3
-
-
-/*
-	The Direct3DMD3 functionality.
-*/
-
-#ifdef __cplusplus
-
-#define MD3TEXRENDER_NOCULL 0x00000001l
-
-
-
-#endif /* __cplusplus */
-
-
-
-/*
-	The texture database functionality.
-*/
-
-
-
-/*
-	The MD3 Skin file functionality.
-*/
-#ifdef __cplusplus
 
 class CMD3SkinFile : public CMD3SkinConfig
 {
@@ -77,14 +38,6 @@ private:
 private:
 	std::vector<IDirect3DTexture9*> m_Textures;
 };
-
-#endif /* __cplusplus */
-
-/* The player mesh functionality. */
-
-#ifdef __cplusplus
-
-
 
 #define SKIN_DEFAULT 0
 
@@ -148,12 +101,11 @@ public:
 	HRESULT Invalidate();
 	HRESULT Validate();
 };
-#endif /* __cplusplus */
 
 /*
 	The player object manages animations.
 */
-#ifdef __cplusplus
+
 /* The flags for the SetAnimation function. */
 #define MD3SETANIM_WAIT      0x00000010l /* Wait for the current animation to finish. */
 #define MD3SETANIM_FRAME     0x00000020l /* Wait for the next key-frame. */
@@ -257,13 +209,11 @@ public:
 
 	HRESULT SetWeapon(CMD3WeaponMesh * lpWeapon);
 };
-#endif /* __cplusplus */
 
 /*
 	The Weapon Mesh Class.
 */
 
-#ifdef __cplusplus
 class CMD3WeaponMesh
 {
 protected:
@@ -303,20 +253,3 @@ public:
 	HRESULT Invalidate();
 	HRESULT Validate();
 };
-#endif /* __cplusplus */
-
-/*
-	The Custom Mesh class.
-*/
-#ifdef __cplusplus
-
-
-#endif /* __cplusplus */
-
-#endif /* D3D_MD3 */
-
-#ifdef __cplusplus 
-}
-#endif /* __cplusplus */
-
-#endif /* __MD3_H__ */
