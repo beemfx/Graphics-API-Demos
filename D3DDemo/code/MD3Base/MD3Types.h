@@ -7,6 +7,9 @@
 
 using md3_bool = bool;
 
+using md3_char8 = char;
+using md3_char16 = wchar_t;
+
 using md3_byte = std::uint8_t;
 
 using md3_uint8 = std::uint8_t;
@@ -21,6 +24,8 @@ using md3_int64 = std::int64_t;
 using md3_real32 = float;
 using md3_real64 = double;
 
+static_assert(sizeof(md3_char8) == 1, "Type is the wrong size.");
+static_assert(sizeof(md3_char16) == 2, "Type is the wrong size.");
 static_assert(sizeof(md3_byte) == 1, "Type is the wrong size.");
 static_assert(sizeof(md3_uint8) == 1, "Type is the wrong size.");
 static_assert(sizeof(md3_int8) == 1, "Type is the wrong size.");

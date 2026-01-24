@@ -14,30 +14,12 @@ extern "C" {
 
 #define MD3BASE_EXPORTS
 
-#include "md3file.h"
+#include "MD3File.h"
 
 #ifdef D3D_MD3
 #include <d3d9.h>
-#include "md3texdb.h"
+#include "MD3TexDB.h"
 #endif /* D3D_MD3 */
-
-#if (defined(WIN32) || defined(WIN64))
-
-#include <windows.h>
-
-#else /* (defined(WIN32) || defined(WIN64))*/
-
-typedef float           FLOAT;
-typedef int             BOOL;
-typedef unsigned short  WORD;
-typedef unsigned long   DWORD;
-typedef signed short    SHORT;
-typedef signed long     LONG;
-
-#define FALSE  0
-#define TRUE   1
-
-#endif /* (defined(WIN32) || defined(WIN64)) */
 
 /* 
 	Skin file structures.
@@ -147,7 +129,7 @@ typedef struct tagD3DMD3VERTEX{
 class MD3BASE_EXPORTS CMD3Mesh
 {
 protected:
-	MD3FILE m_md3File;
+	md3File m_md3File;
 
 	LPDIRECT3DVERTEXBUFFER9 * m_lppVB;
 	D3DMD3VERTEX * m_lpVertices;
@@ -155,7 +137,7 @@ protected:
 
 	LPDIRECT3DDEVICE9 m_lpDevice;
 
-	MD3VECTOR ** m_lppNormals;
+	md3Vector ** m_lppNormals;
 
 	BOOL m_bMD3Loaded; /* Whether or not MD3 is loaded. */
 	BOOL m_bValid; /* Whether or not the MD3 is valid for D3D usage. */

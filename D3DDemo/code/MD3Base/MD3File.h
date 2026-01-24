@@ -3,136 +3,140 @@
 #pragma once
 
 #include "MD3Types.h"
-#include <windows.h>
 
-/* MD3 and Q3 Definitions */
-#define MD3_VERSION       15
-#define MD3_ID            (*(DWORD*)"IDP3")
-#define MAX_QPATH         64
-#define MD3_MAX_FRAMES    1024
-#define MD3_MAX_SHADERS   256
-#define MD3_MAX_SURFACES  32
-#define MD3_MAX_TAGS      16
-#define MD3_MAX_TRIANGLES 8192
-#define MD3_MAX_VERTS     4096
-#define MD3_XYZ_SCALE     (1.0f/64.0f)
+static const md3_int32 MD3_VERSION = 15;
+static const md3_int32 MD3_ID = (*(md3_uint32*)"IDP3");
+static const md3_int32 MAX_QPATH = 64;
+static const md3_int32 MD3_MAX_FRAMES = 1024;
+static const md3_int32 MD3_MAX_SHADERS = 256;
+static const md3_int32 MD3_MAX_SURFACES = 32;
+static const md3_int32 MD3_MAX_TAGS = 16;
+static const md3_int32 MD3_MAX_TRIANGLES = 8192;
+static const md3_int32 MD3_MAX_VERTS = 4096;
+static const md3_real32 MD3_XYZ_SCALE = (1.0f/64.0f);
 
-/* MD3 File Header */
-typedef struct tagMD3HEADER{
-	DWORD dwID; /* *(DWORD*)"IDP3" */
-	LONG lVersion; /* MD3_VERSION */
-	char szFileName[MAX_QPATH]; /* Filename for PK3 usage */
-	LONG lFlags; /* Unused, ??? */
-	LONG lNumFrames; /* Number of frame objects */
-	LONG lNumTags; /* Number of tag objects */
-	LONG lNumMeshes; /* Number of meshes, not greater than MD3_MAX_SURFACES */
-	LONG lNumSkins; /* Number of skin objects, unused?*/
-	LONG lFrameOffset; /* File position where frame objects begin */
-	LONG lTagOffset; /* File position where tag objects start */
-	LONG lMeshOffset; /* File position where mesh objects start */
-	LONG lFileSize; /* File position where relative data ends */
-}MD3HEADER, *LPMD3HEADER;
+struct md3Header
+{
+	md3_uint32 ID = 0; /* *(md3_uint32*)"IDP3" */
+	md3_int32 Version = 0; /* MD3_VERSION */
+	md3_char8 Filename[MAX_QPATH] = { }; /* Filename for PK3 usage */
+	md3_int32 Flags = 0; /* Unused, ??? */
+	md3_int32 NumFrames = 0; /* Number of frame objects */
+	md3_int32 NumTags = 0; /* Number of tag objects */
+	md3_int32 NumMeshes = 0; /* Number of meshes, not greater than MD3_MAX_SURFACES */
+	md3_int32 NumSkins = 0; /* Number of skin objects, unused?*/
+	md3_int32 FrameOffset = 0; /* File position where frame objects begin */
+	md3_int32 TagOffset = 0; /* File position where tag objects start */
+	md3_int32 MeshOffset = 0; /* File position where mesh objects start */
+	md3_int32 FileSize = 0; /* File position where relative data ends */
+};
 
-/* MD3 Vector */
-typedef struct tagMD3VECTOR{
-	FLOAT x;
-	FLOAT y;
-	FLOAT z;
-}MD3VECTOR, *LPMD3VECTOR;
+struct md3Vector
+{
+	md3_real32 x = 0.f;
+	md3_real32 y = 0.f;
+	md3_real32 z = 0.f;
+};
 
-/* MD3 Frame */
-typedef struct tagMD3FRAME{
-	MD3VECTOR vMin; /* First corner of bounding box */
-	MD3VECTOR vMax; /* Second corner of bounding box */
-	MD3VECTOR vOrigin; /* local origin, usually (0, 0, 0) */
-	FLOAT fRadius; /* Radius of bounding sphere */
-	char szName[16]; /* Name of frame ASCII character sting NULL-terminated */
-}MD3FRAME, *LPMD3FRAME;
+struct md3Frame
+{
+	md3Vector Min; /* First corner of bounding box */
+	md3Vector Max; /* Second corner of bounding box */
+	md3Vector Origin; /* local origin, usually (0, 0, 0) */
+	md3_real32 Radius = 0.f; /* Radius of bounding sphere */
+	md3_char8 Name[16] = { }; /* Name of frame ASCII character sting NULL-terminated */
+};
 
-/* MD3 Tag */
-typedef struct tagMD3TAG{
-	char szName[MAX_QPATH]; /* Name of tag object stirng, NULL-TERMINATED */
-	MD3VECTOR vPosition; /* Coordinates of tag objects relative to frame origin. */
-	MD3VECTOR vAxis[3]; /* Orientation of tag object. */
-}MD3TAG, *LPMD3TAG;
+struct md3Tag
+{
+	md3_char8 Name[MAX_QPATH] = { }; /* Name of tag object string, NULL-TERMINATED */
+	md3Vector Position; /* Coordinates of tag objects relative to frame origin. */
+	md3Vector Axis[3]; /* Orientation of tag object. */
+};
 
-/* MD3 Mesh Header */
-typedef struct tagMD3MESHHEADER{
-	DWORD dwID; /* *(WORD*)"IDP3" */
-	char szMeshName[MAX_QPATH]; /* Name of mesh object. */
-	LONG lFlags; /* Flags, unused? */
-	LONG lNumFrames; /* Number of animation frames should match with MD3HEADER */
-	LONG lNumShaders; /* Number of shader objects, Textures. */
-	LONG lNumVertices; /* Number of vertices in object */
-	LONG lNumTriangles; /* Number of traingles defined in this mesh */
-	LONG lTriangleOffset; /* Relative offset from mesh start where triangle list begins */
-	LONG lShaderOffset; /* Offset from start of mesh where shader data begins */
-	LONG lTexCoordOffset; /* offset from begining of mesh where texture coordinates begin */
-	LONG lVertexOffset; /* offset form begining of mesh wehre vertext objecs starts */
-	LONG lMeshDataSize; /* offet from begining of mesh where mesh ends */
-}MD3MESHHEADER, *LPMD3MESHHEADER;
+struct md3MeshHeader
+{
+	md3_uint32 ID = 0; /* *(WORD*)"IDP3" */
+	md3_char8 MeshName[MAX_QPATH] = { }; /* Name of mesh object. */
+	md3_int32 Flags = 0; /* Flags, unused? */
+	md3_int32 NumFrames = 0; /* Number of animation frames should match with MD3HEADER */
+	md3_int32 NumShaders = 0; /* Number of shader objects, Textures. */
+	md3_int32 NumVertices = 0; /* Number of vertices in object */
+	md3_int32 NumTriangles = 0; /* Number of triangles defined in this mesh */
+	md3_int32 TriangleOffset = 0; /* Relative offset from mesh start where triangle list begins */
+	md3_int32 ShaderOffset = 0; /* Offset from start of mesh where shader data begins */
+	md3_int32 TexCoordOffset = 0; /* offset from beginning of mesh where texture coordinates begin */
+	md3_int32 VertexOffset = 0; /* offset form beginning of mesh where vertex objects starts */
+	md3_int32 MeshDataSize = 0; /* offset from beginning of mesh where mesh ends */
+};
 
-/* MD3 Shader */
-typedef struct tagMD3SHADER{
-	char szShaderName[MAX_QPATH]; /* Name of shader NULL-terminated */
-	LONG lShaderNum; /* Shade index number */
-}MD3SHADER, *LPMD3SHADER;
+struct md3Shader
+{
+	md3_char8 ShaderName[MAX_QPATH]; /* Name of shader NULL-terminated */
+	md3_int32 ShaderNum = 0; /* Shade index number */
+};
 
-/* MD3 Triangle */
-typedef struct tagMD3TRIANGLE{
-	LONG nIndexes[3]; /* References to vertex objects used to described a triangle in mesh */
-}MD3TRIANGLE, *LPMD3TRIANGLE;
+struct md3Triangle
+{
+	md3_int32 Indexes[3] = { }; /* References to vertex objects used to described a triangle in mesh */
+};
 
-/* MD3 Texture Coordinates */
-typedef struct tagMD3TEXCOORDS{
-	FLOAT tu;
-	FLOAT tv;
-}MD3TEXCOORDS, *LPMD3TEXCOORDS;
+struct md3TexCoords
+{
+	md3_real32 tu = 0.f;
+	md3_real32 tv = 0.f;
+};
 
-/* MD3 Vertex */
-typedef struct tagMD3VERTEX{
-	SHORT x; /* x-coordinate */
-	SHORT y; /* y-coordinate */
-	SHORT z; /* z-coordinate */
-	SHORT nNormal; /* Encoded normal vector */
-}MD3VERTEX, *LPMD3VERTEX;
+struct md3Vertex
+{
+	md3_int16 x = 0; /* x-coordinate */
+	md3_int16 y = 0; /* y-coordinate */
+	md3_int16 z = 0; /* z-coordinate */
+	md3_int16 Normal = 0; /* Encoded normal vector */
+};
 
-/* MD3 Mesh (dynamic size) */
-typedef struct tagMD3MESH{
-	MD3MESHHEADER md3MeshHeader; /* The Mesh Header */
-	MD3SHADER * md3Shader; /* Shader list */
-	MD3TRIANGLE * md3Triangle; /* Triangle list */
-	MD3TEXCOORDS * md3TexCoords; /* Texture coordinate list */
-	MD3VERTEX * md3Vertex; /* Vertex list */
-}MD3MESH, *LPMD3MESH;
+// Dynamic Size Mesh
+struct md3Mesh
+{
+	md3MeshHeader MeshHeader; /* The Mesh Header */
+	md3Shader* Shaders = nullptr; /* Shader list */
+	md3Triangle* Triangles = nullptr; /* Triangle list */
+	md3TexCoords* TexCoords = nullptr; /* Texture coordinate list */
+	md3Vertex* Vertexes = nullptr; /* Vertex list */
+};
 
-/* MD3MESH2 is fixed in size. */
-typedef struct tagMD3MESH2{
-	MD3MESHHEADER md3MeshHeader;
-	MD3SHADER md3Shader[MD3_MAX_SHADERS];
-	MD3TRIANGLE md3Triangle[MD3_MAX_TRIANGLES];
-	MD3TEXCOORDS md3TexCoords[MD3_MAX_VERTS];
-	MD3VERTEX md3Vertex[MD3_MAX_VERTS];
-}MD3MESH2, *LPMD3MESH2;
+// Dynamic Size File
+struct md3File
+{
+	md3Header Header; /* File Header */
+	md3Frame* Frames = nullptr; /* List of md3 frames */
+	md3Tag* Tags = nullptr; /* List of md3 tag data */
+	md3Mesh* Meshes = nullptr; /* List of md3 meshes */
+};
 
-/* MD3 File (dynamic size) */
-typedef struct tagMD3FILE{
-	MD3HEADER md3Header; /* File Header */
-	MD3FRAME * md3Frame; /* List of md3 frames */
-	MD3TAG * md3Tag; /* List of md3 tag data */
-	MD3MESH * md3Mesh; /* List of md3 meshes */
-}MD3FILE, *LPMD3FILE;
+// Fixed Size Mesh (Unused)
+struct md3Mesh2
+{
+	md3MeshHeader MeshHeader;
+	md3Shader Shaders[MD3_MAX_SHADERS];
+	md3Triangle Triangles[MD3_MAX_TRIANGLES];
+	md3TexCoords TexCoords[MD3_MAX_VERTS];
+	md3Vertex Vertexes[MD3_MAX_VERTS];
+};
 
-/* MD3FILE2 is a fixed size structure for md3's. */
-typedef struct tagMD3FILE2{
-	MD3HEADER md3Header;
-	MD3FRAME md3Frame[MD3_MAX_FRAMES];
-	MD3TAG md3Tag[MD3_MAX_TAGS];
-	MD3MESH md3Mesh[MD3_MAX_SURFACES];
-}MD3FILE2, *LPMD3FILE2;
+// Fixed Size File (Unused)
+struct md3File2
+{
+	md3Header Header;
+	md3Frame Frames[MD3_MAX_FRAMES];
+	md3Tag Tags[MD3_MAX_TAGS];
+	md3Mesh Meshes[MD3_MAX_SURFACES];
+};
 
 
 /* MD3 File reader functions for Windows */
+
+#include <windows.h>
 
 /*
 	ReadMD3File and ReadMD3Mesh are more advanced than
@@ -145,106 +149,14 @@ typedef struct tagMD3FILE2{
 */
 
 /* Read and Create an MD3 File in the MD3FILE structure. */
-BOOL ReadMD3File(
+md3_bool ReadMD3File(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped);
 
 /* Delete an MD3FILE that has been created. */
-BOOL DeleteMD3File(
+md3_bool DeleteMD3File(
 	LPVOID lpFile);
 
-/* Read and Create an MD3 Mesh (AKA MD3 Surface) in the MD3MESH structure. */
-BOOL ReadMD3Mesh(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Delete an MD3MESH that has been created. */
-BOOL DeleteMD3Mesh(
-	LPVOID lpMesh);
-
-/* Finds the offset in the file in which the MD3 file begins. */
-LONG FindMD3Header(
-	HANDLE hFile,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3FRAME structure. */
-BOOL ReadMD3Frame(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3HEADER structure. */
-BOOL ReadMD3Header(
-	HANDLE hFile, 
-	LPVOID lpBuffer, 
-	LPDWORD lpNumBytesRead, 
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3MESHHEADER structure. */
-BOOL ReadMD3MeshHeader(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3SHADER structure. */
-BOOL ReadMD3Shader(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3TAG structure. */
-BOOL ReadMD3Tag(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3TEXCOORD structure. */
-BOOL ReadMD3TexCoords(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3TRIANGLE structure. */
-BOOL ReadMD3Triangle(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3VECTOR structure. */
-BOOL ReadMD3Vector(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Read data from a file into MD3VERTEX structure. */
-BOOL ReadMD3Vertex(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex);
-
-/*
-	Generic MD3 Functions.
-*/
-/* Dumps copy of MD3 data to a file. */
-#define MD3DUMP_BONEFRAME    0x00000001l
-#define MD3DUMP_TAG          0x00000002l
-#define MD3DUMP_MESH         0x00000004l
-#define MD3DUMP_MESHSHADER   0x00000008l
-#define MD3DUMP_MESHTRI      0x00000010l
-#define MD3DUMP_MESHTEXCOORD 0x00000020l
-#define MD3DUMP_MESHVERTEX   0x00000040l
-#define MD3DUMP_ALL          0xFFFFFFFFl
+md3Vector DecodeNormalVector(const md3Vertex& Vertex);

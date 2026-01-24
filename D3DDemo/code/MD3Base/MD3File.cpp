@@ -8,17 +8,97 @@
 #include "MD3.h"
 #include "MD3File.h"
 
-BOOL ReadMD3File(
+
+/* Read and Create an MD3 Mesh (AKA MD3 Surface) in the MD3MESH structure. */
+static md3_bool ReadMD3Mesh(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Delete an MD3MESH that has been created. */
+static md3_bool DeleteMD3Mesh(
+	LPVOID lpMesh);
+
+/* Finds the offset in the file in which the MD3 file begins. */
+static md3_int32 FindMD3Header(
+	HANDLE hFile,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3FRAME structure. */
+static md3_bool ReadMD3Frame(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3HEADER structure. */
+static md3_bool ReadMD3Header(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3MESHHEADER structure. */
+static md3_bool ReadMD3MeshHeader(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3SHADER structure. */
+static md3_bool ReadMD3Shader(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3TAG structure. */
+static md3_bool ReadMD3Tag(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3TEXCOORD structure. */
+static md3_bool ReadMD3TexCoords(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3TRIANGLE structure. */
+static md3_bool ReadMD3Triangle(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3VECTOR structure. */
+static md3_bool ReadMD3Vector(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+/* Read data from a file into MD3VERTEX structure. */
+static md3_bool ReadMD3Vertex(
+	HANDLE hFile,
+	LPVOID lpBuffer,
+	LPDWORD lpNumBytesRead,
+	LPOVERLAPPED lpOverlapped);
+
+md3_bool ReadMD3File(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	LONG lHeaderOffset=0;
-	BOOL bSuccess=FALSE;
+	md3_int32 lHeaderOffset=0;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	LPMD3FILE lpFile=NULL;
-	LONG i=0;
+	md3File* lpFile=NULL;
+	md3_int32 i=0;
 
 	*lpNumBytesRead=0;
 	
@@ -30,12 +110,12 @@ BOOL ReadMD3File(
 
 	if(FAILED(GetLastError()))return FALSE;
 
-	lpFile=(LPMD3FILE)lpBuffer;
+	lpFile=(md3File*)lpBuffer;
 
 	/* Begin by reading the MD3 File Header. */
 	bSuccess=ReadMD3Header(
 		hFile,
-		&(lpFile->md3Header),
+		&(lpFile->Header),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -44,37 +124,37 @@ BOOL ReadMD3File(
 
 	/* We have the header so lets make sure the information is correct. */
 
-	if( ( lpFile->md3Header.dwID != MD3_ID) )return FALSE;
-	if( ( lpFile->md3Header.lVersion != MD3_VERSION) )return FALSE;
+	if( ( lpFile->Header.ID != MD3_ID) )return FALSE;
+	if( ( lpFile->Header.Version != MD3_VERSION) )return FALSE;
 
 
 	/* Initialize and read frame data. */
-	lpFile->md3Frame=reinterpret_cast<MD3FRAME*>(malloc(lpFile->md3Header.lNumFrames * sizeof(MD3FRAME)));
-	if(lpFile->md3Frame == NULL)return FALSE;
+	lpFile->Frames=reinterpret_cast<md3Frame*>(malloc(lpFile->Header.NumFrames * sizeof(md3Frame)));
+	if(lpFile->Frames == NULL)return FALSE;
 
 	/* Set file pointer to appropriate location, then read the data. */
-	SetFilePointer(hFile, lpFile->md3Header.lFrameOffset+lHeaderOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpFile->md3Header.lNumFrames; i++){
-		if(!ReadMD3Frame(hFile, &(lpFile->md3Frame[i]), &dwBytesRead, lpOverlapped)){
-			SAFE_FREE(lpFile->md3Frame);
+	SetFilePointer(hFile, lpFile->Header.FrameOffset+lHeaderOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpFile->Header.NumFrames; i++){
+		if(!ReadMD3Frame(hFile, &(lpFile->Frames[i]), &dwBytesRead, lpOverlapped)){
+			SAFE_FREE(lpFile->Frames);
 			return FALSE;
 		}
 		*lpNumBytesRead+=dwBytesRead;
 	}
 
 	/* Initialzie and read tag data. */
-	lpFile->md3Tag=reinterpret_cast<MD3TAG*>(malloc(lpFile->md3Header.lNumTags * lpFile->md3Header.lNumFrames * sizeof(MD3TAG) ));
-	if(lpFile->md3Tag == NULL){
-		SAFE_FREE(lpFile->md3Frame);
+	lpFile->Tags=reinterpret_cast<md3Tag*>(malloc(lpFile->Header.NumTags * lpFile->Header.NumFrames * sizeof(md3Tag) ));
+	if(lpFile->Tags == NULL){
+		SAFE_FREE(lpFile->Frames);
 		return FALSE;
 	}
 
 	/* Set file pointer to appropriate location. */
-	SetFilePointer(hFile, lpFile->md3Header.lTagOffset + lHeaderOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpFile->md3Header.lNumTags * lpFile->md3Header.lNumFrames; i++){
-		if(!ReadMD3Tag(hFile, &(lpFile->md3Tag[i]), &dwBytesRead, lpOverlapped)){
-			SAFE_FREE(lpFile->md3Frame);
-			SAFE_FREE(lpFile->md3Tag);
+	SetFilePointer(hFile, lpFile->Header.TagOffset + lHeaderOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpFile->Header.NumTags * lpFile->Header.NumFrames; i++){
+		if(!ReadMD3Tag(hFile, &(lpFile->Tags[i]), &dwBytesRead, lpOverlapped)){
+			SAFE_FREE(lpFile->Frames);
+			SAFE_FREE(lpFile->Tags);
 			return FALSE;
 		}
 		*lpNumBytesRead+=dwBytesRead;
@@ -83,24 +163,24 @@ BOOL ReadMD3File(
 	/* Next up Meshes need to be read. */
 
 	/* Allocate memory for meshes. */
-	lpFile->md3Mesh=reinterpret_cast<MD3MESH*>(malloc(lpFile->md3Header.lNumMeshes * sizeof(MD3MESH)));
-	if(lpFile->md3Mesh == NULL){
-		SAFE_FREE(lpFile->md3Frame);
-		SAFE_FREE(lpFile->md3Tag);
+	lpFile->Meshes=reinterpret_cast<md3Mesh*>(malloc(lpFile->Header.NumMeshes * sizeof(md3Mesh)));
+	if(lpFile->Meshes == NULL){
+		SAFE_FREE(lpFile->Frames);
+		SAFE_FREE(lpFile->Tags);
 		return FALSE;
 	}
 
 	/* Set file pointer to appropriate position, then read the meshes. */
-	SetFilePointer(hFile, lpFile->md3Header.lMeshOffset + lHeaderOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpFile->md3Header.lNumMeshes; i++){
-		if(!ReadMD3Mesh(hFile, /*&md3Mesh*/&(lpFile->md3Mesh[i]), &dwBytesRead, lpOverlapped)){
-			SAFE_FREE(lpFile->md3Frame);
-			SAFE_FREE(lpFile->md3Tag);
+	SetFilePointer(hFile, lpFile->Header.MeshOffset + lHeaderOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpFile->Header.NumMeshes; i++){
+		if(!ReadMD3Mesh(hFile, /*&md3Mesh*/&(lpFile->Meshes[i]), &dwBytesRead, lpOverlapped)){
+			SAFE_FREE(lpFile->Frames);
+			SAFE_FREE(lpFile->Tags);
 			/* Here I need to release any meshes that were created. */
 			for(i= (i-1); i>=0; i--){
-				DeleteMD3Mesh(&(lpFile->md3Mesh[i]));
+				DeleteMD3Mesh(&(lpFile->Meshes[i]));
 			}
-			SAFE_FREE((lpFile->md3Mesh));
+			SAFE_FREE((lpFile->Meshes));
 			return FALSE;
 		}
 		//DeleteMD3Mesh(&md3Mesh);
@@ -110,137 +190,137 @@ BOOL ReadMD3File(
 	return TRUE;
 }
 
-BOOL DeleteMD3File(
+md3_bool DeleteMD3File(
 	LPVOID lpFile)
 {
-	LONG i=0;
-	LPMD3FILE lpMd3File = (LPMD3FILE)lpFile;
+	md3_int32 i=0;
+	md3File* lpMd3File = (md3File*)lpFile;
 	if(!lpFile)return FALSE;
 
 	/* Free frame and tag data. */
-	SAFE_FREE( ( ((LPMD3FILE)lpFile)->md3Frame ) );
-	SAFE_FREE( ( ((LPMD3FILE)lpFile)->md3Tag ) );
+	SAFE_FREE( lpMd3File->Frames );
+	SAFE_FREE( lpMd3File->Tags );
 	
 
 	/* Free each of the meshes. */
-	if( ((LPMD3FILE)lpFile)->md3Mesh){
-		for(i=0; i<((LPMD3FILE)lpFile)->md3Header.lNumMeshes; i++){
-			DeleteMD3Mesh( &( ((LPMD3FILE)lpFile)->md3Mesh[i] ) );
+	if(lpMd3File->Meshes){
+		for(i=0; i< lpMd3File->Header.NumMeshes; i++){
+			DeleteMD3Mesh( &lpMd3File->Meshes[i] );
 		}
 		/* Free the mesh array. */
-		SAFE_FREE( ( ((LPMD3FILE)lpFile)->md3Mesh ) );
+		SAFE_FREE(lpMd3File->Meshes );
 	}
 	return TRUE;
 }
 
-BOOL ReadMD3Mesh(
+static md3_bool ReadMD3Mesh(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	LONG lMeshOffset=0;
-	LONG i=0;
-	LPMD3MESH lpMesh=NULL;
-	BOOL bSuccess=FALSE;
+	md3_int32 lMeshOffset=0;
+	md3_int32 i=0;
+	md3Mesh* lpMesh=NULL;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
 	*lpNumBytesRead=dwBytesRead;
 
 	lMeshOffset=SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
-	lpMesh=(LPMD3MESH)lpBuffer;
+	lpMesh=(md3Mesh*)lpBuffer;
 
 	/* First read the mesh header. */
 	bSuccess=ReadMD3MeshHeader(
 		hFile,
-		&(lpMesh->md3MeshHeader),
+		&(lpMesh->MeshHeader),
 		&dwBytesRead, lpOverlapped);
 	if( (!bSuccess) || (dwBytesRead==0))return FALSE;
 	*lpNumBytesRead+=dwBytesRead;
-	if(lpMesh->md3MeshHeader.dwID != MD3_ID)return FALSE;
+	if(lpMesh->MeshHeader.ID != MD3_ID)return FALSE;
 
 	/* Prepare shader data. */
-	lpMesh->md3Shader=reinterpret_cast<MD3SHADER*>(malloc(lpMesh->md3MeshHeader.lNumShaders * sizeof(MD3SHADER)));
-	if(lpMesh->md3Shader == NULL)return FALSE;
+	lpMesh->Shaders=reinterpret_cast<md3Shader*>(malloc(lpMesh->MeshHeader.NumShaders * sizeof(md3Shader)));
+	if(lpMesh->Shaders == NULL)return FALSE;
 	/* Read shader. */
-	SetFilePointer(hFile, lMeshOffset+lpMesh->md3MeshHeader.lShaderOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpMesh->md3MeshHeader.lNumShaders; i++){
+	SetFilePointer(hFile, lMeshOffset+lpMesh->MeshHeader.ShaderOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpMesh->MeshHeader.NumShaders; i++){
 		bSuccess=ReadMD3Shader(
 			hFile,
-			&(lpMesh->md3Shader[i]),
+			&(lpMesh->Shaders[i]),
 			&dwBytesRead,
 			lpOverlapped);
 		if( (!bSuccess) || (dwBytesRead==0) ){
-			SAFE_FREE(lpMesh->md3Shader);
+			SAFE_FREE(lpMesh->Shaders);
 			return FALSE;
 		}
 		*lpNumBytesRead+=dwBytesRead;
 	}
 	/* Prepare triangle data. */
-	lpMesh->md3Triangle= reinterpret_cast<MD3TRIANGLE*>(malloc(lpMesh->md3MeshHeader.lNumTriangles * sizeof(MD3TRIANGLE)));
-	if(lpMesh->md3Triangle == NULL){
-		SAFE_FREE(lpMesh->md3Shader);
+	lpMesh->Triangles= reinterpret_cast<md3Triangle*>(malloc(lpMesh->MeshHeader.NumTriangles * sizeof(md3Triangle)));
+	if(lpMesh->Triangles == NULL){
+		SAFE_FREE(lpMesh->Shaders);
 		return FALSE;
 	}
 	/* Read shader. */
-	SetFilePointer(hFile, lMeshOffset+lpMesh->md3MeshHeader.lTriangleOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpMesh->md3MeshHeader.lNumTriangles; i++){
+	SetFilePointer(hFile, lMeshOffset+lpMesh->MeshHeader.TriangleOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpMesh->MeshHeader.NumTriangles; i++){
 		bSuccess=ReadMD3Triangle(
 			hFile,
-			&(lpMesh->md3Triangle[i]),
+			&(lpMesh->Triangles[i]),
 			&dwBytesRead,
 			lpOverlapped);
 		if( (!bSuccess) || (dwBytesRead==0)){
-			SAFE_FREE(lpMesh->md3Shader);
-			SAFE_FREE(lpMesh->md3Triangle);
+			SAFE_FREE(lpMesh->Shaders);
+			SAFE_FREE(lpMesh->Triangles);
 			return FALSE;
 		}
 
 		*lpNumBytesRead+=dwBytesRead;
 	}
 	/* Prepare Texture coordinates. */
-	lpMesh->md3TexCoords= reinterpret_cast<MD3TEXCOORDS*>(malloc(lpMesh->md3MeshHeader.lNumVertices * sizeof(MD3TEXCOORDS)));
-	if(lpMesh->md3TexCoords == NULL){
-		SAFE_FREE(lpMesh->md3Shader);
-		SAFE_FREE(lpMesh->md3Triangle);
+	lpMesh->TexCoords= reinterpret_cast<md3TexCoords*>(malloc(lpMesh->MeshHeader.NumVertices * sizeof(md3TexCoords)));
+	if(lpMesh->TexCoords == NULL){
+		SAFE_FREE(lpMesh->Shaders);
+		SAFE_FREE(lpMesh->Triangles);
 		return FALSE;
 	}
 	/* Read texture coordinates. */
-	SetFilePointer(hFile, lMeshOffset+lpMesh->md3MeshHeader.lTexCoordOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpMesh->md3MeshHeader.lNumVertices; i++){
+	SetFilePointer(hFile, lMeshOffset+lpMesh->MeshHeader.TexCoordOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpMesh->MeshHeader.NumVertices; i++){
 		bSuccess=ReadMD3TexCoords(
 			hFile,
-			&(lpMesh->md3TexCoords[i]),
+			&(lpMesh->TexCoords[i]),
 			&dwBytesRead,
 			lpOverlapped);
 		if( (!bSuccess) || (dwBytesRead==0) ){
-			SAFE_FREE(lpMesh->md3Shader);
-			SAFE_FREE(lpMesh->md3Triangle);
-			SAFE_FREE(lpMesh->md3TexCoords);
+			SAFE_FREE(lpMesh->Shaders);
+			SAFE_FREE(lpMesh->Triangles);
+			SAFE_FREE(lpMesh->TexCoords);
 			return FALSE;
 		}
 		*lpNumBytesRead+=dwBytesRead;
 	}
 	/* Prepare vertex data. */
-	lpMesh->md3Vertex= reinterpret_cast<MD3VERTEX*>(malloc(lpMesh->md3MeshHeader.lNumVertices * lpMesh->md3MeshHeader.lNumFrames * sizeof(MD3VERTEX)));
-	if(lpMesh->md3Vertex == NULL){
-		SAFE_FREE(lpMesh->md3Shader);
-		SAFE_FREE(lpMesh->md3Triangle);
-		SAFE_FREE(lpMesh->md3TexCoords);
+	lpMesh->Vertexes= reinterpret_cast<md3Vertex*>(malloc(lpMesh->MeshHeader.NumVertices * lpMesh->MeshHeader.NumFrames * sizeof(md3Vertex)));
+	if(lpMesh->Vertexes == NULL){
+		SAFE_FREE(lpMesh->Shaders);
+		SAFE_FREE(lpMesh->Triangles);
+		SAFE_FREE(lpMesh->TexCoords);
 		return FALSE;
 	}
 	/* Read vertex data. */
-	SetFilePointer(hFile, lMeshOffset+lpMesh->md3MeshHeader.lVertexOffset, 0, FILE_BEGIN);
-	for(i=0; i<lpMesh->md3MeshHeader.lNumVertices * lpMesh->md3MeshHeader.lNumFrames; i++){
+	SetFilePointer(hFile, lMeshOffset+lpMesh->MeshHeader.VertexOffset, 0, FILE_BEGIN);
+	for(i=0; i<lpMesh->MeshHeader.NumVertices * lpMesh->MeshHeader.NumFrames; i++){
 		bSuccess=ReadMD3Vertex(
 			hFile,
-			&(lpMesh->md3Vertex[i]),
+			&(lpMesh->Vertexes[i]),
 			&dwBytesRead,
 			lpOverlapped);
 		if( (!bSuccess) || (dwBytesRead==0) ){
-			SAFE_FREE(lpMesh->md3Shader);
-			SAFE_FREE(lpMesh->md3Triangle);
-			SAFE_FREE(lpMesh->md3TexCoords);
-			SAFE_FREE(lpMesh->md3Vertex);
+			SAFE_FREE(lpMesh->Shaders);
+			SAFE_FREE(lpMesh->Triangles);
+			SAFE_FREE(lpMesh->TexCoords);
+			SAFE_FREE(lpMesh->Vertexes);
 			return FALSE;
 		}
 
@@ -248,25 +328,25 @@ BOOL ReadMD3Mesh(
 	}
 
 	/* Set the file pointer to the end of this surface. */
-	SetFilePointer(hFile, lpMesh->md3MeshHeader.lMeshDataSize+lMeshOffset, 0, FILE_BEGIN);
+	SetFilePointer(hFile, lpMesh->MeshHeader.MeshDataSize+lMeshOffset, 0, FILE_BEGIN);
 
 	return TRUE;
 }
 
-BOOL DeleteMD3Mesh(
+static md3_bool DeleteMD3Mesh(
 	LPVOID lpMesh)
 {
 	if(lpMesh==NULL)return FALSE;
 	/* Free shader, vertex, texcoords, and triangle data. */
-	SAFE_FREE( ( ((LPMD3MESH)lpMesh)->md3Shader ) );
-	SAFE_FREE( ( ((LPMD3MESH)lpMesh)->md3Triangle ) );
-	SAFE_FREE( ( ((LPMD3MESH)lpMesh)->md3TexCoords ) );
-	SAFE_FREE( ( ((LPMD3MESH)lpMesh)->md3Vertex ) );
+	SAFE_FREE( ( ((md3Mesh*)lpMesh)->Shaders ) );
+	SAFE_FREE( ( ((md3Mesh*)lpMesh)->Triangles ) );
+	SAFE_FREE( ( ((md3Mesh*)lpMesh)->TexCoords ) );
+	SAFE_FREE( ( ((md3Mesh*)lpMesh)->Vertexes ) );
 
 	return TRUE;
 }
 
-LONG FindMD3Header(
+static md3_int32 FindMD3Header(
 	HANDLE hFile,
 	LPOVERLAPPED lpOverlapped)
 {
@@ -275,17 +355,17 @@ LONG FindMD3Header(
 	return 0;
 }
 
-BOOL ReadMD3Vertex(
+static md3_bool ReadMD3Vertex(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3VERTEX md3Vertex;
+	md3Vertex md3Vertex;
 
-	ZeroMemory(&md3Vertex, sizeof(MD3VERTEX));
+	ZeroMemory(&md3Vertex, sizeof(md3Vertex));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
@@ -293,7 +373,7 @@ BOOL ReadMD3Vertex(
 	bSuccess=ReadFile(
 		hFile,
 		&(md3Vertex.x),
-		sizeof(SHORT),
+		sizeof(md3_int16),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -303,7 +383,7 @@ BOOL ReadMD3Vertex(
 	bSuccess=ReadFile(
 		hFile,
 		&(md3Vertex.y),
-		sizeof(SHORT),
+		sizeof(md3_int16),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -313,7 +393,7 @@ BOOL ReadMD3Vertex(
 	bSuccess=ReadFile(
 		hFile,
 		&(md3Vertex.z),
-		sizeof(SHORT),
+		sizeof(md3_int16),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -322,30 +402,30 @@ BOOL ReadMD3Vertex(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Vertex.nNormal),
-		sizeof(SHORT),
+		&(md3Vertex.Normal),
+		sizeof(md3_int16),
 		&dwBytesRead,
 		lpOverlapped);
 
 	if( (!bSuccess) || (dwBytesRead==0) )return FALSE;
 	*lpNumBytesRead+=dwBytesRead;
 
-	memcpy(lpBuffer, &md3Vertex, sizeof(MD3VERTEX));
+	memcpy(lpBuffer, &md3Vertex, sizeof(md3Vertex));
 	return TRUE;
 }
 
 
-BOOL ReadMD3TexCoords(
+static md3_bool ReadMD3TexCoords(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3TEXCOORDS md3TexCoords;
+	md3TexCoords md3TexCoords;
 
-	ZeroMemory(&md3TexCoords, sizeof(MD3TEXCOORDS));
+	ZeroMemory(&md3TexCoords, sizeof(md3TexCoords));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
@@ -370,30 +450,30 @@ BOOL ReadMD3TexCoords(
 	if( (!bSuccess) || (dwBytesRead==0) )return FALSE;
 	*lpNumBytesRead+=dwBytesRead;
 
-	memcpy(lpBuffer, &md3TexCoords, sizeof(MD3TEXCOORDS));
+	memcpy(lpBuffer, &md3TexCoords, sizeof(md3TexCoords));
 	return TRUE;
 }
 
 
-BOOL ReadMD3Triangle(
+static md3_bool ReadMD3Triangle(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3TRIANGLE md3Triangle;
+	md3Triangle md3Triangle;
 
-	ZeroMemory(&md3Triangle, sizeof(MD3TRIANGLE));
+	ZeroMemory(&md3Triangle, sizeof(md3Triangle));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Triangle.nIndexes[0]),
-		sizeof(LONG),
+		&(md3Triangle.Indexes[0]),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -402,8 +482,8 @@ BOOL ReadMD3Triangle(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Triangle.nIndexes[1]),
-		sizeof(LONG),
+		&(md3Triangle.Indexes[1]),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -412,8 +492,8 @@ BOOL ReadMD3Triangle(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Triangle.nIndexes[2]),
-		sizeof(LONG),
+		&(md3Triangle.Indexes[2]),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -421,28 +501,28 @@ BOOL ReadMD3Triangle(
 	*lpNumBytesRead+=dwBytesRead;
 
 
-	memcpy(lpBuffer, &md3Triangle, sizeof(MD3TRIANGLE));
+	memcpy(lpBuffer, &md3Triangle, sizeof(md3Triangle));
 	return TRUE;
 }
 
-BOOL ReadMD3Shader(
+static md3_bool ReadMD3Shader(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3SHADER md3Shader;
+	md3Shader md3Shader;
 
-	ZeroMemory(&md3Shader, sizeof(MD3SHADER));
+	ZeroMemory(&md3Shader, sizeof(md3Shader));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Shader.szShaderName),
+		&(md3Shader.ShaderName),
 		MAX_QPATH,
 		&dwBytesRead,
 		lpOverlapped);
@@ -452,37 +532,37 @@ BOOL ReadMD3Shader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Shader.lShaderNum),
-		sizeof(LONG),
+		&(md3Shader.ShaderNum),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
 	if( (!bSuccess) || (dwBytesRead==0) )return FALSE;
 	*lpNumBytesRead+=dwBytesRead;
 
-	memcpy(lpBuffer, &md3Shader, sizeof(MD3SHADER));
+	memcpy(lpBuffer, &md3Shader, sizeof(md3Shader));
 	return TRUE;
 }
 
 
-BOOL ReadMD3MeshHeader(
+static md3_bool ReadMD3MeshHeader(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3MESHHEADER md3MeshHeader;
+	md3MeshHeader md3MeshHeader;
 
-	ZeroMemory(&md3MeshHeader, sizeof(MD3MESHHEADER));
+	ZeroMemory(&md3MeshHeader, sizeof(md3MeshHeader));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.dwID),
+		&(md3MeshHeader.ID),
 		sizeof(DWORD),
 		&dwBytesRead,
 		lpOverlapped);
@@ -492,7 +572,7 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.szMeshName),
+		&(md3MeshHeader.MeshName),
 		MAX_QPATH,
 		&dwBytesRead,
 		lpOverlapped);
@@ -502,8 +582,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lFlags),
-		sizeof(LONG),
+		&(md3MeshHeader.Flags),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -512,8 +592,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lNumFrames),
-		sizeof(LONG),
+		&(md3MeshHeader.NumFrames),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -522,8 +602,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lNumShaders),
-		sizeof(LONG),
+		&(md3MeshHeader.NumShaders),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -532,8 +612,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lNumVertices),
-		sizeof(LONG),
+		&(md3MeshHeader.NumVertices),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -542,8 +622,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lNumTriangles),
-		sizeof(LONG),
+		&(md3MeshHeader.NumTriangles),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -552,8 +632,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lTriangleOffset),
-		sizeof(LONG),
+		&(md3MeshHeader.TriangleOffset),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -562,8 +642,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lShaderOffset),
-		sizeof(LONG),
+		&(md3MeshHeader.ShaderOffset),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -572,8 +652,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lTexCoordOffset),
-		sizeof(LONG),
+		&(md3MeshHeader.TexCoordOffset),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -582,8 +662,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lVertexOffset),
-		sizeof(LONG),
+		&(md3MeshHeader.VertexOffset),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -592,8 +672,8 @@ BOOL ReadMD3MeshHeader(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3MeshHeader.lMeshDataSize),
-		sizeof(LONG),
+		&(md3MeshHeader.MeshDataSize),
+		sizeof(md3_int32),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -601,28 +681,28 @@ BOOL ReadMD3MeshHeader(
 	*lpNumBytesRead+=dwBytesRead;
 
 
-	memcpy(lpBuffer, &md3MeshHeader, sizeof(MD3MESHHEADER));
+	memcpy(lpBuffer, &md3MeshHeader, sizeof(md3MeshHeader));
 	return TRUE;
 }
 
-BOOL ReadMD3Tag(
+static md3_bool ReadMD3Tag(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3TAG md3Tag;
+	md3Tag md3Tag;
 
-	ZeroMemory(&md3Tag, sizeof(MD3TAG));
+	ZeroMemory(&md3Tag, sizeof(md3Tag));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Tag.szName),
+		&(md3Tag.Name),
 		MAX_QPATH,
 		&dwBytesRead,
 		lpOverlapped);
@@ -632,7 +712,7 @@ BOOL ReadMD3Tag(
 
 	bSuccess=ReadMD3Vector(
 		hFile,
-		&(md3Tag.vPosition),
+		&(md3Tag.Position),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -641,7 +721,7 @@ BOOL ReadMD3Tag(
 
 	bSuccess=ReadMD3Vector(
 		hFile,
-		&(md3Tag.vAxis[0]),
+		&(md3Tag.Axis[0]),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -650,7 +730,7 @@ BOOL ReadMD3Tag(
 
 	bSuccess=ReadMD3Vector(
 		hFile,
-		&(md3Tag.vAxis[1]),
+		&(md3Tag.Axis[1]),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -659,7 +739,7 @@ BOOL ReadMD3Tag(
 
 	bSuccess=ReadMD3Vector(
 		hFile,
-		&(md3Tag.vAxis[2]),
+		&(md3Tag.Axis[2]),
 		&dwBytesRead,
 		lpOverlapped);
 
@@ -667,29 +747,29 @@ BOOL ReadMD3Tag(
 	*lpNumBytesRead+=dwBytesRead;
 
 
-	memcpy(lpBuffer, &md3Tag, sizeof(MD3TAG));
+	memcpy(lpBuffer, &md3Tag, sizeof(md3Tag));
 	return TRUE;
 }
 
 
-BOOL ReadMD3Frame(
+static md3_bool ReadMD3Frame(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3FRAME md3Frame;
+	md3Frame md3Frame;
 
-	ZeroMemory(&md3Frame, sizeof(MD3FRAME));
+	ZeroMemory(&md3Frame, sizeof(md3Frame));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
 	
 	bSuccess=ReadMD3Vector(
 		hFile, 
-		&(md3Frame.vMin), 
+		&(md3Frame.Min), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -698,7 +778,7 @@ BOOL ReadMD3Frame(
 
 	bSuccess=ReadMD3Vector(
 		hFile, 
-		&(md3Frame.vMax), 
+		&(md3Frame.Max), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -707,7 +787,7 @@ BOOL ReadMD3Frame(
 
 	bSuccess=ReadMD3Vector(
 		hFile, 
-		&(md3Frame.vOrigin), 
+		&(md3Frame.Origin), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -716,7 +796,7 @@ BOOL ReadMD3Frame(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Frame.fRadius),
+		&(md3Frame.Radius),
 		sizeof(FLOAT),
 		&dwBytesRead,
 		lpOverlapped);
@@ -726,7 +806,7 @@ BOOL ReadMD3Frame(
 
 	bSuccess=ReadFile(
 		hFile,
-		&(md3Frame.szName),
+		&(md3Frame.Name),
 		16,
 		&dwBytesRead,
 		lpOverlapped);
@@ -735,21 +815,21 @@ BOOL ReadMD3Frame(
 	*lpNumBytesRead+=dwBytesRead;
 
 
-	memcpy(lpBuffer, &md3Frame, sizeof(MD3FRAME));
+	memcpy(lpBuffer, &md3Frame, sizeof(md3Frame));
 	return TRUE;
 }
 
-BOOL ReadMD3Vector(
+static md3_bool ReadMD3Vector(
 	HANDLE hFile,
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3VECTOR md3Vector;
+	md3Vector md3Vector;
 
-	ZeroMemory(&md3Vector, sizeof(MD3VECTOR));
+	ZeroMemory(&md3Vector, sizeof(md3Vector));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
@@ -783,29 +863,29 @@ BOOL ReadMD3Vector(
 
 	if( (!bSuccess) || (dwBytesRead==0))return FALSE;
 	*lpNumBytesRead+=dwBytesRead;
-	memcpy(lpBuffer, &md3Vector, sizeof(MD3VECTOR));
+	memcpy(lpBuffer, &md3Vector, sizeof(md3Vector));
 
 	return TRUE;
 }
 
-BOOL ReadMD3Header(
+static md3_bool ReadMD3Header(
 	HANDLE hFile, 
 	LPVOID lpBuffer, 
 	LPDWORD lpNumBytesRead, 
 	LPOVERLAPPED lpOverlapped)
 {
-	BOOL bSuccess=FALSE;
+	md3_bool bSuccess=FALSE;
 	DWORD dwBytesRead=0;
-	MD3HEADER md3Header;
+	md3Header Header;
 
-	ZeroMemory(&md3Header, sizeof(MD3HEADER));
+	ZeroMemory(&Header, sizeof(md3Header));
 	*lpNumBytesRead=0;
 
 	if(hFile==NULL)return FALSE;
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.dwID), 
+		&(Header.ID), 
 		sizeof(DWORD), 
 		&dwBytesRead, 
 		lpOverlapped);
@@ -815,8 +895,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lVersion), 
-		sizeof(LONG), 
+		&(Header.Version), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -825,7 +905,7 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.szFileName), 
+		&(Header.Filename), 
 		MAX_QPATH, 
 		&dwBytesRead, 
 		lpOverlapped);
@@ -835,8 +915,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lFlags), 
-		sizeof(LONG), 
+		&(Header.Flags), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -845,8 +925,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lNumFrames), 
-		sizeof(LONG), 
+		&(Header.NumFrames), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -855,8 +935,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lNumTags), 
-		sizeof(LONG), 
+		&(Header.NumTags), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -865,8 +945,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lNumMeshes), 
-		sizeof(LONG), 
+		&(Header.NumMeshes), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -875,8 +955,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lNumSkins), 
-		sizeof(LONG), 
+		&(Header.NumSkins), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -885,8 +965,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lFrameOffset), 
-		sizeof(LONG), 
+		&(Header.FrameOffset), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -895,8 +975,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lTagOffset), 
-		sizeof(LONG), 
+		&(Header.TagOffset), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -905,8 +985,8 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lMeshOffset), 
-		sizeof(LONG), 
+		&(Header.MeshOffset), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
@@ -915,36 +995,31 @@ BOOL ReadMD3Header(
 
 	bSuccess=ReadFile(
 		hFile, 
-		&(md3Header.lFileSize), 
-		sizeof(LONG), 
+		&(Header.FileSize), 
+		sizeof(md3_int32), 
 		&dwBytesRead, 
 		lpOverlapped);
 
 	if( (!bSuccess) || (dwBytesRead==0) )return FALSE;
 	*lpNumBytesRead+=dwBytesRead;
 
-	memcpy(lpBuffer, &md3Header, sizeof(MD3HEADER));
+	memcpy(lpBuffer, &Header, sizeof(md3Header));
 	return TRUE;
 }
 
-BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex)
+md3Vector DecodeNormalVector(const md3Vertex& Vertex)
 {
-	FLOAT lat = 0, lng = 0;
-	FLOAT x = 0, y = 0, z = 0;
+	md3Vector Out;
 
-	/* Get the latitude and longitude. */
-	lat = (lpVertex->nNormal & 0x00FF) * (2.0f * 3.141592654f) / 255.0f;
-	lng = ((lpVertex->nNormal & 0xFF00) >> 8) * (2.0f * 3.141592654f) / 255.0f;
-	/* Get the x, y, z values. */
-	x = (FLOAT)(std::cos(lat) * std::sin(lng));
-	y = (FLOAT)(std::sin(lat) * std::sin(lng));
-	z = (FLOAT)(std::cos(lng));
+	md3_real32 lat = 0, lng = 0;
 
-	/* Adjust the normal vector. */
-	/*
-	lpOut->x=x+(lpVertex->x*MD3_XYZ_SCALE);
-	lpOut->y=y+(lpVertex->y*MD3_XYZ_SCALE);
-	lpOut->z=z+(lpVertex->z*MD3_XYZ_SCALE);
-	*/
-	return TRUE;
+	// Get the latitude and longitude.
+	lat = (Vertex.Normal & 0x00FF) * (2.0f * 3.141592654f) / 255.0f;
+	lng = ((Vertex.Normal & 0xFF00) >> 8) * (2.0f * 3.141592654f) / 255.0f;
+	// Get the x, y, z values.
+	Out.x = static_cast<md3_real32>(std::cos(lat) * std::sin(lng));
+	Out.y = static_cast<md3_real32>(std::sin(lat) * std::sin(lng));
+	Out.z = static_cast<md3_real32>(std::cos(lng));
+
+	return Out;
 }
