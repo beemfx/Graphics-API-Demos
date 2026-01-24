@@ -27,30 +27,30 @@ struct md3Skin
 	std::string SkinPath;
 };
 
-/*
-	Animation definitions types and structures.
-*/
-typedef enum tagMD3SEX{
-	MD3SEX_MALE=0x00000000l,
-	MD3SEX_FEMALE,
-	MD3SEX_MACHINE,
-	MD3SEX_OTHER,
-	MD3SEX_DEFAULT
-}MD3SEX;
+enum class md3_anim_sex
+{
+	Default,
+	Male,
+	Female,
+	Machine,
+	Other,
+};
 
-typedef enum tagMD3FOOTSTEP{
-	MD3FOOTSTEP_BOOT=0x00000000l,
-	MD3FOOTSTEP_ENERGY,
-	MD3FOOTSTEP_OTHER,
-	MD3FOOTSTEP_DEFAULT
-}MD3FOOTSTEP;
+enum class md3_anim_footstep
+{
+	Default,
+	Boot,
+	Energy,
+	Other,
+};
 
-typedef struct tagMD3ANIMATION{
-	md3_int32 lFirstFrame;
-	md3_int32 lNumFrames;
-	md3_int32 lLoopingFrames;
-	md3_int32 lFramesPerSecond;
-}MD3ANIMATION;
+struct md3AnimationConfig
+{
+	md3_int32 lFirstFrame = 0;
+	md3_int32 lNumFrames = 0;
+	md3_int32 lLoopingFrames = 0;
+	md3_int32 lFramesPerSecond = 0;
+};
 
 /* Animation definitions. */
 #define BOTH_DEATH1   0
@@ -326,12 +326,12 @@ protected:
 class MD3BASE_EXPORTS CMD3Animation
 {
 protected:
-	MD3SEX m_nSex;
-	MD3FOOTSTEP m_nFootStep;
-	SHORT m_nHeadOffset[3];
-	LONG m_lLegOffset;
-	MD3ANIMATION m_Animations[MD3_NUM_ANIMS];
-	std::size_t m_CurReadAnim = 0;
+	md3_anim_sex m_Sex = md3_anim_sex::Default;
+	md3_anim_footstep m_Footstep = md3_anim_footstep::Default;
+	md3_int16 m_HeadOffset[3] = { };
+	md3_int32 m_LegOffset = 0;
+	md3AnimationConfig m_Animations[MD3_NUM_ANIMS] = { };
+	md3_uint32 m_NumAnims = 0;
 
 	void ReadAnimations(const std::vector<std::string>& Lines);
 	void ParseLine(const std::string& Line);
@@ -340,8 +340,8 @@ public:
 	CMD3Animation();
 	~CMD3Animation();
 
-	HRESULT LoadAnimation(const std::filesystem::path& Filename);
-	HRESULT GetAnimation(DWORD dwRef, MD3ANIMATION * lpAnimation, DWORD dwFlags);
+	md3_bool LoadAnimation(const std::filesystem::path& Filename);
+	md3AnimationConfig GetAnimation(md3_uint32 Ref, md3_uint32 Flags);
 };
 
 #endif /* __cplusplus */
@@ -395,7 +395,7 @@ public:
 	CMD3PlayerMesh();
 	~CMD3PlayerMesh();
 
-	HRESULT GetAnimation(DWORD dwAnimRef, MD3ANIMATION * lpAnimation);
+	HRESULT GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation);
 
 	HRESULT GetSkinRef(DWORD * lpRef, char szSkinName[]);
 
@@ -454,9 +454,9 @@ protected:
 	DWORD m_dwSkinRef; /* The current skin reference. */
 
 	DWORD m_dwUpperAnim; /* The reference for the torso animation. */
-	MD3ANIMATION m_AnimationUpper; /* The data for the torso animation. */
+	md3AnimationConfig m_AnimationUpper; /* The data for the torso animation. */
 	DWORD m_dwLowerAnim; /* The reference for the legs animation. */
-	MD3ANIMATION m_AnimationLower; /* The data for the legs animation. */
+	md3AnimationConfig m_AnimationLower; /* The data for the legs animation. */
 
 	CMD3WeaponMesh * m_lpWeapon;
 
@@ -485,7 +485,7 @@ protected:
 
 	__inline HRESULT FrameTransitionAdjust(
 		FRAMETRANSITIONTYPE * lpTransition,
-		MD3ANIMATION * lpAnimation,
+		md3AnimationConfig* lpAnimation,
 		LONG * lpFirstFrame,
 		LONG * lpSecondFrame,
 		FLOAT * lpTime,
@@ -505,7 +505,7 @@ protected:
 		FLOAT * lpTime,
 		DWORD dwTimeElapsed,
 		DWORD dwFrameTime,
-		const MD3ANIMATION Animation); /* Gets the correct frame and time data for animation. */
+		const md3AnimationConfig& Animation); /* Gets the correct frame and time data for animation. */
 
 	HRESULT ApplyAnimation(
 		DWORD dwAnimRef,

@@ -1,3 +1,5 @@
+// (c) Beem Media. All rights reserved.
+
 #define D3D_MD3
 #include "Functions.h"
 #include "MD3.h"
@@ -7,30 +9,17 @@
 #define PERR_NOLINE         0x80000001l
 #define PERR_ANIMOUTOFRANGE 0x80000002l
 
-////////////////////////////////
-// Constructor and Destructor //
-////////////////////////////////
-
 CMD3Animation::CMD3Animation()
 {
-	m_nHeadOffset[0] = m_nHeadOffset[1] = m_nHeadOffset[2] = 0;
-	m_nSex = MD3SEX_DEFAULT;
-	m_nFootStep = MD3FOOTSTEP_DEFAULT;
-	m_lLegOffset = 0;
-
-	ZeroMemory(m_Animations, sizeof(m_Animations));
+	
 }
 
 CMD3Animation::~CMD3Animation()
 {
-
+	
 }
 
-//////////////////////
-// Public Functions //
-//////////////////////
-
-HRESULT CMD3Animation::LoadAnimation(const std::filesystem::path& Filename)
+md3_bool CMD3Animation::LoadAnimation(const std::filesystem::path& Filename)
 {
 	CDataStream AnimDataStream(Filename);
 	const std::vector<std::string> AnimDataLines = Functions::ReadLines(AnimDataStream);
@@ -40,36 +29,43 @@ HRESULT CMD3Animation::LoadAnimation(const std::filesystem::path& Filename)
 	//Get the leg animation offset.
 	if (m_Animations[TORSO_GESTURE].lFirstFrame != m_Animations[LEGS_WALKCR].lFirstFrame)
 	{
-		m_lLegOffset = m_Animations[LEGS_WALKCR].lFirstFrame - m_Animations[TORSO_GESTURE].lFirstFrame;
+		m_LegOffset = m_Animations[LEGS_WALKCR].lFirstFrame - m_Animations[TORSO_GESTURE].lFirstFrame;
 	}
 	else
-		m_lLegOffset = 0;
+	{
+		m_LegOffset = 0;
+	}
 
-	return S_OK;
+	return m_NumAnims == MD3_NUM_ANIMS;
 }
 
-HRESULT CMD3Animation::GetAnimation(DWORD dwRef, MD3ANIMATION* lpAnimation, DWORD dwFlags)
+md3AnimationConfig CMD3Animation::GetAnimation(md3_uint32 Ref, md3_uint32 Flags)
 {
-	if (dwRef >= MD3_NUM_ANIMS)
-		return E_FAIL;
+	const bool bIsValidRef = 0 <= Ref && Ref < m_NumAnims;
 
-	lpAnimation->lFirstFrame = m_Animations[dwRef].lFirstFrame;
-	lpAnimation->lNumFrames = m_Animations[dwRef].lNumFrames;
-	lpAnimation->lLoopingFrames = m_Animations[dwRef].lLoopingFrames;
-	lpAnimation->lFramesPerSecond = m_Animations[dwRef].lFramesPerSecond;
+	if (!bIsValidRef)
+	{
+		return md3AnimationConfig();
+	}
+
+	md3AnimationConfig Out;
+	Out.lFirstFrame = m_Animations[Ref].lFirstFrame;
+	Out.lNumFrames = m_Animations[Ref].lNumFrames;
+	Out.lLoopingFrames = m_Animations[Ref].lLoopingFrames;
+	Out.lFramesPerSecond = m_Animations[Ref].lFramesPerSecond;
 
 	if (
-		(dwRef >= LEGS_WALKCR) &&
-		(dwRef <= LEGS_TURN) &&
-		((dwFlags & MD3ANIM_ADJUST) == MD3ANIM_ADJUST)
-		)
+		(Ref >= LEGS_WALKCR) &&
+		(Ref <= LEGS_TURN) &&
+		((Flags & MD3ANIM_ADJUST) == MD3ANIM_ADJUST)
+	)
 	{
 		//The animation legs offset should be adjusted.
-		lpAnimation->lFirstFrame -= m_lLegOffset;
+		Out.lFirstFrame -= m_LegOffset;
 
 	}
 
-	return S_OK;
+	return Out;
 }
 
 ///////////////////////
@@ -78,7 +74,7 @@ HRESULT CMD3Animation::GetAnimation(DWORD dwRef, MD3ANIMATION* lpAnimation, DWOR
 
 void CMD3Animation::ReadAnimations(const std::vector<std::string>& Lines)
 {
-	m_CurReadAnim = 0;
+	m_NumAnims = 0;
 
 	for (auto& Line : Lines)
 	{
@@ -126,15 +122,15 @@ void CMD3Animation::ParseLine(const std::string& Line)
 		const std::string SecondWord = Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart);
 		if (SecondWord == "m")
 		{
-			m_nSex = MD3SEX_MALE;
+			m_Sex = md3_anim_sex::Male;
 		}
 		else if (SecondWord == "f")
 		{
-			m_nSex = MD3SEX_FEMALE;
+			m_Sex = md3_anim_sex::Female;
 		}
 		else
 		{
-			m_nSex = MD3SEX_OTHER;
+			m_Sex = md3_anim_sex::Other;
 		}
 	}
 	else if (FirstWord == "headoffset")
@@ -143,7 +139,7 @@ void CMD3Animation::ParseLine(const std::string& Line)
 
 		for (std::size_t i = 0; i < 3; i++)
 		{
-			m_nHeadOffset[i] = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+			m_HeadOffset[i] = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
 		}
 	}
 	else if (FirstWord == "footsteps")
@@ -153,33 +149,33 @@ void CMD3Animation::ParseLine(const std::string& Line)
 
 		if (SecondWord == "boot")
 		{
-			m_nFootStep = MD3FOOTSTEP_BOOT;
+			m_Footstep = md3_anim_footstep::Boot;
 		}
 		else if (SecondWord == "energy")
 		{
-			m_nFootStep = MD3FOOTSTEP_ENERGY;
+			m_Footstep = md3_anim_footstep::Energy;
 		}
 		else
 		{
-			m_nFootStep = MD3FOOTSTEP_DEFAULT;
+			m_Footstep = md3_anim_footstep::Default;
 		}
 
 	}
 	else if (FirstWord.size() > 0)
 	{
 		//We assume it is an animation configuration.
-		assert( m_CurReadAnim < MD3_NUM_ANIMS);
-		if (m_CurReadAnim < MD3_NUM_ANIMS)
+		assert(m_NumAnims < MD3_NUM_ANIMS);
+		if (m_NumAnims < MD3_NUM_ANIMS)
 		{
 			//Set the first frame to the current word.
-			m_Animations[m_CurReadAnim].lFirstFrame = atoi(FirstWord.c_str());
+			m_Animations[m_NumAnims].lFirstFrame = atoi(FirstWord.c_str());
 
 			//Read the additional three words to get the rest of the info.
-			m_Animations[m_CurReadAnim].lNumFrames = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
-			m_Animations[m_CurReadAnim].lLoopingFrames = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
-			m_Animations[m_CurReadAnim].lFramesPerSecond = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+			m_Animations[m_NumAnims].lNumFrames = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+			m_Animations[m_NumAnims].lLoopingFrames = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+			m_Animations[m_NumAnims].lFramesPerSecond = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
 
-			m_CurReadAnim++;
+			m_NumAnims++;
 		}
 	}
 }

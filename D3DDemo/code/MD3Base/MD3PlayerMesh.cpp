@@ -41,9 +41,13 @@ HRESULT CMD3PlayerMesh::GetSkinRef(DWORD * lpRef, char szSkinName[])
 	return E_FAIL;
 }
 
-HRESULT CMD3PlayerMesh::GetAnimation(DWORD dwAnimRef, MD3ANIMATION * lpAnimation)
+HRESULT CMD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation)
 {
-	return m_Animation.GetAnimation(dwAnimRef, lpAnimation, MD3ANIM_ADJUST);
+	if (lpAnimation)
+	{
+		*lpAnimation = m_Animation.GetAnimation(dwAnimRef, MD3ANIM_ADJUST);
+	}
+	return S_OK;
 }
 
 HRESULT CMD3PlayerMesh::GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef)
@@ -186,11 +190,10 @@ HRESULT CMD3PlayerMesh::Render(
 
 		//Find out if the weapon should perform the flash.
 		LONG lShoot=0, lGauntlet=0;
-		MD3ANIMATION Animation;
-		m_Animation.GetAnimation(TORSO_ATTACK, &Animation, MD3ANIM_ADJUST);
-		lShoot=Animation.lFirstFrame;
-		m_Animation.GetAnimation(TORSO_ATTACK2, &Animation, MD3ANIM_ADJUST);
-		lGauntlet=Animation.lFirstFrame;
+		md3AnimationConfig TorsoAttackAnim = m_Animation.GetAnimation(TORSO_ATTACK, MD3ANIM_ADJUST);
+		lShoot= TorsoAttackAnim.lFirstFrame;
+		md3AnimationConfig TorsoMeleeAnim = m_Animation.GetAnimation(TORSO_ATTACK2, MD3ANIM_ADJUST);
+		lGauntlet= TorsoMeleeAnim.lFirstFrame;
 
 		if(lUpperSecondFrame==(lShoot+1) || lUpperSecondFrame==(lGauntlet+2) || lUpperSecondFrame==(lGauntlet+3))
 			lpWeapon->Render(TRUE, WorldMatrix);
@@ -471,8 +474,8 @@ HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAI
 	//Attempt to load the animation.
 	strcpy(szAnimation, szDirectory);
 	strcat(szAnimation, "animation.cfg");
-	hr=m_Animation.LoadAnimation(szAnimation);
-	if(FAILED(hr)){
+	if (!m_Animation.LoadAnimation(szAnimation))
+	{
 		m_meshHead.ClearMD3();
 		m_meshUpper.ClearMD3();
 		m_meshLower.ClearMD3();

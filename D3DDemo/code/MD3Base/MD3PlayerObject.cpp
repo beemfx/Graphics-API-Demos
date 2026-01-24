@@ -37,8 +37,8 @@ CMD3PlayerObject::CMD3PlayerObject()
 	m_dwLastCycleTimeLower=timeGetTime();
 	m_dwLastCycleTimeUpper=timeGetTime();
 
-	ZeroMemory(&m_AnimationLower, sizeof(MD3ANIMATION));
-	ZeroMemory(&m_AnimationUpper, sizeof(MD3ANIMATION));
+	m_AnimationLower = { };
+	m_AnimationUpper = { };
 }
 
 CMD3PlayerObject::~CMD3PlayerObject()
@@ -221,7 +221,7 @@ HRESULT CMD3PlayerObject::GetFrames(
 	FLOAT * lpTime,
 	DWORD dwTimeElapsed,
 	DWORD dwFrameTime,
-	const MD3ANIMATION Animation)
+	const md3AnimationConfig& Animation)
 {
 	//We get the first frame by dividing the
 	//elapsed time by the frames per second.
@@ -254,7 +254,7 @@ HRESULT CMD3PlayerObject::GetFrames(
 
 __inline HRESULT CMD3PlayerObject::FrameTransitionAdjust(
 	FRAMETRANSITIONTYPE * lpTransition,
-	MD3ANIMATION * lpAnimation,
+	md3AnimationConfig * lpAnimation,
 	LONG * lpFirstFrame,
 	LONG * lpSecondFrame,
 	FLOAT * lpTime,
