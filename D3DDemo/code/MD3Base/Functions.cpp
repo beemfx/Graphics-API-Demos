@@ -1,4 +1,7 @@
+// (c) Beem Media. All rights reserved.
+
 #include "Functions.h"
+#include "FileSystem/DataStream.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -183,4 +186,78 @@ HRESULT ReadWordFromLine(LPSTR szLineOut, LPSTR szLine, DWORD dwStart, DWORD * d
 		*dwEnd=(DWORD)(dwStart+j+1);
 
 	return S_OK;
+}
+
+std::vector<std::string> Functions::ReadLines(CDataStream& In)
+{
+	std::vector<std::string> Out;
+
+	std::vector<md3_char8> CurWord;
+
+	while (!In.IsEOF())
+	{
+		const md3_char8 c = In.Read<md3_char8>();
+		if (c == '\n')
+		{
+			CurWord.push_back('\0');
+			Out.push_back(CurWord.data());
+			CurWord.resize(0);
+		}
+		else if (c == '\r')
+		{
+			// Ignore return carriage.
+		}
+		else
+		{
+			CurWord.push_back(c);
+		}
+	}
+
+	if (CurWord.size() > 0)
+	{
+		CurWord.push_back('\0');
+		Out.push_back(CurWord.data());
+		CurWord.resize(0);
+	}
+
+	return Out;
+}
+
+std::string Functions::ReadWordFromLine(const std::string& Line, md3_int32 Start, md3_int32* End)
+{
+	std::string Out;
+	std::size_t dwLen = 0;
+	std::size_t j = 0;
+
+	md3_bool bReadChar = false;
+
+	const std::size_t StrLen = Line.size();
+
+	for (std::size_t i = Start, j = 0; i < dwLen; i++, j++)
+	{
+		if (Line[i] == ' ' && bReadChar)
+		{
+			break;
+		}
+		Out.append( { Line[i] , '\0' } );
+
+		if (Line[i] == ' ' || Line[i] == '\t')
+			j--;
+		else
+			bReadChar = true;
+	}
+
+	if (End)
+	{
+		*End = static_cast<md3_int32>(Start + j + 1);
+	}
+
+	return Out;
+}
+
+std::string Functions::RemoveDirectoryFromString(const std::string& In)
+{
+	const std::filesystem::path Path = In;
+
+	return Path.filename().string();
 }

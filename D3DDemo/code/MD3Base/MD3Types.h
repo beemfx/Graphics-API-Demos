@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <string>
 #include <vector>
 
 using md3_bool = bool;

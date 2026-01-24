@@ -53,7 +53,7 @@
     <ClCompile Include="code\GFX3D9\Vertex.cpp">
       <Filter>code\GFX3D9</Filter>
     </ClCompile>
-    <ClCompile Include="code\MD3Base\Functions.c">
+    <ClCompile Include="code\MD3Base\Functions.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
     <ClCompile Include="code\MD3Base\MD3Animation.cpp">

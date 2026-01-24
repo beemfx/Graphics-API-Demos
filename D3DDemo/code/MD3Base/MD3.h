@@ -21,13 +21,11 @@ extern "C" {
 #include "MD3TexDB.h"
 #endif /* D3D_MD3 */
 
-/* 
-	Skin file structures.
-*/
-typedef struct tagMD3SKIN{
-	char szMeshName[MAX_QPATH];
-	char szSkinPath[260];
-}MD3SKIN, *LPMD3SKIN;
+struct md3Skin
+{
+	std::string MeshName;
+	std::string SkinPath;
+};
 
 /*
 	Animation definitions types and structures.
@@ -235,17 +233,17 @@ public:
 
 	HRESULT GetNumTextures(DWORD * dwNumTex);
 
-	HRESULT AddTexture(LPDIRECT3DDEVICE9 lpDevice, char szTexName[]);
-	HRESULT AddTexture(LPDIRECT3DTEXTURE9 lpTexture, char szTexName[]);
+	HRESULT AddTexture(LPDIRECT3DDEVICE9 lpDevice, const md3_char8* szTexName);
+	HRESULT AddTexture(LPDIRECT3DTEXTURE9 lpTexture, const md3_char8* szTexName);
 	
 	HRESULT GetTexture(DWORD dwRef, LPDIRECT3DTEXTURE9 * lppTexture);
-	HRESULT GetTexture(char szTexName[], LPDIRECT3DTEXTURE9 * lppTexture);
+	HRESULT GetTexture(const md3_char8* szTexName, LPDIRECT3DTEXTURE9 * lppTexture);
 	
 	HRESULT SetRenderTexture(DWORD dwRef, DWORD dwStage, LPDIRECT3DDEVICE9 lpDevice);
-	HRESULT SetRenderTexture(LPSTR szTexName, DWORD dwStage, LPDIRECT3DDEVICE9 lpDevice);
+	HRESULT SetRenderTexture(const md3_char8* szTexName, DWORD dwStage, LPDIRECT3DDEVICE9 lpDevice);
 	
 	HRESULT DeleteTexture(DWORD dwRef);
-	HRESULT DeleteTexture(LPSTR szTexName);
+	HRESULT DeleteTexture(const md3_char8* szTexName);
 
 	HRESULT ClearDB();
 };
@@ -256,12 +254,6 @@ public:
 	The MD3 Skin file functionality.
 */
 #ifdef __cplusplus
-
-#ifdef UNICODE
-#define LoadSkin LoadSkinW
-#else /* UNICODE */
-#define LoadSkin LoadSkinA
-#endif /* UNICODE */
 
 #define MD3SKINCREATE_REMOVEDIR    0x00000001l
 #define MD3SKINCREATE_STATICTEXDB  0x00000002l
@@ -275,15 +267,9 @@ public:
 	CMD3SkinFile();
 	~CMD3SkinFile();
 
-	HRESULT LoadSkinA(
+	HRESULT LoadSkin(
 		LPDIRECT3DDEVICE9 lpDevice,
-		char szFilename[MAX_PATH],
-		DWORD dwFlags,
-		LPVOID lpTexDB);
-
-	HRESULT LoadSkinW(
-		LPDIRECT3DDEVICE9 lpDevice,
-		WCHAR szFilename[MAX_PATH],
+		const std::filesystem::path& Filename,
 		DWORD dwFlags,
 		LPVOID lpTexDB);
 
@@ -295,39 +281,35 @@ public:
 		DWORD dwRef, 
 		LPDIRECT3DDEVICE9 lpDevice);
 
-	HRESULT UnloadSkin();
+	void UnloadSkin();
 
 	HRESULT SetSkin(
 		LPDIRECT3DDEVICE9 lpDevice, 
 		DWORD dwRef);
 
-	HRESULT SetSkinRef(
-		char szName[], 
-		DWORD dwRef);
+	void SetSkinRef(const char* Name, md3_uint32 Ref);
 
-	static HRESULT ClearTexDB();
+	static void ClearTexDB();
 protected:
-	HRESULT CreateSkinFile(DWORD dwNumSkins);
-	HRESULT DeleteSkinFile();
+	void CreateSkinFile(md3_uint32 NumSkins);
+	void DeleteSkinFile();
 
-	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, char szTexPath[], DWORD dwFlags, LPVOID lpTexDB);
+	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, DWORD dwFlags, LPVOID lpTexDB);
 	
-	HRESULT ReadSkins(HANDLE hFile, DWORD dwNumSkinsToRead, DWORD * dwNumSkinsRead, DWORD dwFlags);
-
-	BOOL ParseLine(MD3SKIN *, LPSTR);
+	void ReadSkins(const std::vector<std::string>& SkinLines);
+	void ParseLine(md3Skin& Out, const std::string& Line);
 
 	/* Member variables. */
 
-	MD3SKIN * m_lpSkins; /* The MD3 skins. */
-	DWORD * m_lpSkinRef; /* Which skin is which reference. */
-	BOOL m_bRefsSet; /* Whether or not references are set. */
-	DWORD m_dwNumSkins; /* Number of skins in this file. */
-	BOOL m_bLoaded; /* Whether or not a skin file is loaded. */
+	std::vector<md3Skin> m_Skins; /* The MD3 skins. */
+	std::vector<md3_uint32> m_SkinRef; /* Which skin is which reference. */
+	md3_bool m_bRefsSet = false; /* Whether or not references are set. */
+	md3_uint32 m_NumSkins = 0; /* Number of skins in this file. */
+	md3_bool m_bLoaded = false; /* Whether or not a skin file is loaded. */
 
-	BOOL m_bUseStaticDB; /* Whether or not to use static texture DB. */
+	md3_bool m_bUseStaticDB = true; /* Whether or not to use static texture DB. */
 	static CMD3TextureDB m_md3TexDB; /* The MD3 skin texture database. */
-
-	LPDIRECT3DTEXTURE9 * m_lppTextures; /* Pointers to the textures used by this file. */
+	std::vector<IDirect3DTexture9*> m_Textures; /* Pointers to the textures used by this file. */
 };
 
 #endif /* __cplusplus */

@@ -220,7 +220,7 @@
     <ClCompile Include="code\GFX3D9\D3DInit.c" />
     <ClCompile Include="code\GFX3D9\Vertex.cpp" />
     <ClCompile Include="code\Main.cpp" />
-    <ClCompile Include="code\MD3Base\Functions.c" />
+    <ClCompile Include="code\MD3Base\Functions.cpp" />
     <ClCompile Include="code\MD3Base\MD3Animation.cpp" />
     <ClCompile Include="code\MD3Base\MD3Data.cpp" />
     <ClCompile Include="code\MD3Base\MD3File.cpp" />

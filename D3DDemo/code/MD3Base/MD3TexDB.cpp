@@ -91,7 +91,7 @@ HRESULT CMD3TextureDB::GetNumTextures(DWORD * dwNumTex)
 }
 
 //Adds a texture from a filename, uses filename as texture name.
-HRESULT CMD3TextureDB::AddTexture(LPDIRECT3DDEVICE9 lpDevice, char szTexName[MAX_PATH])
+HRESULT CMD3TextureDB::AddTexture(LPDIRECT3DDEVICE9 lpDevice, const md3_char8* szTexName)
 {
 	CMD3Texture * lpCurrent=NULL;
 	CMD3Texture * lpNext=NULL;
@@ -107,7 +107,7 @@ HRESULT CMD3TextureDB::AddTexture(LPDIRECT3DDEVICE9 lpDevice, char szTexName[MAX
 
 	//Reomving the path directory from the filename gives a good
 	//texture name.
-	RemoveDirectoryFromString(szName, szTexName);
+	RemoveDirectoryFromStringA(szName, szTexName);
 
 	//If the texture already exists we silently return.
 	if(SUCCEEDED(GetTexture(szName, &lpTexture))){
@@ -203,7 +203,7 @@ HRESULT CMD3TextureDB::AddTexture(LPDIRECT3DDEVICE9 lpDevice, char szTexName[MAX
 	Release() will need to be called on any textures passed to this
 	function before the program terminates.
 */
-HRESULT CMD3TextureDB::AddTexture(LPDIRECT3DTEXTURE9 lpTexture, char szTexName[])
+HRESULT CMD3TextureDB::AddTexture(LPDIRECT3DTEXTURE9 lpTexture, const md3_char8* szTexName)
 {
 	//Se previous method for information on how this works.
 	CMD3Texture * lpCurrent=NULL;
@@ -287,7 +287,7 @@ HRESULT CMD3TextureDB::GetTexture(
 
 //Get a texture from it's name.
 HRESULT CMD3TextureDB::GetTexture(
-	char szTexName[], 
+	const md3_char8* szTexName,
 	LPDIRECT3DTEXTURE9 * lppTexture)
 {
 	CMD3Texture * lpCurrent=NULL;
@@ -342,7 +342,7 @@ HRESULT CMD3TextureDB::SetRenderTexture(
 
 //Sets the current render texture based on name.
 HRESULT CMD3TextureDB::SetRenderTexture(
-	LPSTR szTexName,
+	const md3_char8* szTexName,
 	DWORD dwStage, 
 	LPDIRECT3DDEVICE9 lpDevice)
 {
@@ -413,7 +413,7 @@ HRESULT CMD3TextureDB::DeleteTexture(
 
 //Delete a texture from the database, based on teh textures name.
 HRESULT CMD3TextureDB::DeleteTexture(
-	LPSTR szTexName)
+	const md3_char8* szTexName)
 {
 	CMD3Texture * lpPrev=NULL;
 	CMD3Texture * lpCurrent=NULL;

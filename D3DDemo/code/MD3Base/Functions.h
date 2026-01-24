@@ -1,19 +1,11 @@
-#ifndef __FUNCTIONS_H__
-#define __FUNCTIONS_H__
+// (c) Beem Media. All rights reserved.
 
+#pragma once
+
+#include "MD3Types.h"
 #include <windows.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#ifdef UNICODE
-#define RemoveDirectoryFromString RemoveDirectoryFromStringW
-#define GetDirectoryFromString    GetDirectoryFromStringW
-#else /* UNICODE */
-#define RemoveDirectoryFromString RemoveDirectoryFromStringA
-#define GetDirectoryFromString    GetDirectoryFromStringA
-#endif /* UNICODE */
+class CDataStream;
 
 BOOL RemoveDirectoryFromStringA(char szLineOut[], const char szLineIn[]);
 BOOL RemoveDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[]);
@@ -32,10 +24,12 @@ BOOL GetDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[]);
 DWORD GetNumLinesInFile(HANDLE hFile);
 HRESULT ReadLine(HANDLE hFile, LPSTR szLine);
 
-HRESULT ReadWordFromLine(LPSTR szLineOut, LPSTR szLine, DWORD dwStart, DWORD * dwEnd);
+HRESULT ReadWordFromLine(LPSTR szLineOut, LPSTR szLine, DWORD dwStart, DWORD* dwEnd);
 
-#ifdef __cplusplus
+namespace Functions
+{
+	std::vector<std::string> ReadLines(CDataStream& In);
+	std::string ReadWordFromLine(const std::string& Line, md3_int32 Start, md3_int32* End);
+
+	std::string RemoveDirectoryFromString(const std::string& In);
 }
-#endif /* __cplusplus */
-
-#endif /* __FUNCTIONS_H__ */

@@ -33,10 +33,12 @@ public:
 	void Close();
 	std::size_t Read(void* pBuffer, std::size_t count);
 	std::size_t Read(ds_byte* pBuffer, std::size_t count);
+	template<typename T> T Read() { T Out; Read(&Out, sizeof(T)); return Out; }
 	std::size_t GetSize() const;
 	std::size_t Seek(signed long nDistance, MOVE_T nMethod);
 	std::size_t SeekFromStart(signed long Distance) { return Seek(Distance, MOVE_START); }
 	std::size_t SeekFromEnd(signed long Distance) { return Seek(Distance, MOVE_END); }
 	std::size_t SeekFromCurrent(signed long Distance) { return Seek(Distance, MOVE_CUR); }
 	std::size_t Tell() const;
+	bool IsEOF() const { return Tell() >= m_Data.size(); }
 };
