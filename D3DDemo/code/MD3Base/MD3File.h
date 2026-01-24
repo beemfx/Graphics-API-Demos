@@ -159,4 +159,4 @@ md3_bool ReadMD3File(
 md3_bool DeleteMD3File(
 	LPVOID lpFile);
 
-md3Vector DecodeNormalVector(const md3Vertex& Vertex);
+md3Vector MD3_DecodeNormalVector(const md3Vertex& Vertex);

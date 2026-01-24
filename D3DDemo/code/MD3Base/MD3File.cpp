@@ -1007,7 +1007,7 @@ static md3_bool ReadMD3Header(
 	return TRUE;
 }
 
-md3Vector DecodeNormalVector(const md3Vertex& Vertex)
+md3Vector MD3_DecodeNormalVector(const md3Vertex& Vertex)
 {
 	md3Vector Out;
 

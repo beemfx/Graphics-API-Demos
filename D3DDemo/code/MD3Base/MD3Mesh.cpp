@@ -748,7 +748,7 @@ HRESULT CMD3Mesh::CreateNormals()
 
 		for(j=0; j<(m_md3File.Meshes[i].MeshHeader.NumVertices*m_md3File.Meshes[i].MeshHeader.NumFrames); j++)
 		{
-			m_lppNormals[i][j] = DecodeNormalVector(m_md3File.Meshes[i].Vertexes[j]);
+			m_lppNormals[i][j] = MD3_DecodeNormalVector(m_md3File.Meshes[i].Vertexes[j]);
 		}
 	}
 	return S_OK;
