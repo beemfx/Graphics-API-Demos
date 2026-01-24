@@ -6,7 +6,7 @@
 #include "defines.h"
 #include "Library/Functions.h"
 
-CMD3WeaponMesh::CMD3WeaponMesh()
+CD3D_MD3WeaponMesh::CD3D_MD3WeaponMesh()
 {
 	m_lpFlashTex = NULL;
 	m_lpWeaponTex = NULL;
@@ -20,12 +20,12 @@ CMD3WeaponMesh::CMD3WeaponMesh()
 }
 
 
-CMD3WeaponMesh::~CMD3WeaponMesh()
+CD3D_MD3WeaponMesh::~CD3D_MD3WeaponMesh()
 {
 	Clear();
 }
 
-HRESULT CMD3WeaponMesh::Clear()
+HRESULT CD3D_MD3WeaponMesh::Clear()
 {
 	DWORD i = 0, j = 0;
 	LONG lNumMesh = 0;
@@ -74,7 +74,7 @@ HRESULT CMD3WeaponMesh::Clear()
 	return S_OK;
 }
 
-HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
+HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
 {
 	char szPath[MAX_PATH];
 	char szWeaponPath[MAX_PATH];
@@ -253,7 +253,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_d
 	return S_OK;
 }
 
-HRESULT CMD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
+HRESULT CD3D_MD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
 {
 	size_t dwLen = 0, i = 0, j = 0;
 	char szTemp[MAX_PATH];
@@ -322,7 +322,7 @@ HRESULT CMD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
 	return E_FAIL;
 }
 
-HRESULT CMD3WeaponMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
+HRESULT CD3D_MD3WeaponMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
 {
 	LONG i = 0;
 	LONG lNumTags = 0;
@@ -340,7 +340,7 @@ HRESULT CMD3WeaponMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], W
 	return E_FAIL;
 }
 
-HRESULT CMD3WeaponMesh::Invalidate()
+HRESULT CD3D_MD3WeaponMesh::Invalidate()
 {
 	if (!m_bLoaded)
 		return S_FALSE;
@@ -354,7 +354,7 @@ HRESULT CMD3WeaponMesh::Invalidate()
 	return S_OK;
 }
 
-HRESULT CMD3WeaponMesh::Validate()
+HRESULT CD3D_MD3WeaponMesh::Validate()
 {
 	if (!m_bLoaded)
 		return S_FALSE;
@@ -368,7 +368,7 @@ HRESULT CMD3WeaponMesh::Validate()
 	return S_OK;
 }
 
-HRESULT CMD3WeaponMesh::Render(BOOL bFlash, const D3DMATRIX& SavedWorldMatrix)
+HRESULT CD3D_MD3WeaponMesh::Render(BOOL bFlash, const D3DMATRIX& SavedWorldMatrix)
 {
 	DWORD i = 0, j = 0;
 	LONG lNumMesh = 0;

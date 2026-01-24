@@ -98,7 +98,7 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 	LONG lLowerSecondFrame,
 	FLOAT fLowerTime,
 	DWORD dwSkinRef,
-	CMD3WeaponMesh* lpWeapon,
+	CD3D_MD3WeaponMesh* lpWeapon,
 	const D3DMATRIX& SavedWorldMatrix)
 {
 	if (!m_bLoaded)

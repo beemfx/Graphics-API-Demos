@@ -1,9 +1,9 @@
-#define D3D_MD3
-#include <stdio.h>
-#include "md3.h"
+// (c) Beem Media. All rights reserved.
+
+#include "D3D_MD3PlayerObject.h"
 #include "D3D_MD3PlayerMesh.h"
 
-CMD3PlayerObject::CMD3PlayerObject()
+CD3D_MD3PlayerObject::CD3D_MD3PlayerObject()
 {
 	m_lpPlayerMesh=NULL;
 	m_dwSkinRef = MD3_DEFAULT_INDEX;
@@ -42,18 +42,18 @@ CMD3PlayerObject::CMD3PlayerObject()
 	m_AnimationUpper = { };
 }
 
-CMD3PlayerObject::~CMD3PlayerObject()
+CD3D_MD3PlayerObject::~CD3D_MD3PlayerObject()
 {
 	
 }
 
-HRESULT CMD3PlayerObject::SetWeapon(CMD3WeaponMesh * lpWeapon)
+HRESULT CD3D_MD3PlayerObject::SetWeapon(CD3D_MD3WeaponMesh * lpWeapon)
 {
 	m_lpWeapon=lpWeapon;
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::GetAnimation(DWORD * lpUpper, DWORD * lpLower)
+HRESULT CD3D_MD3PlayerObject::GetAnimation(DWORD * lpUpper, DWORD * lpLower)
 {
 	if(lpUpper)
 		*lpUpper=m_dwUpperAnim;
@@ -63,7 +63,7 @@ HRESULT CMD3PlayerObject::GetAnimation(DWORD * lpUpper, DWORD * lpLower)
 	return S_OK;
 };
 
-HRESULT CMD3PlayerObject::SetSkinByName(char szSkinName[])
+HRESULT CD3D_MD3PlayerObject::SetSkinByName(char szSkinName[])
 {
 	DWORD dwRef=0;
 	if(!m_lpPlayerMesh)
@@ -77,14 +77,14 @@ HRESULT CMD3PlayerObject::SetSkinByName(char szSkinName[])
 	}
 }
 
-HRESULT CMD3PlayerObject::SetSkinByRef(DWORD dwSkinRef)
+HRESULT CD3D_MD3PlayerObject::SetSkinByRef(DWORD dwSkinRef)
 {
 	m_dwSkinRef=dwSkinRef;
 
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::ApplyAnimation(DWORD dwAnimRef, FLOAT fSpeed, DWORD dwFlags)
+HRESULT CD3D_MD3PlayerObject::ApplyAnimation(DWORD dwAnimRef, FLOAT fSpeed, DWORD dwFlags)
 {
 	if(!m_lpPlayerMesh)
 		return E_FAIL;
@@ -135,7 +135,7 @@ HRESULT CMD3PlayerObject::ApplyAnimation(DWORD dwAnimRef, FLOAT fSpeed, DWORD dw
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::SetAnimation(DWORD dwAnimRef, DWORD dwFlags, FLOAT fSpeed)
+HRESULT CD3D_MD3PlayerObject::SetAnimation(DWORD dwAnimRef, DWORD dwFlags, FLOAT fSpeed)
 {
 	BOOL bLower=FALSE;
 	BOOL bUpper=FALSE;
@@ -202,7 +202,7 @@ HRESULT CMD3PlayerObject::SetAnimation(DWORD dwAnimRef, DWORD dwFlags, FLOAT fSp
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::SetPlayerMesh(CD3D_MD3PlayerMesh * lpPlayerMesh)
+HRESULT CD3D_MD3PlayerObject::SetPlayerMesh(CD3D_MD3PlayerMesh * lpPlayerMesh)
 {
 	//Apply the animation.
 	m_lpPlayerMesh=lpPlayerMesh;
@@ -216,7 +216,7 @@ HRESULT CMD3PlayerObject::SetPlayerMesh(CD3D_MD3PlayerMesh * lpPlayerMesh)
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::GetFrames(
+HRESULT CD3D_MD3PlayerObject::GetFrames(
 	LONG * lpFirstFrame,
 	LONG * lpSecondFrame,
 	FLOAT * lpTime,
@@ -253,7 +253,7 @@ HRESULT CMD3PlayerObject::GetFrames(
 	return S_OK;
 }
 
-__inline HRESULT CMD3PlayerObject::FrameTransitionAdjust(
+__inline HRESULT CD3D_MD3PlayerObject::FrameTransitionAdjust(
 	FRAMETRANSITIONTYPE * lpTransition,
 	md3AnimationConfig * lpAnimation,
 	LONG * lpFirstFrame,
@@ -329,7 +329,7 @@ __inline HRESULT CMD3PlayerObject::FrameTransitionAdjust(
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::Render( const D3DMATRIX& SavedWorldMatrix )
+HRESULT CD3D_MD3PlayerObject::Render( const D3DMATRIX& SavedWorldMatrix )
 {
 	//We need a speed adjust to display animation at correct speed.
 	if(!this->m_lpPlayerMesh)

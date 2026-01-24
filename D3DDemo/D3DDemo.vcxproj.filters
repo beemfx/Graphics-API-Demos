@@ -74,7 +74,7 @@
     <ClCompile Include="code\MD3Base\D3D_MD3PlayerMesh.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
-    <ClCompile Include="code\MD3Base\MD3PlayerObject.cpp">
+    <ClCompile Include="code\MD3Base\D3D_MD3PlayerObject.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
     <ClCompile Include="code\MD3Base\D3D_MD3WeaponMesh.cpp">
@@ -130,7 +130,7 @@
     <ClInclude Include="code\MD3Base\defines.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
-    <ClInclude Include="code\MD3Base\MD3.h">
+    <ClInclude Include="code\MD3Base\D3D_MD3PlayerObject.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
     <ClInclude Include="code\MD3Base\MD3File.h">

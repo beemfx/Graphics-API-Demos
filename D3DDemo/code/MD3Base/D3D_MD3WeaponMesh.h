@@ -5,7 +5,7 @@
 #include "D3D_MD3Mesh.h"
 #include "GFX3D9/GFX3D9TextureDB.h"
 
-class CMD3WeaponMesh
+class CD3D_MD3WeaponMesh
 {
 protected:
 	CD3D_MD3Mesh m_meshWeapon;
@@ -33,8 +33,8 @@ protected:
 	HRESULT TextureExtension(char szShader[MAX_PATH]);
 
 public:
-	CMD3WeaponMesh();
-	~CMD3WeaponMesh();
+	CD3D_MD3WeaponMesh();
+	~CD3D_MD3WeaponMesh();
 
 	HRESULT Clear();
 

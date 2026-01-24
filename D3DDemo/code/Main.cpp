@@ -1,9 +1,9 @@
 // (c) Beem Media. All rights reserved.
 
 #include "D3D_MD3PlayerMesh.h"
+#include "D3D_MD3PlayerObject.h"
 #include "D3D_MD3WeaponMesh.h"
 #include "GFX3D9.h"
-#include "md3.h"
 #include "resource.h"
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -30,9 +30,9 @@ LPDIRECT3DVERTEXBUFFER9 g_lpTestPrimVB=NULL;
 #define TESTMD3
 #ifdef TESTMD3
 CD3D_MD3PlayerMesh g_lpTestHuman;
-CMD3PlayerObject g_lpTestPlayer;
+CD3D_MD3PlayerObject g_lpTestPlayer;
 
-CMD3WeaponMesh g_lpTestGun;
+CD3D_MD3WeaponMesh g_lpTestGun;
 #endif //TESTMD3
 
 //#define TESTME
@@ -202,7 +202,7 @@ BOOL ConsoleParse(LPSTR szCommand, LPSTR szParams, HBEEMCONSOLE hConsole)
 
 #ifdef TESTMD3
 
-BOOL CreateAnimationString(char szAnimationString[100], CMD3PlayerObject * lpObject)
+BOOL CreateAnimationString(char szAnimationString[100], CD3D_MD3PlayerObject * lpObject)
 {
 	char szUpper[MAX_QPATH];
 	char szLower[MAX_QPATH];
@@ -335,7 +335,7 @@ BOOL CreateAnimationString(char szAnimationString[100], CMD3PlayerObject * lpObj
 	return TRUE;
 }
 
-BOOL CycleAnimation(DWORD dwBone, CMD3PlayerObject * lpObject)
+BOOL CycleAnimation(DWORD dwBone, CD3D_MD3PlayerObject * lpObject)
 {
 	DWORD dwUpper=0, dwLower=0;
 	DWORD dwCycleType=MD3SETANIM_FRAME;

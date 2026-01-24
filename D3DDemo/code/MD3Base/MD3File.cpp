@@ -1,6 +1,5 @@
 // (c) Beem Media. All rights reserved.
 
-#include "MD3.h"
 #include "MD3File.h"
 #include "FileSystem/DataStream.h"
 

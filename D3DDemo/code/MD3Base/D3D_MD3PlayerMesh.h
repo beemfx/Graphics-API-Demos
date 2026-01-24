@@ -7,7 +7,7 @@
 #include "GFX3D9/GFX3D9TextureDB.h"
 
 class CD3D_MD3Skin;
-class CMD3WeaponMesh;
+class CD3D_MD3WeaponMesh;
 
 class CD3D_MD3PlayerMesh
 {
@@ -58,7 +58,7 @@ public:
 		LONG lLowerSecondFrame,
 		FLOAT fLowerTime,
 		DWORD dwSkinRef,
-		CMD3WeaponMesh* lpWeapon,
+		CD3D_MD3WeaponMesh* lpWeapon,
 		const D3DMATRIX& SavedWorldMatrix);
 
 	HRESULT LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail);
