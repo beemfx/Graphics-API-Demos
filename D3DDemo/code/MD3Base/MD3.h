@@ -15,6 +15,7 @@ extern "C" {
 #include "MD3File.h"
 #include "MD3AnimConfig.h"
 #include "MD3SkinConfig.h"
+#include "D3D_MD3Mesh.h"
 #include "GFX3D9/GFX3D9TextureDB.h"
 
 #ifdef D3D_MD3
@@ -31,17 +32,6 @@ class CMD3WeaponMesh;
 */
 #ifdef D3D_MD3
 
-/*
-	The MD3 vertex format.
-*/
-#define D3DMD3VERTEX_TYPE (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)
-
-typedef struct tagD3DMD3VERTEX{
-	D3DVECTOR Postion; /* Position of vertex. */
-	D3DVECTOR Normal; /* The normal of the vertex. */
-	FLOAT tu, tv; /* Texture coordinates. */
-}D3DMD3VERTEX, *LPD3DMD3VERTEX;
-
 
 /*
 	The Direct3DMD3 functionality.
@@ -51,92 +41,7 @@ typedef struct tagD3DMD3VERTEX{
 
 #define MD3TEXRENDER_NOCULL 0x00000001l
 
-class CMD3Mesh
-{
-protected:
-	CMD3File m_md3File;
 
-	LPDIRECT3DVERTEXBUFFER9 * m_lppVB;
-	D3DMD3VERTEX * m_lpVertices;
-	LPDIRECT3DINDEXBUFFER9 * m_lppIB;
-
-	LPDIRECT3DDEVICE9 m_lpDevice;
-
-	md3Vector ** m_lppNormals;
-
-	BOOL m_bMD3Loaded; /* Whether or not MD3 is loaded. */
-	BOOL m_bValid; /* Whether or not the MD3 is valid for D3D usage. */
-	DWORD m_dwNumSkins; /* Total number of skins in the mesh. */
-	D3DPOOL m_Pool; /* The Pool Direct3D objects should be created in. */
-
-	HRESULT CreateVB();
-	HRESULT DeleteVB();
-
-	HRESULT CreateIB();
-	HRESULT DeleteIB();
-
-	HRESULT CreateNormals();
-
-	HRESULT CreateModel();
-	HRESULT DeleteModel();
-
-public:
-	CMD3Mesh();
-	~CMD3Mesh();
-
-	HRESULT LoadMD3(
-		const std::filesystem::path& Filename, 
-		LPDWORD lpBytesRead, 
-		LPDIRECT3DDEVICE9 lpDevice,
-		D3DPOOL Pool);
-
-	HRESULT ClearMD3();
-
-	HRESULT Render(
-		CMD3SkinFile * lpSkin,
-		FLOAT fTime,
-		LONG lFirstFrame,
-		LONG lNextFrame,
-		DWORD dwFlags);
-
-	HRESULT RenderWithTexture(
-		LPDIRECT3DTEXTURE9 lpTexture,
-		LONG lMesh,
-		FLOAT fTime,
-		LONG lFirstFrame,
-		LONG lNextFrame,
-		DWORD dwFlags);
-
-	HRESULT Invalidate();
-	HRESULT Validate();
-
-	HRESULT SetSkinRefs(
-		CMD3SkinFile * lpSkin);
-
-	HRESULT GetTagTranslation(
-		DWORD dwTagRef,
-		FLOAT fTime,
-		LONG dwFirstFrame,
-		LONG dwSecondFrame,
-		D3DMATRIX * Translation);
-
-	HRESULT GetNumTags(
-		LONG * lpNumTags);
-	HRESULT GetTagName(
-		LONG lRef,
-		char szTagName[MAX_QPATH]);
-	HRESULT GetShader(
-		LONG lMesh,
-		LONG lShader,
-		char szShaderName[MAX_QPATH],
-		LONG * lpShaderNum);
-
-	HRESULT GetNumMeshes(
-		LONG * lpNumMeshes);
-
-	HRESULT DumpDebug();
-
-};
 
 #endif /* __cplusplus */
 
@@ -179,24 +84,20 @@ private:
 
 #ifdef __cplusplus
 
-typedef enum tagMD3DETAIL{
-	DETAIL_HIGH=0x00000000l,
-	DETAIL_MEDIUM,
-	DETAIL_LOW
-}MD3DETAIL;
+
 
 #define SKIN_DEFAULT 0
 
 class CMD3PlayerMesh
 {
 protected:
-	CMD3Mesh m_meshHead;
+	CD3D_MD3Mesh m_meshHead;
 	CMD3SkinFile * m_skinHead;
 
-	CMD3Mesh m_meshUpper;
+	CD3D_MD3Mesh m_meshUpper;
 	CMD3SkinFile * m_skinUpper;
 
-	CMD3Mesh m_meshLower;
+	CD3D_MD3Mesh m_meshLower;
 	CMD3SkinFile * m_skinLower;
 
 	CMD3AnimConfig m_Animation;
@@ -215,7 +116,7 @@ protected:
 
 	BOOL m_bLoaded;
 
-	HRESULT GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef);
+	HRESULT GetLink(CD3D_MD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef);
 
 	HRESULT GetSkinsA(char szDir[]);
 	HRESULT GetSkinsW(WCHAR szDir[]);
@@ -239,8 +140,8 @@ public:
 		CMD3WeaponMesh * lpWeapon,
 		const D3DMATRIX& SavedWorldMatrix);
 
-	HRESULT LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL nDetail);
-	HRESULT LoadW(LPDIRECT3DDEVICE9 lpDevice, WCHAR szDir[], MD3DETAIL nDetail);
+	HRESULT LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail);
+	HRESULT LoadW(LPDIRECT3DDEVICE9 lpDevice, WCHAR szDir[], d3d_md3_detail nDetail);
 
 	HRESULT Clear();
 
@@ -366,10 +267,10 @@ public:
 class CMD3WeaponMesh
 {
 protected:
-	CMD3Mesh m_meshWeapon;
-	CMD3Mesh m_meshBarrel;
-	CMD3Mesh m_meshFlash;
-	CMD3Mesh m_meshHand;
+	CD3D_MD3Mesh m_meshWeapon;
+	CD3D_MD3Mesh m_meshBarrel;
+	CD3D_MD3Mesh m_meshFlash;
+	CD3D_MD3Mesh m_meshHand;
 
 	CGFX3D9TextureDB m_TexDB;
 
@@ -387,7 +288,7 @@ protected:
 
 	BOOL m_bLoaded;
 
-	HRESULT GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef);
+	HRESULT GetLink(CD3D_MD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef);
 	HRESULT TextureExtension(char szShader[MAX_PATH]);
 
 public:
@@ -398,7 +299,7 @@ public:
 
 	HRESULT Render(BOOL bFlash, const D3DMATRIX& WorldMatrix);
 
-	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL nDetail);
+	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail);
 	HRESULT Invalidate();
 	HRESULT Validate();
 };
@@ -409,29 +310,7 @@ public:
 */
 #ifdef __cplusplus
 
-class CMD3ObjectMesh
-{
-protected:
-	CMD3Mesh m_meshObject;
-	CGFX3D9TextureDB m_TexDB;
-	LPDIRECT3DTEXTURE9 * m_lppObjTex;
 
-	BOOL m_bLoaded;
-
-	HRESULT TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShader[MAX_PATH]);
-public:
-	CMD3ObjectMesh();
-	~CMD3ObjectMesh();
-
-	HRESULT Render(LPDIRECT3DDEVICE9 lpDevice , const D3DMATRIX& WorldMatrix );
-
-	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAIL nDetail);
-
-	HRESULT Clear();
-
-	HRESULT Invalidate();
-	HRESULT Validate(LPDIRECT3DDEVICE9 lpDevice);
-};
 #endif /* __cplusplus */
 
 #endif /* D3D_MD3 */

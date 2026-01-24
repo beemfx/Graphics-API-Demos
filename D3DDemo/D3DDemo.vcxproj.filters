@@ -65,7 +65,7 @@
     <ClCompile Include="code\MD3Base\MD3File.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
-    <ClCompile Include="code\MD3Base\MD3Mesh.cpp">
+    <ClCompile Include="code\MD3Base\D3D_MD3Mesh.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
     <ClCompile Include="code\MD3Base\MD3ObjectMesh.cpp">
@@ -165,6 +165,12 @@
     </ClInclude>
     <ClInclude Include="code\Library\Functions.h">
       <Filter>code\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3ObjectMesh.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\D3D_MD3Mesh.h">
+      <Filter>code\MD3Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

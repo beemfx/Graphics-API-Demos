@@ -94,7 +94,7 @@ BOOL ConsoleParse(LPSTR szCommand, LPSTR szParams, HBEEMCONSOLE hConsole)
 			if(!BeemParseGetString(szFilename, szFilename)){
 				SendBeemConsoleMessage(hConsole, "Usage: LOADWEAPON <string>");
 			}else{
-				if(SUCCEEDED(g_lpTestGun.Load(g_lpDevice, szFilename, DETAIL_HIGH))){
+				if(SUCCEEDED(g_lpTestGun.Load(g_lpDevice, szFilename, d3d_md3_detail::High))){
 					g_lpTestPlayer.SetWeapon(&g_lpTestGun);
 					sprintf(szOutputMessage, "Successfully loaded \"%s\" weapon.", szFilename);
 					SendBeemConsoleMessage(hConsole, szOutputMessage);
@@ -114,7 +114,7 @@ BOOL ConsoleParse(LPSTR szCommand, LPSTR szParams, HBEEMCONSOLE hConsole)
 			if(!BeemParseGetString(szFilename, szFilename)){
 				SendBeemConsoleMessage(hConsole, "Usage: LOADMD3 <string>");
 			}else{
-				if((SUCCEEDED(g_lpTestHuman.LoadA(g_lpDevice, szFilename, DETAIL_HIGH)))){
+				if((SUCCEEDED(g_lpTestHuman.LoadA(g_lpDevice, szFilename, d3d_md3_detail::High)))){
 					g_lpTestPlayer.SetPlayerMesh(&g_lpTestHuman);
 					g_lpTestPlayer.SetAnimation(TORSO_STAND, MD3SETANIM_WAIT, 2.0f);
 					g_lpTestPlayer.SetAnimation(LEGS_IDLE, MD3SETANIM_WAIT, 2.0f);

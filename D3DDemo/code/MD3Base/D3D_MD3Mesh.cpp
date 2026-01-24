@@ -1,3 +1,5 @@
+// (c) Beem Media. All rights reserved.
+
 #define D3D_MD3
 #include "MD3.h"
 #include <d3dx9.h>
@@ -11,7 +13,7 @@
 ///  Constructor and Destructor ///
 ///////////////////////////////////
 
-CMD3Mesh::CMD3Mesh()
+CD3D_MD3Mesh::CD3D_MD3Mesh()
 {
 	m_lppIB=NULL;
 	m_lppVB=NULL;
@@ -28,7 +30,7 @@ CMD3Mesh::CMD3Mesh()
 	m_lpDevice=NULL;
 }
 
-CMD3Mesh::~CMD3Mesh()
+CD3D_MD3Mesh::~CD3D_MD3Mesh()
 {
 	ClearMD3();
 }
@@ -37,7 +39,7 @@ CMD3Mesh::~CMD3Mesh()
 ///  Public member methods  ///
 ///////////////////////////////
 
-HRESULT CMD3Mesh::GetNumTags(
+HRESULT CD3D_MD3Mesh::GetNumTags(
 	LONG * lpNumTags)
 {
 	if(m_bMD3Loaded){
@@ -48,7 +50,7 @@ HRESULT CMD3Mesh::GetNumTags(
 		return E_FAIL;
 	}
 }
-HRESULT CMD3Mesh::GetTagName(
+HRESULT CD3D_MD3Mesh::GetTagName(
 	LONG lRef,
 	char szTagName[MAX_QPATH])
 {
@@ -61,7 +63,7 @@ HRESULT CMD3Mesh::GetTagName(
 	}
 }
 
-HRESULT CMD3Mesh::GetTagTranslation(
+HRESULT CD3D_MD3Mesh::GetTagTranslation(
 	DWORD dwTagRef,
 	FLOAT fTime,
 	LONG dwFirstFrame,
@@ -160,7 +162,7 @@ HRESULT CMD3Mesh::GetTagTranslation(
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::LoadMD3(
+HRESULT CD3D_MD3Mesh::LoadMD3(
 	const std::filesystem::path& Filename,
 	LPDWORD lpBytesRead, 
 	LPDIRECT3DDEVICE9 lpDevice,
@@ -204,7 +206,7 @@ HRESULT CMD3Mesh::LoadMD3(
 	return hr;
 }
 
-HRESULT CMD3Mesh::ClearMD3()
+HRESULT CD3D_MD3Mesh::ClearMD3()
 {
 	//If an MD3 is loaded delete the model and the file.
 	if(m_bMD3Loaded){
@@ -218,7 +220,7 @@ HRESULT CMD3Mesh::ClearMD3()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::RenderWithTexture(
+HRESULT CD3D_MD3Mesh::RenderWithTexture(
 	LPDIRECT3DTEXTURE9 lpTexture,
 	LONG lMesh,
 	FLOAT fTime,
@@ -291,10 +293,10 @@ HRESULT CMD3Mesh::RenderWithTexture(
 	}
 
 	IDirect3DVertexBuffer9_Lock(m_lppVB[lMesh-1], 0, 0, &lpBuffer, 0);
-	memcpy(lpBuffer, m_lpVertices, sizeof(D3DMD3VERTEX)*lNumVertices);
+	memcpy(lpBuffer, m_lpVertices, sizeof(d3d_md3_vertex)*lNumVertices);
 	IDirect3DVertexBuffer9_Unlock(m_lppVB[lMesh-1]);
 
-	IDirect3DDevice9_SetStreamSource(m_lpDevice, 0, m_lppVB[lMesh-1], 0, sizeof(D3DMD3VERTEX));
+	IDirect3DDevice9_SetStreamSource(m_lpDevice, 0, m_lppVB[lMesh-1], 0, sizeof(d3d_md3_vertex));
 	IDirect3DDevice9_SetIndices(m_lpDevice, m_lppIB[lMesh-1]);
 	
 	m_lpDevice->SetTexture(0, lpTexture);
@@ -339,7 +341,7 @@ HRESULT CMD3Mesh::RenderWithTexture(
 }
 
 
-HRESULT CMD3Mesh::Render(
+HRESULT CD3D_MD3Mesh::Render(
 	CMD3SkinFile * lpSkin,
 	FLOAT fTime,
 	LONG lFirstFrame,
@@ -419,7 +421,7 @@ HRESULT CMD3Mesh::Render(
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::Invalidate()
+HRESULT CD3D_MD3Mesh::Invalidate()
 {
 	HRESULT hr=S_OK;
 	HRESULT hrReturn=S_OK;
@@ -448,7 +450,7 @@ HRESULT CMD3Mesh::Invalidate()
 	return hrReturn;
 }
 
-HRESULT CMD3Mesh::Validate()
+HRESULT CD3D_MD3Mesh::Validate()
 {
 	HRESULT hr=0;
 
@@ -471,7 +473,7 @@ HRESULT CMD3Mesh::Validate()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::GetNumMeshes(
+HRESULT CD3D_MD3Mesh::GetNumMeshes(
 	LONG * lpNumMeshes)
 {
 	if(!m_bMD3Loaded)
@@ -484,7 +486,7 @@ HRESULT CMD3Mesh::GetNumMeshes(
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::GetShader(
+HRESULT CD3D_MD3Mesh::GetShader(
 	LONG lMesh,
 	LONG lShader,
 	char szShaderName[MAX_QPATH],
@@ -506,7 +508,7 @@ HRESULT CMD3Mesh::GetShader(
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::DumpDebug()
+HRESULT CD3D_MD3Mesh::DumpDebug()
 {
 	FILE * fout=fopen("md3dump.txt", "w");
 	DumpMD3DebugData(fout, m_md3File, MD3DUMP_ALL);
@@ -514,7 +516,7 @@ HRESULT CMD3Mesh::DumpDebug()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::SetSkinRefs(
+HRESULT CD3D_MD3Mesh::SetSkinRefs(
 	CMD3SkinFile * lpSkin)
 {
 	LONG i=0;
@@ -532,7 +534,7 @@ HRESULT CMD3Mesh::SetSkinRefs(
 ////////////////////////////////
 
 
-HRESULT CMD3Mesh::CreateVB()
+HRESULT CD3D_MD3Mesh::CreateVB()
 {
 	LONG i=0, j=0;
 	DWORD dwVerticeSize=0;
@@ -544,7 +546,7 @@ HRESULT CMD3Mesh::CreateVB()
 
 	//Create a vertex buffer for each mesh.
 	for(i=0; i<m_md3File.Header.NumMeshes; i++){
-		dwVerticeSize=m_md3File.Meshes[i].MeshHeader.NumVertices * sizeof(D3DMD3VERTEX);
+		dwVerticeSize=m_md3File.Meshes[i].MeshHeader.NumVertices * sizeof(d3d_md3_vertex);
 
 		//Create the vertex buffer.  We don't fill it with data because
 		//we will be interpolating at render time.
@@ -567,7 +569,7 @@ HRESULT CMD3Mesh::CreateVB()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::DeleteVB()
+HRESULT CD3D_MD3Mesh::DeleteVB()
 {
 	LONG i=0;
 	for(i=0; i<m_md3File.Header.NumMeshes; i++){
@@ -576,7 +578,7 @@ HRESULT CMD3Mesh::DeleteVB()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::CreateIB()
+HRESULT CD3D_MD3Mesh::CreateIB()
 {
 	//This function should check to make sure everything worked properly
 	//not just assume it did.
@@ -638,7 +640,7 @@ HRESULT CMD3Mesh::CreateIB()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::DeleteIB()
+HRESULT CD3D_MD3Mesh::DeleteIB()
 {
 	LONG i=0;
 	for(i=0; i<m_md3File.Header.NumMeshes; i++){
@@ -647,7 +649,7 @@ HRESULT CMD3Mesh::DeleteIB()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::CreateNormals()
+HRESULT CD3D_MD3Mesh::CreateNormals()
 {
 	LONG i=0, j=0;
 	
@@ -678,7 +680,7 @@ HRESULT CMD3Mesh::CreateNormals()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::CreateModel()
+HRESULT CD3D_MD3Mesh::CreateModel()
 {
 	LONG i=0, j=0;
 	DWORD dwSizeVB=0;
@@ -702,7 +704,7 @@ HRESULT CMD3Mesh::CreateModel()
 
 	//We also create the interpolated vertex buffer.  It
 	//should be the size of the largest meshes vertex buffer.
-	m_lpVertices=(D3DMD3VERTEX*)malloc(sizeof(D3DMD3VERTEX) * dwSizeVB);
+	m_lpVertices=(d3d_md3_vertex*)malloc(sizeof(d3d_md3_vertex) * dwSizeVB);
 	if(m_lpVertices==NULL){
 		SAFE_FREE(m_lppVB);
 		SAFE_FREE(m_lppIB);
@@ -731,7 +733,7 @@ HRESULT CMD3Mesh::CreateModel()
 	return S_OK;
 }
 
-HRESULT CMD3Mesh::DeleteModel()
+HRESULT CD3D_MD3Mesh::DeleteModel()
 {
 	HRESULT hr=S_OK;
 	LONG i=0;

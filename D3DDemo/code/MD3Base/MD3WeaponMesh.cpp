@@ -73,7 +73,7 @@ HRESULT CMD3WeaponMesh::Clear()
 	return S_OK;
 }
 
-HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL nDetail)
+HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
 {
 	char szPath[MAX_PATH];
 	char szWeaponPath[MAX_PATH];
@@ -115,9 +115,9 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 	//Prepare each of the path names.
 
 	//Set the detail level.
-	if (nDetail == DETAIL_LOW)
+	if (nDetail == d3d_md3_detail::Low)
 		strcpy(szDetailLevel, "_2");
-	else if (nDetail == DETAIL_MEDIUM)
+	else if (nDetail == d3d_md3_detail::Medium)
 		strcpy(szDetailLevel, "_1");
 	else
 		strcpy(szDetailLevel, "");
@@ -135,10 +135,10 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 	hr = m_meshWeapon.LoadMD3(szWeaponPath, NULL, lpDevice, D3DPOOL_DEFAULT);
 
 	if (FAILED(hr)) {
-		if (nDetail != DETAIL_HIGH)
+		if (nDetail != d3d_md3_detail::High)
 		{
 			SAFE_RELEASE(m_lpDevice);
-			return Load(lpDevice, szDir, DETAIL_HIGH);
+			return Load(lpDevice, szDir, d3d_md3_detail::High);
 		}
 		SAFE_RELEASE(m_lpDevice);
 		return E_FAIL;
@@ -321,7 +321,7 @@ HRESULT CMD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
 	return E_FAIL;
 }
 
-HRESULT CMD3WeaponMesh::GetLink(CMD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
+HRESULT CMD3WeaponMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
 {
 	LONG i = 0;
 	LONG lNumTags = 0;

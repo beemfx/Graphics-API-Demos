@@ -1,4 +1,6 @@
-#define D3D_MD3
+// (c) Beem Media. All rights reserved.
+
+#include "MD3ObjectMesh.h"
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
@@ -115,7 +117,7 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	return E_FAIL;
 }
 
-HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAIL nDetail)
+HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_detail nDetail)
 {
 	LONG lNumMesh=0;
 	DWORD i=0;
@@ -129,9 +131,9 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 
 	strcpy(szFileName, szFile);
 
-	if(nDetail==DETAIL_LOW)
+	if(nDetail== d3d_md3_detail::Low)
 		strcpy(szExt, "_2.md3");
-	else if(nDetail==DETAIL_MEDIUM)
+	else if(nDetail== d3d_md3_detail::Medium)
 		strcpy(szExt, "_1.md3");
 	else
 		strcpy(szExt, ".md3");
@@ -145,8 +147,8 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	strcat(szFileName, szExt);
 
 	if(FAILED(m_meshObject.LoadMD3(szFileName, NULL, lpDevice, D3DPOOL_DEFAULT))){
-		if(nDetail==DETAIL_MEDIUM || nDetail==DETAIL_LOW)
-			return Load(lpDevice, szFile, DETAIL_HIGH);
+		if(nDetail== d3d_md3_detail::Medium || nDetail== d3d_md3_detail::Low)
+			return Load(lpDevice, szFile, d3d_md3_detail::High);
 		return E_FAIL;
 	}
 
@@ -162,7 +164,7 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	for(i=0; i<(DWORD)lNumMesh; i++){
 		m_meshObject.GetShader(i+1, 1, szShader, NULL);
 		std::filesystem::path ShaderPath = Functions::RemoveDirectoryFromString(szShader);
-		sprintf(szTexName, "%s%s", szPath.string().c_str(), ShaderPath.c_str());
+		sprintf(szTexName, "%s%s", szPath.string().c_str(), ShaderPath.string().c_str());
 		if(SUCCEEDED(TextureExtension(lpDevice, szTexName))){
 			m_lppObjTex[i] = m_TexDB.GetTexture(szTexName);
 		}else{
