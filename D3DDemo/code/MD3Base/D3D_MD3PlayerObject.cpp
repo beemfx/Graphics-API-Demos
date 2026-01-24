@@ -90,7 +90,7 @@ HRESULT CD3D_MD3PlayerObject::ApplyAnimation(DWORD dwAnimRef, FLOAT fSpeed, DWOR
 		{
 			m_dwAnimPrevUpper=m_dwUpperAnim;
 			m_dwUpperAnim=dwAnimRef;
-			m_lpPlayerMesh->GetAnimation(dwAnimRef, &m_AnimationUpper);
+			m_AnimationUpper = m_lpPlayerMesh->GetAnimation(dwAnimRef);
 			m_dwLastCycleTimeUpper=timeGetTime();
 			m_fFPSUpper=fSpeed;
 		}
@@ -98,7 +98,7 @@ HRESULT CD3D_MD3PlayerObject::ApplyAnimation(DWORD dwAnimRef, FLOAT fSpeed, DWOR
 		{
 			m_dwAnimPrevLower=m_dwLowerAnim;
 			m_dwLowerAnim=dwAnimRef;
-			m_lpPlayerMesh->GetAnimation(dwAnimRef, &m_AnimationLower);
+			m_AnimationLower = m_lpPlayerMesh->GetAnimation(dwAnimRef);
 			m_dwLastCycleTimeLower=timeGetTime();
 			m_fFPSLower=fSpeed;
 		}
@@ -108,22 +108,22 @@ HRESULT CD3D_MD3PlayerObject::ApplyAnimation(DWORD dwAnimRef, FLOAT fSpeed, DWOR
 			m_dwAnimPrevLower=m_dwLowerAnim;
 			m_dwUpperAnim=dwAnimRef;
 			m_dwLowerAnim=dwAnimRef;
-			m_lpPlayerMesh->GetAnimation(dwAnimRef, &m_AnimationUpper);
-			m_lpPlayerMesh->GetAnimation(dwAnimRef, &m_AnimationLower);
+			m_AnimationUpper = m_lpPlayerMesh->GetAnimation(dwAnimRef);
+			m_AnimationLower = m_lpPlayerMesh->GetAnimation(dwAnimRef);
 			m_dwLastCycleTimeUpper=m_dwLastCycleTimeLower=timeGetTime();
 			m_fFPSUpper=m_fFPSLower=fSpeed;
 		}
 	}else if( (dwAnimRef >= TORSO_GESTURE) && (dwAnimRef <= TORSO_STAND2)){
 		m_dwAnimPrevUpper=m_dwUpperAnim;
 		m_dwUpperAnim=dwAnimRef;
-		m_lpPlayerMesh->GetAnimation(dwAnimRef, &m_AnimationUpper);
+		m_AnimationUpper = m_lpPlayerMesh->GetAnimation(dwAnimRef);
 		m_dwLastCycleTimeUpper=timeGetTime();
 		m_fFPSUpper=fSpeed;
 	}else if( (dwAnimRef >= LEGS_WALKCR) && (dwAnimRef <= LEGS_TURN)){
 		m_dwAnimPrevLower=m_dwLowerAnim;
 		m_dwLowerAnim=dwAnimRef;
 		m_dwLastCycleTimeLower=timeGetTime();
-		m_lpPlayerMesh->GetAnimation(dwAnimRef, &m_AnimationLower);
+		m_AnimationLower = m_lpPlayerMesh->GetAnimation(dwAnimRef);
 		m_fFPSLower=fSpeed;
 	}else{
 		return E_FAIL;

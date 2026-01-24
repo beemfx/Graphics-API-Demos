@@ -34,7 +34,7 @@ md3_bool CMD3AnimConfig::LoadAnimation(const std::filesystem::path& Filename)
 	return m_NumAnims == MD3_NUM_ANIMS;
 }
 
-md3AnimationConfig CMD3AnimConfig::GetAnimation(md3_uint32 Ref, md3_uint32 Flags /*= MD3ANIM_ADJUST*/)
+md3AnimationConfig CMD3AnimConfig::GetAnimation(md3_uint32 Ref, md3_uint32 Flags /*= MD3ANIM_ADJUST*/) const
 {
 	const bool bIsValidRef = 0 <= Ref && Ref < m_NumAnims;
 

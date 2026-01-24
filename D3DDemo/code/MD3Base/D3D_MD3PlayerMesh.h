@@ -12,6 +12,31 @@ class CD3D_MD3WeaponMesh;
 
 class CD3D_MD3PlayerMesh
 {
+public:
+	CD3D_MD3PlayerMesh();
+	~CD3D_MD3PlayerMesh();
+
+	md3AnimationConfig GetAnimation(md3_uint32 AnimRef) const;
+	md3_uint32 GetSkinRef(const md3_char8* SkinName) const;
+
+	HRESULT Render(
+		LONG lUpperFirstFrame,
+		LONG lUpperSecondFrame,
+		FLOAT fUpperTime,
+		LONG lLowerFirstFrame,
+		LONG lLowerSecondFrame,
+		FLOAT fLowerTime,
+		DWORD dwSkinRef,
+		CD3D_MD3WeaponMesh* lpWeapon,
+		const D3DMATRIX& SavedWorldMatrix);
+
+	bool Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Dir, d3d_md3_detail nDetail);
+
+	HRESULT Clear();
+
+	HRESULT Invalidate();
+	HRESULT Validate();
+
 private:
 	struct CSkinSet
 	{
@@ -43,31 +68,5 @@ protected:
 
 	HRESULT GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef);
 
-	bool GetSkins(const std::filesystem::path& Path);
-
-public:
-	CD3D_MD3PlayerMesh();
-	~CD3D_MD3PlayerMesh();
-
-	HRESULT GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation);
-
-	md3_uint32 GetSkinRef(const md3_char8* SkinName) const;
-
-	HRESULT Render(
-		LONG lUpperFirstFrame,
-		LONG lUpperSecondFrame,
-		FLOAT fUpperTime,
-		LONG lLowerFirstFrame,
-		LONG lLowerSecondFrame,
-		FLOAT fLowerTime,
-		DWORD dwSkinRef,
-		CD3D_MD3WeaponMesh* lpWeapon,
-		const D3DMATRIX& SavedWorldMatrix);
-
-	HRESULT LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail);
-
-	HRESULT Clear();
-
-	HRESULT Invalidate();
-	HRESULT Validate();
+	bool GetSkins(const std::filesystem::path& Dir);
 };

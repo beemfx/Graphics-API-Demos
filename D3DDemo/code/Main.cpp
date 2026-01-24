@@ -111,20 +111,30 @@ BOOL ConsoleParse(LPSTR szCommand, LPSTR szParams, HBEEMCONSOLE hConsole)
 
 		char szFilename[100];
 
-		if(!BeemParseGetParam(szFilename, szParams, 1)){
+		if(!BeemParseGetParam(szFilename, szParams, 1))
+		{
 			SendBeemConsoleMessage(hConsole, "Usage: LOADMD3 <string>");
-		}else{
-			if(!BeemParseGetString(szFilename, szFilename)){
+		}
+		else
+		{
+			if(!BeemParseGetString(szFilename, szFilename))
+			{
 				SendBeemConsoleMessage(hConsole, "Usage: LOADMD3 <string>");
-			}else{
-				if((SUCCEEDED(g_lpTestHuman.LoadA(g_lpDevice, szFilename, d3d_md3_detail::High)))){
+			}
+			else
+			{
+				if(g_lpTestHuman.Load(g_lpDevice, szFilename, d3d_md3_detail::High))
+				{
 					g_lpTestPlayer.SetPlayerMesh(&g_lpTestHuman);
 					g_lpTestPlayer.SetAnimation(TORSO_STAND, MD3SETANIM_WAIT, 2.0f);
 					g_lpTestPlayer.SetAnimation(LEGS_IDLE, MD3SETANIM_WAIT, 2.0f);
 					sprintf(szOutputMessage, "Successfully loaded \"%s\".", szFilename);
 					SendBeemConsoleMessage(hConsole, szOutputMessage);
-				}else
+				}
+				else
+				{
 					SendBeemConsoleMessage(hConsole, "Could not load MD3 file!");
+				}
 			}
 		}
 			

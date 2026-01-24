@@ -73,7 +73,7 @@ public:
 	~CMD3AnimConfig();
 
 	md3_bool LoadAnimation(const std::filesystem::path& Filename);
-	md3AnimationConfig GetAnimation(md3_uint32 Ref, md3_uint32 Flags = MD3ANIM_ADJUST);
+	md3AnimationConfig GetAnimation(md3_uint32 Ref, md3_uint32 Flags = MD3ANIM_ADJUST) const;
 
 private:
 	md3_anim_sex m_Sex = md3_anim_sex::Default;

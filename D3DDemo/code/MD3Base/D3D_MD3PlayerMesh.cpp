@@ -37,13 +37,9 @@ md3_uint32 CD3D_MD3PlayerMesh::GetSkinRef(const md3_char8* SkinName) const
 	return MD3_DEFAULT_INDEX;
 }
 
-HRESULT CD3D_MD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation)
+md3AnimationConfig CD3D_MD3PlayerMesh::GetAnimation(md3_uint32 AnimRef) const
 {
-	if (lpAnimation)
-	{
-		*lpAnimation = m_Animation.GetAnimation(dwAnimRef);
-	}
-	return S_OK;
+	return m_Animation.GetAnimation(AnimRef);
 }
 
 HRESULT CD3D_MD3PlayerMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
@@ -223,22 +219,21 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 	return S_OK;
 }
 
-bool CD3D_MD3PlayerMesh::GetSkins(const std::filesystem::path& Path)
+bool CD3D_MD3PlayerMesh::GetSkins(const std::filesystem::path& Dir)
 {
 	std::vector<std::string> SkinFiles;
 
 	{
-		char szFindString[MAX_PATH];
-		WIN32_FIND_DATA FindData = { };
+		WIN32_FIND_DATAA FindData = { };
 
 		//Basically my intent is to find out how many skins there
 		//are. This can be done by finding out how many files with names
 		//skin file beginning with upper_ exist.  We could use any bone
 		//of the body, but upper will do nicely.
-		strcpy(szFindString, Path.string().c_str());
-		strcat(szFindString, "upper_*.skin");
-		HANDLE hFind = FindFirstFile(
-			szFindString,
+		std::filesystem::path SearchPath = Dir / "upper_*.skin";
+
+		HANDLE hFind = FindFirstFileA(
+			SearchPath.string().c_str(),
 			&FindData);
 
 		if (hFind == INVALID_HANDLE_VALUE)
@@ -298,9 +293,9 @@ bool CD3D_MD3PlayerMesh::GetSkins(const std::filesystem::path& Path)
 		const std::string UpperFilename = "upper_" + m_SkinSets[i].Name + ".skin";
 		const std::string LowerFilename = "lower_" + m_SkinSets[i].Name + ".skin";
 
-		const std::filesystem::path HeadPath = Path / HeadFilename;
-		const std::filesystem::path UpperPath = Path / UpperFilename;
-		const std::filesystem::path LowerPath = Path / LowerFilename;
+		const std::filesystem::path HeadPath = Dir / HeadFilename;
+		const std::filesystem::path UpperPath = Dir / UpperFilename;
+		const std::filesystem::path LowerPath = Dir / LowerFilename;
 
 
 		const bool bSkinLoaded 
@@ -331,71 +326,46 @@ bool CD3D_MD3PlayerMesh::GetSkins(const std::filesystem::path& Path)
 	return true;
 }
 
-HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
+bool CD3D_MD3PlayerMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Dir, d3d_md3_detail nDetail)
 {
-	size_t dwLen = 0;
-	HRESULT hr = 0;
-	char szDirectory[MAX_PATH];
-	char szHead[MAX_PATH];
-	char szUpper[MAX_PATH];
-	char szLower[MAX_PATH];
-	char szAnimation[MAX_PATH];
-
 	if (!lpDevice)
-		return E_FAIL;
+		return false;
 
 	Clear();
 
 	m_lpDevice = lpDevice;
 	m_lpDevice->AddRef();
 
-
-	//First thing to do is attempt to acquire the actual md3's.
-	strcpy(szDirectory, szDir);
-	dwLen = strlen(szDirectory);
-
-	//Insure that there is a backslash at the end of the directory.
-	if (szDirectory[dwLen - 1] != '\\') {
-		szDirectory[dwLen] = '\\';
-		szDirectory[dwLen + 1] = 0;
-		dwLen++;
-	}
+	std::filesystem::path HeadPath;
+	std::filesystem::path UpperPath;
+	std::filesystem::path LowerPath;
 
 	switch (nDetail)
 	{
 	case d3d_md3_detail::High:
-		strcpy(szHead, szDirectory);
-		strcpy(szUpper, szDirectory);
-		strcpy(szLower, szDirectory);
-		strcat(szHead, "head.md3");
-		strcat(szUpper, "upper.md3");
-		strcat(szLower, "lower.md3");
+		HeadPath = Dir / "head.md3";
+		UpperPath = Dir / "upper.md3";
+		LowerPath = Dir / "lower.md3";
 		break;
 	case d3d_md3_detail::Medium:
-		strcpy(szHead, szDirectory);
-		strcpy(szUpper, szDirectory);
-		strcpy(szLower, szDirectory);
-		strcat(szHead, "head_1.md3");
-		strcat(szUpper, "upper_1.md3");
-		strcat(szLower, "lower_1.md3");
+		HeadPath = Dir / "head_1.md3";
+		UpperPath = Dir / "upper_1.md3";
+		LowerPath = Dir / "lower_1.md3";
 		break;
 	case d3d_md3_detail::Low:
-		strcpy(szHead, szDirectory);
-		strcpy(szUpper, szDirectory);
-		strcpy(szLower, szDirectory);
-		strcat(szHead, "head_2.md3");
-		strcat(szUpper, "upper_2.md3");
-		strcat(szLower, "lower_2.md3");
+		HeadPath = Dir / "head_2.md3";
+		UpperPath = Dir / "upper_2.md3";
+		LowerPath = Dir / "lower_2.md3";
 		break;
 	};
 
 	const md3_bool bLoadedMeshes
 	=
-	m_meshHead.LoadMD3(szHead, lpDevice, D3DPOOL_DEFAULT)
+	m_meshHead.LoadMD3(HeadPath, lpDevice, D3DPOOL_DEFAULT)
 	&&
-	m_meshUpper.LoadMD3(szUpper, lpDevice, D3DPOOL_DEFAULT)
+	m_meshUpper.LoadMD3(UpperPath, lpDevice, D3DPOOL_DEFAULT)
 	&&
-	m_meshLower.LoadMD3(szLower, lpDevice, D3DPOOL_DEFAULT);
+	m_meshLower.LoadMD3(LowerPath, lpDevice, D3DPOOL_DEFAULT);
 
 	if (!bLoadedMeshes)
 	{
@@ -408,26 +378,26 @@ HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_
 			//Lower details may not exist of this model so
 			//attempt to load at high detail.
 			SAFE_RELEASE(m_lpDevice);
-			return LoadA(lpDevice, szDir, d3d_md3_detail::High);
+			return Load(lpDevice, Dir, d3d_md3_detail::High);
 		}
 		SAFE_RELEASE(m_lpDevice);
-		return hr;
+		return false;
 	}
 
 
 	//Attempt to load the animation.
-	strcpy(szAnimation, szDirectory);
-	strcat(szAnimation, "animation.cfg");
-	if (!m_Animation.LoadAnimation(szAnimation))
+	const std::filesystem::path AnimConfigPath = Dir / "animation.cfg";
+
+	if (!m_Animation.LoadAnimation(AnimConfigPath))
 	{
 		m_meshHead.ClearMD3();
 		m_meshUpper.ClearMD3();
 		m_meshLower.ClearMD3();
 		SAFE_RELEASE(m_lpDevice);
-		return E_FAIL;
+		return false;
 	}
 
-	if (!GetSkins(szDirectory))
+	if (!GetSkins(Dir))
 	{
 		m_SkinSets.resize(0);
 
@@ -435,7 +405,7 @@ HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_
 		m_meshUpper.ClearMD3();
 		m_meshLower.ClearMD3();
 		SAFE_RELEASE(m_lpDevice);
-		return hr;
+		return false;
 	}
 
 	//Get the link reference for all the md3 mesh's.
@@ -445,7 +415,7 @@ HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_
 
 	m_bLoaded = TRUE;
 
-	return S_OK;
+	return true;
 }
 
 HRESULT CD3D_MD3PlayerMesh::Clear()
