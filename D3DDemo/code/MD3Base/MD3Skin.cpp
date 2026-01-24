@@ -5,13 +5,6 @@
 #include "MD3.h"
 #include "FileSystem/DataStream.h"
 
-CMD3TextureDB CMD3SkinFile::m_md3TexDB;
-
-void CMD3SkinFile::ClearTexDB()
-{
-	m_md3TexDB.ClearDB();
-}
-
 HRESULT CMD3SkinFile::GetTexturePointer(
 	DWORD dwRef,
 	LPDIRECT3DTEXTURE9* lppTexture)
@@ -47,7 +40,7 @@ HRESULT CMD3SkinFile::SetSkin(
 	}
 
 	if (m_Textures[m_SkinRef[dwRef]] == NULL)
-		return S_SKINNULL;
+		return S_OK;
 	else
 		return S_OK;
 }
@@ -73,29 +66,20 @@ void CMD3SkinFile::ClearTextures()
 	m_Textures.shrink_to_fit();
 }
 
-HRESULT CMD3SkinFile::LoadSkin(
-	LPDIRECT3DDEVICE9 lpDevice,
-	const std::filesystem::path& Filename,
-	DWORD dwFlags,
-	LPVOID lpTexDB)
+HRESULT CMD3SkinFile::LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CMD3TextureDB& TexDB)
 {
 	CMD3SkinConfig::LoadSkin(Filename);
-
 
 	ClearTextures();
 	m_Textures.resize(m_NumSkins);
 	wchar_t szTexPath[MAX_PATH];
 	GetDirectoryFromStringW(szTexPath, Filename.c_str());
-	ObtainTextures(lpDevice, szTexPath, dwFlags, lpTexDB);
+	ObtainTextures(lpDevice, szTexPath, TexDB);
 
 	return S_OK;
 }
 
-HRESULT CMD3SkinFile::ObtainTextures(
-	LPDIRECT3DDEVICE9 lpDevice,
-	const std::filesystem::path& TexPath,
-	DWORD dwFlags,
-	LPVOID lpTexDB)
+HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CMD3TextureDB& TexDB)
 {
 	//The name and path to the texture.
 	char szFilename[MAX_PATH];
@@ -115,43 +99,22 @@ HRESULT CMD3SkinFile::ObtainTextures(
 
 		//If using static texture buffer create and/or obtain texture from
 		//the static buffer
-		if ((dwFlags & MD3SKINCREATE_STATICTEXDB) == MD3SKINCREATE_STATICTEXDB) {
-			if (SUCCEEDED(m_md3TexDB.AddTexture(lpDevice, szFilename))) {
-				if (SUCCEEDED(m_md3TexDB.GetTexture(m_Skins[i].SkinPath.c_str(), &m_Textures[i]))) {
-
-				}
-				else {
-					m_Textures[i] = NULL;
-				}
+		if (SUCCEEDED(TexDB.AddTexture(lpDevice, szFilename)))
+		{
+			if (SUCCEEDED(TexDB.GetTexture(m_Skins[i].SkinPath.c_str(), &m_Textures[i])))
+			{
+				
 			}
-			else {
+			else 
+			{
 				m_Textures[i] = NULL;
 			}
-			//If using dynamic buffer add texture to the parameter as database.
 		}
-		else if ((dwFlags & MD3SKINCREATE_DYNAMICTEXDB) == MD3SKINCREATE_DYNAMICTEXDB) {
-			if (SUCCEEDED(((CMD3TextureDB*)lpTexDB)->AddTexture(lpDevice, szFilename))) {
-				if (SUCCEEDED(((CMD3TextureDB*)lpTexDB)->GetTexture(m_Skins[i].SkinPath.c_str(), &m_Textures[i]))) {
-				}
-				else {
-					m_Textures[i] = NULL;
-				}
-			}
-			else {
-				m_Textures[i] = NULL;
-			}
-			//If invalid parameter apply null to the texture.
-		}
-		else {
+		else
+		{
 			m_Textures[i] = NULL;
 		}
 	}
 
-	if ((dwFlags & MD3SKINCREATE_STATICTEXDB) == MD3SKINCREATE_STATICTEXDB) {
-		m_bUseStaticDB = TRUE;
-	}
-	else {
-		m_bUseStaticDB = FALSE;
-	}
 	return S_OK;
 }

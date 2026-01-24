@@ -357,9 +357,9 @@ HRESULT CMD3PlayerMesh::GetSkinsA(char szDir[])
 		sprintf(szUpperSkin, "%s%s%s%s", szDir, "upper_", m_szSkinName[i], ".skin");
 		sprintf(szLowerSkin, "%s%s%s%s", szDir, "lower_", m_szSkinName[i], ".skin");
 
-		hr=m_skinHead[i].LoadSkin(m_lpDevice, szHeadSkin, MD3SKINCREATE_DYNAMICTEXDB, &m_TexDB);
-		hr|=m_skinUpper[i].LoadSkin(m_lpDevice, szUpperSkin, MD3SKINCREATE_DYNAMICTEXDB, &m_TexDB);
-		hr|=m_skinLower[i].LoadSkin(m_lpDevice, szLowerSkin, MD3SKINCREATE_DYNAMICTEXDB, &m_TexDB);
+		hr=m_skinHead[i].LoadSkin(m_lpDevice, szHeadSkin, m_TexDB);
+		hr|=m_skinUpper[i].LoadSkin(m_lpDevice, szUpperSkin, m_TexDB);
+		hr|=m_skinLower[i].LoadSkin(m_lpDevice, szLowerSkin, m_TexDB);
 
 		if(FAILED(hr)){
 			for(j=0; j<i; j++){

@@ -181,47 +181,24 @@ public:
 */
 #ifdef __cplusplus
 
-#define MD3SKINCREATE_REMOVEDIR    0x00000001l
-#define MD3SKINCREATE_STATICTEXDB  0x00000002l
-#define MD3SKINCREATE_DYNAMICTEXDB 0x00000004l
-
-#define S_SKINNULL 0x00000002l
-
 class CMD3SkinFile : public CMD3SkinConfig
 {
 public:
 	CMD3SkinFile();
 	~CMD3SkinFile();
 
-	HRESULT LoadSkin(
-		LPDIRECT3DDEVICE9 lpDevice,
-		const std::filesystem::path& Filename,
-		DWORD dwFlags,
-		LPVOID lpTexDB);
-
-	HRESULT GetTexturePointer(
-		DWORD dwRef,
-		LPDIRECT3DTEXTURE9 * lppTexture);
-
-	HRESULT SetRenderTexture(
-		DWORD dwRef, 
-		LPDIRECT3DDEVICE9 lpDevice);
-
-	HRESULT SetSkin(
-		LPDIRECT3DDEVICE9 lpDevice, 
-		DWORD dwRef);
-
-	static void ClearTexDB();
+	HRESULT LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CMD3TextureDB& TexDB);
+	HRESULT GetTexturePointer(DWORD dwRef, LPDIRECT3DTEXTURE9 * lppTexture);
+	HRESULT SetRenderTexture(DWORD dwRef, LPDIRECT3DDEVICE9 lpDevice);
+	HRESULT SetSkin(LPDIRECT3DDEVICE9 lpDevice, DWORD dwRef);
 
 private:
 	void ClearTextures();
 
-	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, DWORD dwFlags, LPVOID lpTexDB);
+	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CMD3TextureDB& TexDB);
 
 private:
-	md3_bool m_bUseStaticDB = true; /* Whether or not to use static texture DB. */
-	static CMD3TextureDB m_md3TexDB; /* The MD3 skin texture database. */
-	std::vector<IDirect3DTexture9*> m_Textures; /* Pointers to the textures used by this file. */
+	std::vector<IDirect3DTexture9*> m_Textures;
 };
 
 #endif /* __cplusplus */
@@ -454,10 +431,6 @@ public:
 	HRESULT Validate();
 };
 #endif /* __cplusplus */
-
-
-
-
 
 /*
 	The Custom Mesh class.
