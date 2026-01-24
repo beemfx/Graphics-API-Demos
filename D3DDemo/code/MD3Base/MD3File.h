@@ -99,19 +99,19 @@ struct md3Vertex
 struct md3Mesh
 {
 	md3MeshHeader MeshHeader; /* The Mesh Header */
-	md3Shader* Shaders = nullptr; /* Shader list */
-	md3Triangle* Triangles = nullptr; /* Triangle list */
-	md3TexCoords* TexCoords = nullptr; /* Texture coordinate list */
-	md3Vertex* Vertexes = nullptr; /* Vertex list */
+	std::vector<md3Shader> Shaders; /* Shader list */
+	std::vector<md3Triangle> Triangles; /* Triangle list */
+	std::vector<md3TexCoords> TexCoords; /* Texture coordinate list */
+	std::vector<md3Vertex> Vertexes; /* Vertex list */
 };
 
 // Dynamic Size File
 struct md3File
 {
 	md3Header Header; /* File Header */
-	md3Frame* Frames = nullptr; /* List of md3 frames */
-	md3Tag* Tags = nullptr; /* List of md3 tag data */
-	md3Mesh* Meshes = nullptr; /* List of md3 meshes */
+	std::vector<md3Frame> Frames; /* List of md3 frames */
+	std::vector<md3Tag> Tags; /* List of md3 tag data */
+	std::vector<md3Mesh> Meshes; /* List of md3 meshes */
 };
 
 // Fixed Size Mesh (Unused)
@@ -132,7 +132,6 @@ struct md3File2
 	md3Tag Tags[MD3_MAX_TAGS];
 	md3Mesh Meshes[MD3_MAX_SURFACES];
 };
-
 
 /* MD3 File reader functions for Windows */
 

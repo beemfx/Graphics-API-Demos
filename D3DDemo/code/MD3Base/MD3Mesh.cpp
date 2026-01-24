@@ -12,11 +12,6 @@
 
 CMD3Mesh::CMD3Mesh()
 {
-	m_md3File.Meshes=NULL;
-	m_md3File.Frames=NULL;
-	m_md3File.Tags=NULL;
-	m_md3File.Header = { };
-
 	m_lppIB=NULL;
 	m_lppVB=NULL;
 	m_lpVertices=NULL;
