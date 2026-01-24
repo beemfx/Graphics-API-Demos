@@ -963,7 +963,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		#endif
 		break;
 	case WM_CHAR:
-		BeemConsoleOnChar(BeemConsole, wParam);
+		BeemConsoleOnChar(BeemConsole, static_cast<char>(wParam));
 		break;
 	case WM_KEYDOWN:
 	{
@@ -1066,7 +1066,7 @@ int WINAPI WinMain(
 				break;
 
 			if(msg.message==WM_USER_ACTIVEAPP)
-				bActiveApp=msg.wParam;
+				bActiveApp=static_cast<BOOL>(msg.wParam);
 
 			TranslateMessage(&msg); 
 			DispatchMessage(&msg);
@@ -1078,5 +1078,5 @@ int WINAPI WinMain(
 		}
 	}
 	GameShutdown();
-	return msg.wParam;
+	return 0;
 }

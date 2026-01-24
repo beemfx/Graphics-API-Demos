@@ -214,7 +214,7 @@ HRESULT CMD3SkinFile::ObtainTextures(
 	//The name and path to the texture.
 	char szFilename[MAX_PATH];
 	DWORD i=0;
-	DWORD dwLen=0;
+	size_t dwLen=0;
 	for(i=0; i<m_dwNumSkins; i++){
 		strcpy(szFilename, szTexPath);
 		//Insure that there is a backslash at the end of the texture path.
@@ -308,7 +308,7 @@ HRESULT CMD3SkinFile::DeleteSkinFile()
 
 BOOL CMD3SkinFile::ParseLine(MD3SKIN * skinout, LPSTR szLineIn)
 {
-	DWORD dwLineLen=0;
+	size_t dwLineLen=0;
 	BOOL bSecondPart=FALSE;
 	DWORD i=0;
 	DWORD nStringPos=0;

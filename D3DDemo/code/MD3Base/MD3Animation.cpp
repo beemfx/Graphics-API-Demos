@@ -141,7 +141,7 @@ HRESULT CMD3Animation::ReadAnimations(HANDLE hFile, DWORD dwNumLines)
 
 HRESULT CMD3Animation::ParseLine(LPVOID lpDataOut, LPSTR szLineIn, DWORD * lpAnimRef)
 {
-	DWORD dwLen=0;
+	size_t dwLen=0;
 	DWORD i=0, j=0;
 	char szTemp[100];
 	char szFinal[100];

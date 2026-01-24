@@ -352,12 +352,12 @@ BOOL ValidateD3DFont(
 
 		if(FAILED(D3DXCreateFont(
 			((LPD3DFONT)lpFont)->lpDevice,
-			lpFont->fCharHeight,
-			lpFont->fCharWidth,
+			(INT)lpFont->fCharHeight,
+			(UINT)lpFont->fCharWidth,
 			1,
 			1,
 			FALSE,
-			"Courier New",
+			0,
 			0,
 			0,
 			0,

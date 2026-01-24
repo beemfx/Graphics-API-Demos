@@ -1,9 +1,10 @@
-#include <stdio.h>
-#include "MD3File.h"
+// (c) Beem Media. All rights reserved.
 
-BOOL DumpMD3MeshDebugData(FILE * fout, LPMD3MESH lpMesh, DWORD dwDumpFlags);
+#include "MD3Data.h"
 
-BOOL DumpMD3MeshDebugData(FILE * fout, LPMD3MESH lpMesh, DWORD dwDumpFlags){
+static BOOL DumpMD3MeshDebugData(FILE * fout, LPMD3MESH lpMesh, DWORD dwDumpFlags);
+
+static BOOL DumpMD3MeshDebugData(FILE * fout, LPMD3MESH lpMesh, DWORD dwDumpFlags){
 	LONG i=0;
 
 	if(!fout)return FALSE;
@@ -55,7 +56,7 @@ BOOL DumpMD3MeshDebugData(FILE * fout, LPMD3MESH lpMesh, DWORD dwDumpFlags){
 	return TRUE;
 }
 
-BOOL DumpMD3DebugData(LPVOID fout, LPMD3FILE lpFile, DWORD dwDumpFlags){
+BOOL DumpMD3DebugData(FILE* fout, LPMD3FILE lpFile, DWORD dwDumpFlags){
 	LONG i=0;
 	/* Write the header data. */
 	fprintf(fout, "--- MD3 Header ---\n\n");

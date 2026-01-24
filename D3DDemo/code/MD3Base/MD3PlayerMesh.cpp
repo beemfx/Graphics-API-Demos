@@ -232,7 +232,7 @@ HRESULT CMD3PlayerMesh::GetSkinsA(char szDir[])
 	HRESULT hr=0;
 
 	DWORD i=0, j=0, k=0;
-	DWORD dwLen=0;
+	size_t dwLen=0;
 	BOOL bFoundName=FALSE;
 
 	char szHeadSkin[MAX_PATH];
@@ -391,7 +391,7 @@ HRESULT CMD3PlayerMesh::GetSkinsW(WCHAR szDir[])
 
 HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL nDetail)
 {
-	DWORD dwLen=0;
+	size_t dwLen=0;
 	HRESULT hr=0;
 	char szDirectory[MAX_PATH];
 	char szHead[MAX_PATH];

@@ -88,7 +88,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 	LONG lNumMesh=0;
 	DWORD i=0;
 
-	DWORD dwLen=0;
+	size_t dwLen=0;
 
 	HRESULT hr=0;
 
@@ -249,7 +249,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 
 HRESULT CMD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
 {
-	DWORD dwLen=0, i=0, j=0;
+	size_t dwLen=0, i=0, j=0;
 	char szTemp[MAX_PATH];
 	HRESULT hr=0;
 

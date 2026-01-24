@@ -50,7 +50,8 @@ BOOL BeemParseGetString(
 	LPSTR szStringOut,
 	LPSTR szString)
 {
-	DWORD dwLen=0, i=0, j=0;
+	size_t dwLen=0;
+	DWORD i=0, j=0;
 	BOOL bInQuotes=FALSE;
 	BOOL bFoundString=FALSE;
 
@@ -83,7 +84,8 @@ BOOL BeemParseGetParam(
 	LPSTR szParams, 
 	WORD wParam)
 {
-	DWORD dwLen=0, i=0, j=0;
+	size_t dwLen=0;
+	DWORD i=0, j=0;
 	BOOL bFoundParam=FALSE;
 
 	if(wParam < 1)
@@ -149,7 +151,7 @@ BOOL BeemConsoleSimpleParse(
 	char szCommand[MAX_CHARSPERLINE], 
 	char szParams[MAX_CHARSPERLINE], 
 	char szIgnore[128],
-	LPSTR szLineIn);
+	LPCSTR szLineIn);
 
 BOOL BeemConsoleEraseInput(
 	HBEEMCONSOLE lpConsole);
@@ -209,13 +211,14 @@ BOOL BeemConsoleSimpleParse(
 	char szCommand[MAX_CHARSPERLINE], 
 	char szParams[MAX_CHARSPERLINE], 
 	char szIgnore[128],
-	LPSTR szLineIn)
+	LPCSTR szLineIn)
 {
 	char szTemp[MAX_CHARSPERLINE];
-	DWORD dwLen=0, i=0, j=0, k=0, dwSpaces=0;
+	size_t dwLen=0;
+	DWORD i=0, j=0, k=0, dwSpaces=0;
 	BOOL bFoundChar=FALSE, bIgnore=FALSE;
 
-	DWORD dwIgnoreLen=0;
+	size_t dwIgnoreLen=0;
 
 	dwLen=strlen(szLineIn);
 	dwIgnoreLen=strlen(szIgnore);
@@ -469,7 +472,7 @@ BOOL BeemConsoleClearEntries(
 
 BOOL SendBeemConsoleMessage(
 	HBEEMCONSOLE lpConsole,
-	LPSTR szMessage)
+	LPCSTR szMessage)
 {
 	char szTemp[MAX_CHARSPERLINE];
 	if(!lpConsole)
@@ -486,12 +489,12 @@ BOOL SendBeemConsoleMessage(
 
 BOOL SendBeemConsoleCommand(
 	HBEEMCONSOLE hConsole,
-	LPSTR szCommandLine)
+	LPCSTR szCommandLine)
 {
 	char szParams[MAX_CHARSPERLINE];
 	char szCommand[MAX_CHARSPERLINE];
 	char szParseIgnore[]=" ,()";
-	DWORD dwLen=0;
+	size_t dwLen=0;
 
 	dwLen=strlen(szCommandLine);
 
@@ -733,7 +736,7 @@ BOOL BeemConsoleOnChar(
 	HBEEMCONSOLE lpConsole,
 	char cChar)
 {
-	DWORD dwLen=0;
+	size_t dwLen=0;
 
 	if(lpConsole==NULL)
 		return FALSE;

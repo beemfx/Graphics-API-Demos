@@ -40,7 +40,7 @@ HRESULT CMD3ObjectMesh::Clear()
 
 HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShader[MAX_PATH])
 {
-	DWORD dwLen=0, i=0, j=0;
+	size_t dwLen=0, i=0, j=0;
 	char szTemp[MAX_PATH];
 	HRESULT hr=0;
 
@@ -131,7 +131,7 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	char szPath[MAX_PATH];
 	char szExt[7];
 	char szFileName[MAX_PATH];
-	DWORD dwLen=0;
+	size_t dwLen=0;
 
 	GetDirectoryFromStringA(szPath, szFile);
 	strcpy(szFileName, szFile);

@@ -4,8 +4,8 @@
 
 BOOL RemoveDirectoryFromStringA(char szLineOut[], const char szLineIn[])
 {
-	DWORD dwStrLen=0;
-	DWORD i=0, j=0;
+	size_t dwStrLen=0;
+	size_t i=0, j=0;
 	char szFinal[MAX_PATH];
 
 	dwStrLen=strlen(szLineIn);
@@ -27,8 +27,8 @@ BOOL RemoveDirectoryFromStringA(char szLineOut[], const char szLineIn[])
 
 BOOL RemoveDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[])
 {
-	DWORD dwStrLen=0;
-	DWORD i=0, j=0;
+	size_t dwStrLen=0;
+	size_t i=0, j=0;
 	WCHAR szFinal[MAX_PATH];
 
 	dwStrLen=wcslen(szLineIn);
@@ -53,8 +53,8 @@ BOOL RemoveDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[])
 
 BOOL GetDirectoryFromStringA(char szLineOut[], const char szLineIn[])
 {
-	DWORD dwStrLen=0;
-	DWORD i=0, j=0;
+	size_t dwStrLen=0;
+	size_t i=0, j=0;
 	char szFinal[MAX_PATH];
 
 	dwStrLen=strlen(szLineIn);
@@ -74,8 +74,8 @@ BOOL GetDirectoryFromStringA(char szLineOut[], const char szLineIn[])
 
 BOOL GetDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[])
 {
-	DWORD dwStrLen=0;
-	DWORD i=0, j=0;
+	size_t dwStrLen=0;
+	size_t i=0, j=0;
 	WCHAR szFinal[MAX_PATH];
 
 	dwStrLen=wcslen(szLineIn);
@@ -159,8 +159,8 @@ DWORD GetNumLinesInFile(HANDLE hFile)
 
 HRESULT ReadWordFromLine(LPSTR szLineOut, LPSTR szLine, DWORD dwStart, DWORD * dwEnd)
 {
-	DWORD i=0, j=0;
-	DWORD dwLen=0;
+	size_t i=0, j=0;
+	size_t dwLen=0;
 
 	BOOL bReadChar=FALSE;
 
@@ -180,7 +180,7 @@ HRESULT ReadWordFromLine(LPSTR szLineOut, LPSTR szLine, DWORD dwStart, DWORD * d
 	szLineOut[j]=0;
 	
 	if(dwEnd)
-		*dwEnd=dwStart+j+1;
+		*dwEnd=(DWORD)(dwStart+j+1);
 
 	return S_OK;
 }

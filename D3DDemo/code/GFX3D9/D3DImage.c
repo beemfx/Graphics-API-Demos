@@ -83,7 +83,7 @@ HD3DIMAGE CopyD3DImage(
 
 HD3DIMAGE CreateD3DImageFromFileA(
 	LPDIRECT3DDEVICE9 lpDevice,
-	char szFilename[MAX_PATH],
+	const char szFilename[MAX_PATH],
 	DWORD dwWidth,
 	DWORD dwHeight,
 	D3DCOLOR dwTransparent)
@@ -159,7 +159,7 @@ HD3DIMAGE CreateD3DImageFromFileA(
 
 HD3DIMAGE CreateD3DImageFromFileW(
 	LPDIRECT3DDEVICE9 lpDevice,
-	WCHAR szFilename[MAX_PATH],
+	const WCHAR szFilename[MAX_PATH],
 	DWORD dwWidth,
 	DWORD dwHeight,
 	D3DCOLOR dwTransparent)

@@ -1,9 +1,10 @@
 #define D3D_MD3
+#include "MD3.h"
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
 #include "Functions.h"
-#include "MD3.h"
+#include "MD3Data.h"
 
 ///////////////////////////////////
 ///  Constructor and Destructor ///

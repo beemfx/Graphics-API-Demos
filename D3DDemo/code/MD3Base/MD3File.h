@@ -1,13 +1,10 @@
-#ifndef __MD3FILE_H__
-#define __MD3FILE_H__
+// (c) Beem Media. All rights reserved.
 
+#pragma once
+
+#include "MD3Types.h"
 #include <windows.h>
 
-#ifdef __cplusplus
-extern "C"{
-#endif /* __cplusplus */
-
-#if (defined(WIN32) || defined(WIN64))
 /* MD3 and Q3 Definitions */
 #define MD3_VERSION       15
 #define MD3_ID            (*(DWORD*)"IDP3")
@@ -239,8 +236,6 @@ BOOL ReadMD3Vertex(
 
 BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex);
 
-
-#endif /* (defined(WIN32) || defined(WIN64)) */
 /*
 	Generic MD3 Functions.
 */
@@ -253,12 +248,3 @@ BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex);
 #define MD3DUMP_MESHTEXCOORD 0x00000020l
 #define MD3DUMP_MESHVERTEX   0x00000040l
 #define MD3DUMP_ALL          0xFFFFFFFFl
-
-BOOL DumpMD3DebugData(LPVOID fout, LPMD3FILE lpFile, DWORD dwDumpFlags);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-
-#endif /* __MD3FILE_H__ */

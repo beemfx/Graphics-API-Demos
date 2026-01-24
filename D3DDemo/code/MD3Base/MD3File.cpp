@@ -49,7 +49,7 @@ BOOL ReadMD3File(
 
 
 	/* Initialize and read frame data. */
-	lpFile->md3Frame=malloc(lpFile->md3Header.lNumFrames * sizeof(MD3FRAME));
+	lpFile->md3Frame=reinterpret_cast<MD3FRAME*>(malloc(lpFile->md3Header.lNumFrames * sizeof(MD3FRAME)));
 	if(lpFile->md3Frame == NULL)return FALSE;
 
 	/* Set file pointer to appropriate location, then read the data. */
@@ -63,7 +63,7 @@ BOOL ReadMD3File(
 	}
 
 	/* Initialzie and read tag data. */
-	lpFile->md3Tag=malloc(lpFile->md3Header.lNumTags * lpFile->md3Header.lNumFrames * sizeof(MD3TAG) );
+	lpFile->md3Tag=reinterpret_cast<MD3TAG*>(malloc(lpFile->md3Header.lNumTags * lpFile->md3Header.lNumFrames * sizeof(MD3TAG) ));
 	if(lpFile->md3Tag == NULL){
 		SAFE_FREE(lpFile->md3Frame);
 		return FALSE;
@@ -83,7 +83,7 @@ BOOL ReadMD3File(
 	/* Next up Meshes need to be read. */
 
 	/* Allocate memory for meshes. */
-	lpFile->md3Mesh=malloc(lpFile->md3Header.lNumMeshes * sizeof(MD3MESH));
+	lpFile->md3Mesh=reinterpret_cast<MD3MESH*>(malloc(lpFile->md3Header.lNumMeshes * sizeof(MD3MESH)));
 	if(lpFile->md3Mesh == NULL){
 		SAFE_FREE(lpFile->md3Frame);
 		SAFE_FREE(lpFile->md3Tag);
@@ -159,7 +159,7 @@ BOOL ReadMD3Mesh(
 	if(lpMesh->md3MeshHeader.dwID != MD3_ID)return FALSE;
 
 	/* Prepare shader data. */
-	lpMesh->md3Shader=malloc(lpMesh->md3MeshHeader.lNumShaders * sizeof(MD3SHADER));
+	lpMesh->md3Shader=reinterpret_cast<MD3SHADER*>(malloc(lpMesh->md3MeshHeader.lNumShaders * sizeof(MD3SHADER)));
 	if(lpMesh->md3Shader == NULL)return FALSE;
 	/* Read shader. */
 	SetFilePointer(hFile, lMeshOffset+lpMesh->md3MeshHeader.lShaderOffset, 0, FILE_BEGIN);
@@ -176,7 +176,7 @@ BOOL ReadMD3Mesh(
 		*lpNumBytesRead+=dwBytesRead;
 	}
 	/* Prepare triangle data. */
-	lpMesh->md3Triangle=malloc(lpMesh->md3MeshHeader.lNumTriangles * sizeof(MD3TRIANGLE));
+	lpMesh->md3Triangle= reinterpret_cast<MD3TRIANGLE*>(malloc(lpMesh->md3MeshHeader.lNumTriangles * sizeof(MD3TRIANGLE)));
 	if(lpMesh->md3Triangle == NULL){
 		SAFE_FREE(lpMesh->md3Shader);
 		return FALSE;
@@ -198,7 +198,7 @@ BOOL ReadMD3Mesh(
 		*lpNumBytesRead+=dwBytesRead;
 	}
 	/* Prepare Texture coordinates. */
-	lpMesh->md3TexCoords=malloc(lpMesh->md3MeshHeader.lNumVertices * sizeof(MD3TEXCOORDS));
+	lpMesh->md3TexCoords= reinterpret_cast<MD3TEXCOORDS*>(malloc(lpMesh->md3MeshHeader.lNumVertices * sizeof(MD3TEXCOORDS)));
 	if(lpMesh->md3TexCoords == NULL){
 		SAFE_FREE(lpMesh->md3Shader);
 		SAFE_FREE(lpMesh->md3Triangle);
@@ -221,7 +221,7 @@ BOOL ReadMD3Mesh(
 		*lpNumBytesRead+=dwBytesRead;
 	}
 	/* Prepare vertex data. */
-	lpMesh->md3Vertex=malloc(lpMesh->md3MeshHeader.lNumVertices * lpMesh->md3MeshHeader.lNumFrames * sizeof(MD3VERTEX));
+	lpMesh->md3Vertex= reinterpret_cast<MD3VERTEX*>(malloc(lpMesh->md3MeshHeader.lNumVertices * lpMesh->md3MeshHeader.lNumFrames * sizeof(MD3VERTEX)));
 	if(lpMesh->md3Vertex == NULL){
 		SAFE_FREE(lpMesh->md3Shader);
 		SAFE_FREE(lpMesh->md3Triangle);
@@ -936,9 +936,9 @@ BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex)
 	lat = (lpVertex->nNormal & 0x00FF) * (2.0f * 3.141592654f) / 255.0f;
 	lng = ((lpVertex->nNormal & 0xFF00) >> 8) * (2.0f * 3.141592654f) / 255.0f;
 	/* Get the x, y, z values. */
-	x = (FLOAT)(cos(lat) * sin(lng));
-	y = (FLOAT)(sin(lat) * sin(lng));
-	z = (FLOAT)(cos(lng));
+	x = (FLOAT)(std::cos(lat) * std::sin(lng));
+	y = (FLOAT)(std::sin(lat) * std::sin(lng));
+	z = (FLOAT)(std::cos(lng));
 
 	/* Adjust the normal vector. */
 	/*

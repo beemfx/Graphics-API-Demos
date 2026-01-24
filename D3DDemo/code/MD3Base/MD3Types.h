@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 
 using md3_bool = bool;
