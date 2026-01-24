@@ -6,7 +6,7 @@
 
 #include <d3d9.h>
 
-class CMD3SkinFile;
+class CD3D_MD3Skin;
 
 static constexpr DWORD D3DMD3VERTEX_TYPE = (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
 
@@ -79,7 +79,7 @@ public:
 	void ClearMD3();
 
 	void Render(
-		CMD3SkinFile* lpSkin,
+		CD3D_MD3Skin* lpSkin,
 		FLOAT fTime,
 		LONG lFirstFrame,
 		LONG lNextFrame,
@@ -96,7 +96,7 @@ public:
 	void Invalidate();
 	bool Validate();
 
-	void SetSkinRefs(CMD3SkinFile& Skin);
+	void SetSkinRefs(CD3D_MD3Skin& Skin);
 
 	HRESULT GetTagTranslation(
 		DWORD dwTagRef,

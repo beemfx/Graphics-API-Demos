@@ -270,15 +270,15 @@ HRESULT CMD3PlayerMesh::GetSkinsA(char szDir[])
 	m_dwNumSkins = dwNumSkins;
 
 	//Allocate memory to all of the skin files.
-	m_skinHead = new CMD3SkinFile[m_dwNumSkins];
+	m_skinHead = new CD3D_MD3Skin[m_dwNumSkins];
 	if (m_skinHead == NULL)
 		return E_FAIL;
-	m_skinUpper = new CMD3SkinFile[m_dwNumSkins];
+	m_skinUpper = new CD3D_MD3Skin[m_dwNumSkins];
 	if (m_skinUpper == NULL) {
 		SAFE_DELETE_ARRAY(m_skinHead);
 		return E_FAIL;
 	}
-	m_skinLower = new CMD3SkinFile[m_dwNumSkins];
+	m_skinLower = new CD3D_MD3Skin[m_dwNumSkins];
 	if (m_skinLower == NULL) {
 		SAFE_DELETE_ARRAY(m_skinHead);
 		SAFE_DELETE_ARRAY(m_skinUpper);

@@ -312,7 +312,7 @@ void CD3D_MD3Mesh::RenderWithTexture(
 
 
 void CD3D_MD3Mesh::Render(
-	CMD3SkinFile* lpSkin,
+	CD3D_MD3Skin* lpSkin,
 	FLOAT fTime,
 	LONG lFirstFrame,
 	LONG lNextFrame,
@@ -477,7 +477,7 @@ HRESULT CD3D_MD3Mesh::DumpDebug()
 	return S_OK;
 }
 
-void CD3D_MD3Mesh::SetSkinRefs(CMD3SkinFile& Skin)
+void CD3D_MD3Mesh::SetSkinRefs(CD3D_MD3Skin& Skin)
 {
 	if (!m_bMD3Loaded)
 		return;

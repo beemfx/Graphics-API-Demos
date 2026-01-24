@@ -16,7 +16,7 @@
 #include <d3d9.h>
 #include "MD3TexDB.h"
 
-class CMD3SkinFile;
+class CD3D_MD3Skin;
 class CMD3WeaponMesh;
 
 
@@ -27,13 +27,13 @@ class CMD3PlayerMesh
 {
 protected:
 	CD3D_MD3Mesh m_meshHead;
-	CMD3SkinFile * m_skinHead;
+	CD3D_MD3Skin * m_skinHead;
 
 	CD3D_MD3Mesh m_meshUpper;
-	CMD3SkinFile * m_skinUpper;
+	CD3D_MD3Skin * m_skinUpper;
 
 	CD3D_MD3Mesh m_meshLower;
-	CMD3SkinFile * m_skinLower;
+	CD3D_MD3Skin * m_skinLower;
 
 	CMD3AnimConfig m_Animation;
 

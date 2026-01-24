@@ -4,17 +4,17 @@
 #include "Library/Functions.h"
 #include "GFX3D9/GFX3D9TextureDB.h"
 
-CMD3SkinFile::CMD3SkinFile()
+CD3D_MD3Skin::CD3D_MD3Skin()
 {
 	
 }
 
-CMD3SkinFile::~CMD3SkinFile()
+CD3D_MD3Skin::~CD3D_MD3Skin()
 {
 	ClearTextures();
 }
 
-bool CMD3SkinFile::LoadSkin(IDirect3DDevice9* lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB)
+bool CD3D_MD3Skin::LoadSkin(IDirect3DDevice9* lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB)
 {
 	CMD3SkinConfig::LoadSkin(Filename);
 
@@ -25,7 +25,7 @@ bool CMD3SkinFile::LoadSkin(IDirect3DDevice9* lpDevice, const std::filesystem::p
 	return true;
 }
 
-IDirect3DTexture9* CMD3SkinFile::GetTexturePointer(md3_uint32 Ref)
+IDirect3DTexture9* CD3D_MD3Skin::GetTexturePointer(md3_uint32 Ref)
 {
 	if ((Ref < 0) || (Ref >= m_NumSkins))
 	{
@@ -50,7 +50,7 @@ IDirect3DTexture9* CMD3SkinFile::GetTexturePointer(md3_uint32 Ref)
 	return Out;
 }
 
-void CMD3SkinFile::ClearTextures()
+void CD3D_MD3Skin::ClearTextures()
 {
 	for (auto& Item : m_Textures)
 	{
@@ -64,7 +64,7 @@ void CMD3SkinFile::ClearTextures()
 	m_Textures.shrink_to_fit();
 }
 
-void CMD3SkinFile::ObtainTextures(IDirect3DDevice9* Dev, const std::filesystem::path& TexPath, CGFX3D9TextureDB& TexDB)
+void CD3D_MD3Skin::ObtainTextures(IDirect3DDevice9* Dev, const std::filesystem::path& TexPath, CGFX3D9TextureDB& TexDB)
 {
 	//The name and path to the texture.
 	char szFilename[MAX_PATH];

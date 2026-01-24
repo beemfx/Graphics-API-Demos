@@ -7,11 +7,11 @@
 
 class CGFX3D9TextureDB;
 
-class CMD3SkinFile : public CMD3SkinConfig
+class CD3D_MD3Skin : public CMD3SkinConfig
 {
 public:
-	CMD3SkinFile();
-	~CMD3SkinFile();
+	CD3D_MD3Skin();
+	~CD3D_MD3Skin();
 
 	bool LoadSkin(IDirect3DDevice9* lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB);
 	IDirect3DTexture9* GetTexturePointer(md3_uint32 Ref);
