@@ -212,8 +212,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="code\3rdParty\miniz\miniz.c" />
-    <ClCompile Include="code\Archive\DataStream.cpp" />
-    <ClCompile Include="code\Archive\ZipArchive.cpp" />
+    <ClCompile Include="code\FileSystem\DataStream.cpp" />
+    <ClCompile Include="code\FileSystem\ZipArchive.cpp" />
     <ClCompile Include="code\GFX3D9\BeemConsole.c" />
     <ClCompile Include="code\GFX3D9\D3DFont.c" />
     <ClCompile Include="code\GFX3D9\D3DImage.c" />
@@ -234,8 +234,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\3rdParty\miniz\miniz.h" />
-    <ClInclude Include="code\Archive\DataStream.h" />
-    <ClInclude Include="code\Archive\ZipArchive.h" />
+    <ClInclude Include="code\FileSystem\DataStream.h" />
+    <ClInclude Include="code\FileSystem\ZipArchive.h" />
     <ClInclude Include="code\GFX3D9\GFX3D9.h" />
     <ClInclude Include="code\MD3Base\defines.h" />
     <ClInclude Include="code\MD3Base\Functions.h" />

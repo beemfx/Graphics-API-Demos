@@ -19,8 +19,8 @@
     <Filter Include="code\3rdParty\miniz\examples">
       <UniqueIdentifier>{4aa93669-8568-46e2-bc80-3282c2cfddb8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\Archive">
-      <UniqueIdentifier>{909a8740-1811-4574-bdc2-3a8500cbd08c}</UniqueIdentifier>
+    <Filter Include="code\FileSsytem">
+      <UniqueIdentifier>{0174cf8f-eb48-4a02-9dae-ffbbca31e3a6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -107,11 +107,11 @@
     <ClCompile Include="code\3rdParty\miniz\examples\example6.c">
       <Filter>code\3rdParty\miniz\examples</Filter>
     </ClCompile>
-    <ClCompile Include="code\Archive\ZipArchive.cpp">
-      <Filter>code\Archive</Filter>
+    <ClCompile Include="code\FileSystem\DataStream.cpp">
+      <Filter>code\FileSsytem</Filter>
     </ClCompile>
-    <ClCompile Include="code\Archive\DataStream.cpp">
-      <Filter>code\Archive</Filter>
+    <ClCompile Include="code\FileSystem\ZipArchive.cpp">
+      <Filter>code\FileSsytem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,11 +139,11 @@
     <ClInclude Include="code\3rdParty\miniz\miniz.h">
       <Filter>code\3rdParty\miniz</Filter>
     </ClInclude>
-    <ClInclude Include="code\Archive\ZipArchive.h">
-      <Filter>code\Archive</Filter>
+    <ClInclude Include="code\FileSystem\DataStream.h">
+      <Filter>code\FileSsytem</Filter>
     </ClInclude>
-    <ClInclude Include="code\Archive\DataStream.h">
-      <Filter>code\Archive</Filter>
+    <ClInclude Include="code\FileSystem\ZipArchive.h">
+      <Filter>code\FileSsytem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
