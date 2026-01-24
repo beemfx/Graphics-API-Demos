@@ -2,7 +2,6 @@
 #define __FUNCTIONS_H__
 
 #include <windows.h>
-#include "MD3.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +20,6 @@ BOOL RemoveDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[]);
 
 BOOL GetDirectoryFromStringA(char szLineOut[], const char szLineIn[]);
 BOOL GetDirectoryFromStringW(WCHAR szLineOut[], const WCHAR szLineIn[]);
-
-
-BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex);
 
 
 #define RLERR_INVALIDFILE 0x80000001l

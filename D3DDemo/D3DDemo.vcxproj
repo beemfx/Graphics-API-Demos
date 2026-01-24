@@ -242,6 +242,7 @@
     <ClInclude Include="code\MD3Base\MD3.h" />
     <ClInclude Include="code\MD3Base\MD3File.h" />
     <ClInclude Include="code\MD3Base\MD3TexDB.h" />
+    <ClInclude Include="code\MD3Base\MD3Types.h" />
     <ClInclude Include="code\resource.h" />
   </ItemGroup>
   <ItemGroup>

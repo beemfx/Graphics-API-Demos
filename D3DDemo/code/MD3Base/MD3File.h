@@ -20,7 +20,6 @@ extern "C"{
 #define MD3_MAX_VERTS     4096
 #define MD3_XYZ_SCALE     (1.0f/64.0f)
 
-
 /* MD3 File Header */
 typedef struct tagMD3HEADER{
 	DWORD dwID; /* *(DWORD*)"IDP3" */
@@ -135,6 +134,7 @@ typedef struct tagMD3FILE2{
 	MD3MESH md3Mesh[MD3_MAX_SURFACES];
 }MD3FILE2, *LPMD3FILE2;
 
+
 /* MD3 File reader functions for Windows */
 
 /*
@@ -236,6 +236,8 @@ BOOL ReadMD3Vertex(
 	LPVOID lpBuffer,
 	LPDWORD lpNumBytesRead,
 	LPOVERLAPPED lpOverlapped);
+
+BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex);
 
 
 #endif /* (defined(WIN32) || defined(WIN64)) */

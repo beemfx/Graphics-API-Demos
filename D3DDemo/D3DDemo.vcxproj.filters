@@ -145,6 +145,9 @@
     <ClInclude Include="code\FileSystem\ZipArchive.h">
       <Filter>code\FileSsytem</Filter>
     </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3Types.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="code\resource.rc">

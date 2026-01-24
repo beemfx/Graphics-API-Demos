@@ -1,28 +1,6 @@
+#include "Functions.h"
 #include <math.h>
 #include <stdio.h>
-#include "Functions.h"
-
-BOOL DecodeNormalVector(LPMD3VECTOR lpOut, const LPMD3VERTEX lpVertex)
-{
-	FLOAT lat=0, lng=0;
-	FLOAT x=0, y=0, z=0;
-
-	/* Get the latitude and longitude. */
-	lat=(lpVertex->nNormal&0x00FF)*(2.0f*3.141592654f)/255.0f;
-	lng=((lpVertex->nNormal&0xFF00)>>8)*(2.0f*3.141592654f)/255.0f;
-	/* Get the x, y, z values. */
-	x=(FLOAT)(cos(lat)*sin(lng));
-	y=(FLOAT)(sin(lat)*sin(lng));
-	z=(FLOAT)(cos(lng));
-
-	/* Adjust the normal vector. */
-	/*
-	lpOut->x=x+(lpVertex->x*MD3_XYZ_SCALE);
-	lpOut->y=y+(lpVertex->y*MD3_XYZ_SCALE);
-	lpOut->z=z+(lpVertex->z*MD3_XYZ_SCALE);
-	*/
-	return TRUE;
-}
 
 BOOL RemoveDirectoryFromStringA(char szLineOut[], const char szLineIn[])
 {
