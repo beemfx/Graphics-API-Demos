@@ -222,6 +222,7 @@
     <ClCompile Include="code\GFX3D9\Vertex.cpp" />
     <ClCompile Include="code\Library\Functions.cpp" />
     <ClCompile Include="code\Main.cpp" />
+    <ClCompile Include="code\MD3Base\D3D_MD3Skin.cpp" />
     <ClCompile Include="code\MD3Base\MD3AnimConfig.cpp" />
     <ClCompile Include="code\MD3Base\MD3Data.cpp" />
     <ClCompile Include="code\MD3Base\MD3File.cpp" />
@@ -229,7 +230,6 @@
     <ClCompile Include="code\MD3Base\MD3ObjectMesh.cpp" />
     <ClCompile Include="code\MD3Base\MD3PlayerMesh.cpp" />
     <ClCompile Include="code\MD3Base\MD3PlayerObject.cpp" />
-    <ClCompile Include="code\MD3Base\MD3Skin.cpp" />
     <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp" />
     <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp" />
   </ItemGroup>
@@ -241,6 +241,7 @@
     <ClInclude Include="code\GFX3D9\GFX3D9TextureDB.h" />
     <ClInclude Include="code\Library\Functions.h" />
     <ClInclude Include="code\MD3Base\D3D_MD3Mesh.h" />
+    <ClInclude Include="code\MD3Base\D3D_MD3Skin.h" />
     <ClInclude Include="code\MD3Base\defines.h" />
     <ClInclude Include="code\MD3Base\MD3.h" />
     <ClInclude Include="code\MD3Base\MD3AnimConfig.h" />

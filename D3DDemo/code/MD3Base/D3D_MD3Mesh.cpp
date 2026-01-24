@@ -1,8 +1,8 @@
 // (c) Beem Media. All rights reserved.
 
 #include "D3D_MD3Mesh.h"
+#include "D3D_MD3Skin.h"
 #include "FileSystem/DataStream.h"
-#include "MD3.h"
 #include "MD3Data.h"
 #include <d3dx9.h>
 
@@ -15,10 +15,6 @@ CD3D_MD3Mesh::~CD3D_MD3Mesh()
 {
 	ClearMD3();
 }
-
-///////////////////////////////
-///  Public member methods  ///
-///////////////////////////////
 
 HRESULT CD3D_MD3Mesh::GetNumTags(
 	LONG* lpNumTags)
@@ -216,10 +212,6 @@ void CD3D_MD3Mesh::RenderWithTexture(
 	FLOAT fNextX = 0.0f, fNextY = 0.0f, fNextZ = 0.0f;
 	LPVOID lpBuffer = NULL;
 
-	//D3D data that should be restored after the render.
-	DWORD dwPrevCullMode = 0;
-	LPDIRECT3DTEXTURE9 lpPrevTexture = NULL;
-
 	if (!m_Dev)
 		return;
 
@@ -231,10 +223,6 @@ void CD3D_MD3Mesh::RenderWithTexture(
 		return;
 	if ((lNextFrame < 0) || (lNextFrame >= m_md3File.Header.NumFrames))
 		return;
-
-	//Get the D3D data that should be restored.
-	m_Dev->GetRenderState(D3DRS_CULLMODE, &dwPrevCullMode);
-	m_Dev->GetTexture(0, (IDirect3DBaseTexture9**)&lpPrevTexture);
 
 	if (MD3TEXRENDER_NOCULL == (MD3TEXRENDER_NOCULL & dwFlags))
 		m_Dev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -320,14 +308,6 @@ void CD3D_MD3Mesh::RenderWithTexture(
 		m_Dev->SetFVF(D3DMD3VERTEX_TYPE);
 	}
 #endif //DRAW_NORMAL_MESH
-
-	//Restore saved D3D data.
-	m_Dev->SetRenderState(D3DRS_CULLMODE, dwPrevCullMode);
-	m_Dev->SetTexture(0, lpPrevTexture);
-	if (lpPrevTexture)
-	{
-		lpPrevTexture->Release();
-	}
 }
 
 

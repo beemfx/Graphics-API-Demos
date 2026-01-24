@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "defines.h"
 #include "md3.h"
+#include "D3D_MD3Skin.h"
 
 CMD3PlayerMesh::CMD3PlayerMesh()
 {

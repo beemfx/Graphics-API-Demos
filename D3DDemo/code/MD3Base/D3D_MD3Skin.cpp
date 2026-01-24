@@ -1,9 +1,8 @@
-#define D3D_MD3
-#include <stdio.h>
-#include "Defines.h"
-#include "Functions.h"
-#include "MD3.h"
-#include "FileSystem/DataStream.h"
+// (c) Beem Media. All rights reserved.
+
+#include "D3D_MD3Skin.h"
+#include "Library/Functions.h"
+#include "GFX3D9/GFX3D9TextureDB.h"
 
 HRESULT CMD3SkinFile::GetTexturePointer(
 	DWORD dwRef,
@@ -48,7 +47,7 @@ HRESULT CMD3SkinFile::SetSkin(
 
 CMD3SkinFile::CMD3SkinFile()
 {
-	
+
 }
 
 CMD3SkinFile::~CMD3SkinFile()
@@ -60,7 +59,11 @@ void CMD3SkinFile::ClearTextures()
 {
 	for (auto& Item : m_Textures)
 	{
-		SAFE_RELEASE(Item);
+		if (Item)
+		{
+			Item->Release();
+			Item = nullptr;
+		}
 	}
 	m_Textures.resize(0);
 	m_Textures.shrink_to_fit();
