@@ -321,12 +321,6 @@ protected:
 #ifdef __cplusplus
 
 
-#ifdef UNICODE 
-#define LoadAnimation LoadAnimationW
-#else /* UNICODE */
-#define LoadAnimation LoadAnimationA
-#endif /* UNICODE */
-
 #define MD3ANIM_ADJUST 0x00000001l
 
 class MD3BASE_EXPORTS CMD3Animation
@@ -337,17 +331,16 @@ protected:
 	SHORT m_nHeadOffset[3];
 	LONG m_lLegOffset;
 	MD3ANIMATION m_Animations[MD3_NUM_ANIMS];
+	std::size_t m_CurReadAnim = 0;
 
-	HRESULT ReadAnimations(HANDLE hFile, DWORD dwNumLines);
-	HRESULT ParseLine(LPVOID lpDataOut, LPSTR szLineIn, DWORD * lpAnimRef);
+	void ReadAnimations(const std::vector<std::string>& Lines);
+	void ParseLine(const std::string& Line);
 
 public:
 	CMD3Animation();
 	~CMD3Animation();
 
-	HRESULT LoadAnimationA(char szFilename[]);
-	HRESULT LoadAnimationW(WCHAR szFilename[]);
-
+	HRESULT LoadAnimation(const std::filesystem::path& Filename);
 	HRESULT GetAnimation(DWORD dwRef, MD3ANIMATION * lpAnimation, DWORD dwFlags);
 };
 

@@ -29,7 +29,7 @@ HRESULT ReadWordFromLine(LPSTR szLineOut, LPSTR szLine, DWORD dwStart, DWORD* dw
 namespace Functions
 {
 	std::vector<std::string> ReadLines(CDataStream& In);
-	std::string ReadWordFromLine(const std::string& Line, md3_int32 Start, md3_int32* End);
+	std::string ReadWordFromLine(const std::string& Line, std::size_t Start, std::size_t* End);
 
 	std::string RemoveDirectoryFromString(const std::string& In);
 }

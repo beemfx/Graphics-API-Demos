@@ -1,6 +1,7 @@
 #define D3D_MD3
-#include "functions.h"
-#include "md3.h"
+#include "Functions.h"
+#include "MD3.h"
+#include "FileSystem/DataStream.h"
 
 #define PERR_FAIL           0x80000000l
 #define PERR_NOLINE         0x80000001l
@@ -12,10 +13,10 @@
 
 CMD3Animation::CMD3Animation()
 {
-	m_nHeadOffset[0]=m_nHeadOffset[1]=m_nHeadOffset[2]=0;
-	m_nSex=MD3SEX_DEFAULT;
-	m_nFootStep=MD3FOOTSTEP_DEFAULT;
-	m_lLegOffset=0;
+	m_nHeadOffset[0] = m_nHeadOffset[1] = m_nHeadOffset[2] = 0;
+	m_nSex = MD3SEX_DEFAULT;
+	m_nFootStep = MD3FOOTSTEP_DEFAULT;
+	m_lLegOffset = 0;
 
 	ZeroMemory(m_Animations, sizeof(m_Animations));
 }
@@ -29,87 +30,43 @@ CMD3Animation::~CMD3Animation()
 // Public Functions //
 //////////////////////
 
-HRESULT CMD3Animation::LoadAnimationA(char szFilename[])
+HRESULT CMD3Animation::LoadAnimation(const std::filesystem::path& Filename)
 {
-	HANDLE hFile=NULL;
+	CDataStream AnimDataStream(Filename);
+	const std::vector<std::string> AnimDataLines = Functions::ReadLines(AnimDataStream);
 
-	hFile=CreateFileA(
-		szFilename,
-		GENERIC_READ,
-		FILE_SHARE_READ,
-		(LPSECURITY_ATTRIBUTES)NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		(HANDLE)NULL);
+	ReadAnimations(AnimDataLines);
 
-	if(hFile==INVALID_HANDLE_VALUE)
-		return E_FAIL;
-
-
-	DWORD dwNumLines=GetNumLinesInFile(hFile);
-	ReadAnimations(hFile, dwNumLines);
-
-	CloseHandle(hFile);
 	//Get the leg animation offset.
-	if(m_Animations[TORSO_GESTURE].lFirstFrame != m_Animations[LEGS_WALKCR].lFirstFrame)
+	if (m_Animations[TORSO_GESTURE].lFirstFrame != m_Animations[LEGS_WALKCR].lFirstFrame)
 	{
-		m_lLegOffset=m_Animations[LEGS_WALKCR].lFirstFrame-m_Animations[TORSO_GESTURE].lFirstFrame;
+		m_lLegOffset = m_Animations[LEGS_WALKCR].lFirstFrame - m_Animations[TORSO_GESTURE].lFirstFrame;
 	}
 	else
-		m_lLegOffset=0;
+		m_lLegOffset = 0;
 
 	return S_OK;
 }
 
-HRESULT CMD3Animation::LoadAnimationW(WCHAR szFilename[])
+HRESULT CMD3Animation::GetAnimation(DWORD dwRef, MD3ANIMATION* lpAnimation, DWORD dwFlags)
 {
-	HANDLE hFile=NULL;
-
-	hFile=CreateFileW(
-		szFilename,
-		GENERIC_READ,
-		FILE_SHARE_READ,
-		(LPSECURITY_ATTRIBUTES)NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		(HANDLE)NULL);
-
-	if(hFile==INVALID_HANDLE_VALUE)
+	if (dwRef >= MD3_NUM_ANIMS)
 		return E_FAIL;
 
+	lpAnimation->lFirstFrame = m_Animations[dwRef].lFirstFrame;
+	lpAnimation->lNumFrames = m_Animations[dwRef].lNumFrames;
+	lpAnimation->lLoopingFrames = m_Animations[dwRef].lLoopingFrames;
+	lpAnimation->lFramesPerSecond = m_Animations[dwRef].lFramesPerSecond;
 
-	DWORD dwNumLines=GetNumLinesInFile(hFile);
-	ReadAnimations(hFile, dwNumLines);
-
-	CloseHandle(hFile);
-	if(m_Animations[TORSO_GESTURE].lFirstFrame != m_Animations[LEGS_WALKCR].lFirstFrame)
-	{
-		m_lLegOffset=m_Animations[LEGS_WALKCR].lFirstFrame-m_Animations[TORSO_GESTURE].lFirstFrame;
-	}
-	else
-		m_lLegOffset=0;
-	return S_OK;
-}
-
-HRESULT CMD3Animation::GetAnimation(DWORD dwRef, MD3ANIMATION * lpAnimation, DWORD dwFlags)
-{
-	if(dwRef >= MD3_NUM_ANIMS)
-		return E_FAIL;
-
-	lpAnimation->lFirstFrame=m_Animations[dwRef].lFirstFrame;
-	lpAnimation->lNumFrames=m_Animations[dwRef].lNumFrames;
-	lpAnimation->lLoopingFrames=m_Animations[dwRef].lLoopingFrames;
-	lpAnimation->lFramesPerSecond=m_Animations[dwRef].lFramesPerSecond;
-
-	if(
-		(dwRef >= LEGS_WALKCR) && 
-		(dwRef <= LEGS_TURN) && 
-		((dwFlags&MD3ANIM_ADJUST)==MD3ANIM_ADJUST)
+	if (
+		(dwRef >= LEGS_WALKCR) &&
+		(dwRef <= LEGS_TURN) &&
+		((dwFlags & MD3ANIM_ADJUST) == MD3ANIM_ADJUST)
 		)
 	{
 		//The animation legs offset should be adjusted.
 		lpAnimation->lFirstFrame -= m_lLegOffset;
-		
+
 	}
 
 	return S_OK;
@@ -119,108 +76,110 @@ HRESULT CMD3Animation::GetAnimation(DWORD dwRef, MD3ANIMATION * lpAnimation, DWO
 // Private Functions //
 ///////////////////////
 
-HRESULT CMD3Animation::ReadAnimations(HANDLE hFile, DWORD dwNumLines)
+void CMD3Animation::ReadAnimations(const std::vector<std::string>& Lines)
 {
-	DWORD i=0;
-	HRESULT hr=0;
-	DWORD dwAnimRef=0;
+	m_CurReadAnim = 0;
 
-	char szLine[100];
-	
-	for(i=0; i<dwNumLines; i++){
-		hr=ReadLine(hFile, szLine);
-		if(FAILED(hr))
-			return hr;
-
-		if(hr!=RLSUC_FINISHED){
-			ParseLine(NULL, szLine, &dwAnimRef);
-		}
+	for (auto& Line : Lines)
+	{
+		ParseLine(Line);
 	}
-	return S_OK;
 }
 
-HRESULT CMD3Animation::ParseLine(LPVOID lpDataOut, LPSTR szLineIn, DWORD * lpAnimRef)
+void CMD3Animation::ParseLine(const std::string& Line)
 {
-	size_t dwLen=0;
-	DWORD i=0, j=0;
-	char szTemp[100];
-	char szFinal[100];
-	
-	strcpy(szFinal, szLineIn);
-	dwLen=strlen(szFinal);
+	std::string Final = Line;
+
 	//The first thing to do is remove anything found after the double slash.
-	for(i=0; i<dwLen; i++){
-		if(i < dwLen-1)
-			if(szFinal[i]=='/' && szFinal[i+1]=='/')
-				szFinal[i]=0;
-
+	for (std::size_t i = 0; i < Final.size(); i++)
+	{
+		if (Final[i] == '/' && Final[i+1] == '/')
+		{
+			Final.resize(i);
+			break;
+		}
 	}
-	dwLen=strlen(szFinal);
 
-	if(dwLen==0)
-		return PERR_NOLINE;
+	if (Final.size() == 0)
+	{
+		// Blank line or comment only.
+		return;
+	}
+
 	//Convert all tabs into spaces.
-	for(i=0; i<dwLen; i++){
-		if(szFinal[i]=='\t')
-			szFinal[i]=' ';
+	for (std::size_t i = 0; i < Final.size(); i++)
+	{
+		if (Final[i] == '\t')
+		{
+			Final[i] = ' ';
+		}
 	}
 
-	//Determine the type of line by geting the first word.
-
-	ReadWordFromLine(szTemp, szFinal, 0, &i);
-
+	//Determine the type of line by getting the first word.
+	std::size_t NextWordStart = 0;
+	const std::string FirstWord = Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart);
 
 	//Check if the line is an assignment or a animation.
-	if(_strnicmp(szTemp, "sex", 3)==0){
-		//It's sex, so read second word to get the sex.
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		switch(szTemp[0])
+	if (FirstWord == "sex")
+	{
+		// It is sex, so read second word to get the sex.
+		const std::string SecondWord = Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart);
+		if (SecondWord == "m")
 		{
-		case 'm': m_nSex=MD3SEX_MALE; break;
-		case 'f': m_nSex=MD3SEX_FEMALE; break;
-		default: m_nSex=MD3SEX_OTHER; break;
-		};
-		return S_OK;
-	}else if(_strnicmp(szTemp, "headoffset", 10)==0){
-		//It is headoffset so we read three additional words.
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		m_nHeadOffset[0]=atoi(szTemp);
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		m_nHeadOffset[1]=atoi(szTemp);
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		m_nHeadOffset[2]=atoi(szTemp);
+			m_nSex = MD3SEX_MALE;
+		}
+		else if (SecondWord == "f")
+		{
+			m_nSex = MD3SEX_FEMALE;
+		}
+		else
+		{
+			m_nSex = MD3SEX_OTHER;
+		}
+	}
+	else if (FirstWord == "headoffset")
+	{
+		// It is head offset so we read three additional words.
 
-		return S_OK;
-	}else if(_strnicmp(szTemp, "footsteps", 9)==0){
+		for (std::size_t i = 0; i < 3; i++)
+		{
+			m_nHeadOffset[i] = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+		}
+	}
+	else if (FirstWord == "footsteps")
+	{
 		//It is footsteps so we read one more word.
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		if(_strnicmp(szTemp, "boot", 4)==0){
-			m_nFootStep=MD3FOOTSTEP_BOOT;
-		}else if(_strnicmp(szTemp, "energy", 6)==0){
-			m_nFootStep=MD3FOOTSTEP_ENERGY;
-		}else{
-			m_nFootStep=MD3FOOTSTEP_DEFAULT;
+		const std::string SecondWord = Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart);
+
+		if (SecondWord == "boot")
+		{
+			m_nFootStep = MD3FOOTSTEP_BOOT;
+		}
+		else if (SecondWord == "energy")
+		{
+			m_nFootStep = MD3FOOTSTEP_ENERGY;
+		}
+		else
+		{
+			m_nFootStep = MD3FOOTSTEP_DEFAULT;
 		}
 
-		return S_OK;
-	}else{
+	}
+	else if (FirstWord.size() > 0)
+	{
 		//We assume it is an animation configuration.
+		assert( m_CurReadAnim < MD3_NUM_ANIMS);
+		if (m_CurReadAnim < MD3_NUM_ANIMS)
+		{
+			//Set the first frame to the current word.
+			m_Animations[m_CurReadAnim].lFirstFrame = atoi(FirstWord.c_str());
 
-		if(*lpAnimRef>=MD3_NUM_ANIMS)return PERR_ANIMOUTOFRANGE;
+			//Read the additional three words to get the rest of the info.
+			m_Animations[m_CurReadAnim].lNumFrames = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+			m_Animations[m_CurReadAnim].lLoopingFrames = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
+			m_Animations[m_CurReadAnim].lFramesPerSecond = std::atoi(Functions::ReadWordFromLine(Final, NextWordStart, &NextWordStart).c_str());
 
-		//Set the first frame to the current word.
-		m_Animations[*lpAnimRef].lFirstFrame=atoi(szTemp);
-
-		//Read the additional three words to get the rest of the info.
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		m_Animations[*lpAnimRef].lNumFrames=atoi(szTemp);
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		m_Animations[*lpAnimRef].lLoopingFrames=atoi(szTemp);
-		ReadWordFromLine(szTemp, szFinal, i, &i);
-		m_Animations[*lpAnimRef].lFramesPerSecond=atoi(szTemp);
-
-		(*lpAnimRef)++;
-
-		return S_OK;
+			m_CurReadAnim++;
+		}
 	}
 }

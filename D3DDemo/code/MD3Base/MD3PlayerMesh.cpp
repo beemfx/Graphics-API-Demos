@@ -471,7 +471,7 @@ HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAI
 	//Attempt to load the animation.
 	strcpy(szAnimation, szDirectory);
 	strcat(szAnimation, "animation.cfg");
-	hr=m_Animation.LoadAnimationA(szAnimation);
+	hr=m_Animation.LoadAnimation(szAnimation);
 	if(FAILED(hr)){
 		m_meshHead.ClearMD3();
 		m_meshUpper.ClearMD3();

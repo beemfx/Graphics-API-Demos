@@ -223,36 +223,45 @@ std::vector<std::string> Functions::ReadLines(CDataStream& In)
 	return Out;
 }
 
-std::string Functions::ReadWordFromLine(const std::string& Line, md3_int32 Start, md3_int32* End)
+std::string Functions::ReadWordFromLine(const std::string& Line, std::size_t Start, std::size_t* End)
 {
-	std::string Out;
-	std::size_t dwLen = 0;
-	std::size_t j = 0;
+	std::vector<md3_char8> Out;
 
-	md3_bool bReadChar = false;
+	md3_bool bStartedRead = false;
 
 	const std::size_t StrLen = Line.size();
+	std::size_t NumRead = 0;
 
-	for (std::size_t i = Start, j = 0; i < dwLen; i++, j++)
+	for (std::size_t i = Start; i < StrLen; i++)
 	{
-		if (Line[i] == ' ' && bReadChar)
+		NumRead++;
+
+		const bool bIsWhitespace = Line[i] == ' ' || Line[i] == '\t';
+
+		if (bIsWhitespace && bStartedRead)
 		{
+			// If we've read and hit whitespace, we're done.
 			break;
 		}
-		Out.append( { Line[i] , '\0' } );
 
-		if (Line[i] == ' ' || Line[i] == '\t')
-			j--;
-		else
-			bReadChar = true;
+		if (!bIsWhitespace)
+		{
+			bStartedRead = true;
+		}
+
+		if (bStartedRead)
+		{
+			Out.push_back(Line[i]);
+		}
 	}
 
 	if (End)
 	{
-		*End = static_cast<md3_int32>(Start + j + 1);
+		*End = Start + NumRead;
 	}
 
-	return Out;
+	Out.push_back('\0');
+	return Out.data();
 }
 
 std::string Functions::RemoveDirectoryFromString(const std::string& In)
