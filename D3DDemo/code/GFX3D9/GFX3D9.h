@@ -92,14 +92,14 @@ typedef HANDLE HD3DIMAGE;
 
 GFX3D9_EXPORTS HD3DIMAGE CreateD3DImageFromFileA(
 	LPDIRECT3DDEVICE9 lpDevice,
-	char szFilename[MAX_PATH],
+	const char szFilename[MAX_PATH],
 	DWORD dwWidth,
 	DWORD dwHeight,
 	D3DCOLOR dwTransparent);
 
 GFX3D9_EXPORTS HD3DIMAGE CreateD3DImageFromFileW(
 	LPDIRECT3DDEVICE9 lpDevice,
-	WCHAR szFilename[MAX_PATH],
+	const WCHAR szFilename[MAX_PATH],
 	DWORD dwWidth,
 	DWORD dwHeight,
 	D3DCOLOR dwTransparent);
@@ -277,11 +277,11 @@ GFX3D9_EXPORTS BOOL AddBeemConsoleEntry(
 
 GFX3D9_EXPORTS BOOL SendBeemConsoleCommand(
 	HBEEMCONSOLE hConsole,
-	LPSTR szCommandLine);
+	LPCSTR szCommandLine);
 
 GFX3D9_EXPORTS BOOL SendBeemConsoleMessage(
 	HBEEMCONSOLE hConsole,
-	LPSTR szMessage);
+	LPCSTR szMessage);
 
 GFX3D9_EXPORTS BOOL BeemConsoleOnChar(
 	HBEEMCONSOLE hConsole,

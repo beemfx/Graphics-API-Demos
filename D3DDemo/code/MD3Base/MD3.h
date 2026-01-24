@@ -435,7 +435,7 @@ protected:
 
 	BOOL m_bLoaded;
 
-	HRESULT GetLink(CMD3Mesh * lpFirst, char szTagName[], WORD * lpTagRef);
+	HRESULT GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef);
 
 	HRESULT GetSkinsA(char szDir[]);
 	HRESULT GetSkinsW(WCHAR szDir[]);
@@ -607,7 +607,7 @@ protected:
 
 	BOOL m_bLoaded;
 
-	HRESULT GetLink(CMD3Mesh * lpFirst, char szTagName[], WORD * lpTagRef);
+	HRESULT GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef);
 	HRESULT TextureExtension(char szShader[MAX_PATH]);
 
 public:

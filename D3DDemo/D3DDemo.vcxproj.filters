@@ -10,6 +10,18 @@
     <Filter Include="code\MD3Base">
       <UniqueIdentifier>{d3ed65ea-738f-4214-abae-25b9e190b1a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\3rdParty">
+      <UniqueIdentifier>{69cfdb4f-e2ad-447c-94f7-58996b14433d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\3rdParty\miniz">
+      <UniqueIdentifier>{8ea45dd5-6586-4580-b3ac-df30f026a673}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\3rdParty\miniz\examples">
+      <UniqueIdentifier>{4aa93669-8568-46e2-bc80-3282c2cfddb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\Archive">
+      <UniqueIdentifier>{909a8740-1811-4574-bdc2-3a8500cbd08c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="code\directx.ico">
@@ -74,6 +86,33 @@
     <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\miniz.c">
+      <Filter>code\3rdParty\miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\examples\example1.c">
+      <Filter>code\3rdParty\miniz\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\examples\example2.c">
+      <Filter>code\3rdParty\miniz\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\examples\example3.c">
+      <Filter>code\3rdParty\miniz\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\examples\example4.c">
+      <Filter>code\3rdParty\miniz\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\examples\example5.c">
+      <Filter>code\3rdParty\miniz\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="code\3rdParty\miniz\examples\example6.c">
+      <Filter>code\3rdParty\miniz\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Archive\ZipArchive.cpp">
+      <Filter>code\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Archive\DataStream.cpp">
+      <Filter>code\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\resource.h">
@@ -97,6 +136,15 @@
     <ClInclude Include="code\MD3Base\MD3TexDB.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
+    <ClInclude Include="code\3rdParty\miniz\miniz.h">
+      <Filter>code\3rdParty\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="code\Archive\ZipArchive.h">
+      <Filter>code\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="code\Archive\DataStream.h">
+      <Filter>code\Archive</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="code\resource.rc">
@@ -110,10 +158,16 @@
     <None Include="code\GFX3D9\GFX3D9.vcproj">
       <Filter>code\GFX3D9</Filter>
     </None>
-    <None Include="code\MD3Base\MD3Base.dsp">
-      <Filter>code\MD3Base</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="code\3rdParty\miniz\ChangeLog.md">
+      <Filter>code\3rdParty\miniz</Filter>
+    </None>
+    <None Include="code\3rdParty\miniz\LICENSE">
+      <Filter>code\3rdParty\miniz</Filter>
+    </None>
+    <None Include="code\3rdParty\miniz\readme.md">
+      <Filter>code\3rdParty\miniz</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="code\MD3Base\ToDo.txt">

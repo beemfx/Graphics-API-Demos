@@ -46,7 +46,7 @@ HRESULT CMD3PlayerMesh::GetAnimation(DWORD dwAnimRef, MD3ANIMATION * lpAnimation
 	return m_Animation.GetAnimation(dwAnimRef, lpAnimation, MD3ANIM_ADJUST);
 }
 
-HRESULT CMD3PlayerMesh::GetLink(CMD3Mesh * lpFirst, char szTagName[], WORD * lpTagRef)
+HRESULT CMD3PlayerMesh::GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef)
 {
 	LONG i=0;
 	LONG lNumTags=0;

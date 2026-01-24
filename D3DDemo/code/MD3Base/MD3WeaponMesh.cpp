@@ -331,7 +331,7 @@ HRESULT CMD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
 	return E_FAIL;
 }
 
-HRESULT CMD3WeaponMesh::GetLink(CMD3Mesh * lpFirst, char szTagName[], WORD * lpTagRef)
+HRESULT CMD3WeaponMesh::GetLink(CMD3Mesh * lpFirst, const char szTagName[], WORD * lpTagRef)
 {
 	LONG i=0;
 	LONG lNumTags=0;
