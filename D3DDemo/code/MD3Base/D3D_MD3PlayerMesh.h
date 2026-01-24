@@ -43,7 +43,7 @@ protected:
 
 	HRESULT GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef);
 
-	HRESULT GetSkinsA(char szDir[]);
+	bool GetSkins(const std::filesystem::path& Path);
 
 public:
 	CD3D_MD3PlayerMesh();
