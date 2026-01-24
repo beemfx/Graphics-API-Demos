@@ -450,9 +450,9 @@ HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAI
 		break;
 	};
 
-	hr=m_meshHead.LoadMD3A(szHead, NULL, lpDevice, D3DPOOL_DEFAULT);
-	hr|=m_meshUpper.LoadMD3A(szUpper, NULL, lpDevice, D3DPOOL_DEFAULT);
-	hr|=m_meshLower.LoadMD3A(szLower, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr=m_meshHead.LoadMD3(szHead, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr|=m_meshUpper.LoadMD3(szUpper, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr|=m_meshLower.LoadMD3(szLower, NULL, lpDevice, D3DPOOL_DEFAULT);
 
 	if(FAILED(hr)){
 		m_meshHead.ClearMD3();

@@ -12,23 +12,6 @@ void CMD3SkinFile::ClearTexDB()
 	m_md3TexDB.ClearDB();
 }
 
-void CMD3SkinFile::SetSkinRef(const char* Name, md3_uint32 Ref)
-{
-	DWORD i = 0;
-
-	if ((Ref < 0) || (Ref >= m_NumSkins))return;
-
-	for (i = 0; i < m_NumSkins; i++)
-	{
-		if (m_Skins[i].MeshName == Name)
-		{
-			m_SkinRef[Ref] = i;
-			break;
-		}
-	}
-	m_bRefsSet = true;
-}
-
 HRESULT CMD3SkinFile::GetTexturePointer(
 	DWORD dwRef,
 	LPDIRECT3DTEXTURE9* lppTexture)
@@ -77,19 +60,17 @@ CMD3SkinFile::CMD3SkinFile()
 
 CMD3SkinFile::~CMD3SkinFile()
 {
-	UnloadSkin();
+	ClearTextures();
 }
 
-
-void CMD3SkinFile::ReadSkins(const std::vector<std::string>& SkinLines)
+void CMD3SkinFile::ClearTextures()
 {
-	assert(SkinLines.size() == m_NumSkins);
-
-	for (md3_uint32 i = 0; i < m_NumSkins; i++)
+	for (auto& Item : m_Textures)
 	{
-		ParseLine(m_Skins[i], SkinLines[i]);
-		m_Skins[i].SkinPath = Functions::RemoveDirectoryFromString(m_Skins[i].SkinPath);
+		SAFE_RELEASE(Item);
 	}
+	m_Textures.resize(0);
+	m_Textures.shrink_to_fit();
 }
 
 HRESULT CMD3SkinFile::LoadSkin(
@@ -98,20 +79,13 @@ HRESULT CMD3SkinFile::LoadSkin(
 	DWORD dwFlags,
 	LPVOID lpTexDB)
 {
-	UnloadSkin();
+	CMD3SkinConfig::LoadSkin(Filename);
 
-	CDataStream SkinData(Filename);
 
-	const std::vector<std::string> SkinLines = Functions::ReadLines(SkinData);
-
-	CreateSkinFile(static_cast<md3_uint32>(SkinLines.size()));
-
-	ReadSkins(SkinLines);
-
+	ClearTextures();
+	m_Textures.resize(m_NumSkins);
 	wchar_t szTexPath[MAX_PATH];
-
 	GetDirectoryFromStringW(szTexPath, Filename.c_str());
-
 	ObtainTextures(lpDevice, szTexPath, dwFlags, lpTexDB);
 
 	return S_OK;
@@ -180,82 +154,4 @@ HRESULT CMD3SkinFile::ObtainTextures(
 		m_bUseStaticDB = FALSE;
 	}
 	return S_OK;
-}
-
-
-void CMD3SkinFile::UnloadSkin()
-{
-	DeleteSkinFile();
-}
-
-void CMD3SkinFile::CreateSkinFile(md3_uint32 NumSkins)
-{
-	m_NumSkins = NumSkins;
-
-	m_Skins.resize(NumSkins);
-
-	m_SkinRef.resize(NumSkins);
-	for (auto& Item : m_SkinRef)
-	{
-		Item = 0;
-	}
-
-	m_Textures.resize(NumSkins);
-	for (auto& Item : m_Textures)
-	{
-		Item = nullptr;
-	}
-}
-
-void CMD3SkinFile::DeleteSkinFile()
-{
-	DWORD i = 0;
-	m_Skins.resize(0);
-	m_Skins.shrink_to_fit();
-	m_SkinRef.resize(0);
-	m_SkinRef.shrink_to_fit();
-
-	for (auto& Item : m_Textures)
-	{
-		SAFE_RELEASE(m_Textures[i]);
-	}
-	m_Textures.resize(0);
-	m_Textures.shrink_to_fit();
-}
-
-void CMD3SkinFile::ParseLine(md3Skin& Out, const std::string& Line)
-{
-	size_t dwLineLen = 0;
-	BOOL bSecondPart = FALSE;
-	DWORD i = 0;
-	std::size_t nStringPos = 0;
-	const std::size_t LineLen = Line.size();
-
-	std::vector<md3_char8> MeshName;
-	std::vector<md3_char8> SkinPath;
-
-	for (std::size_t i = 0; i < LineLen; i++, nStringPos++)
-	{
-		if (Line[i] == ',')
-		{
-			i++;
-			nStringPos = 0;
-			bSecondPart = TRUE;
-		}
-
-		if (!bSecondPart)
-		{
-			MeshName.push_back(Line[i]);
-		}
-		else
-		{
-			SkinPath.push_back(Line[i]);
-		}
-	}
-
-	MeshName.push_back('\0');
-	SkinPath.push_back('\0');
-
-	Out.MeshName = MeshName.data();
-	Out.SkinPath = SkinPath.data();
 }

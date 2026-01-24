@@ -113,6 +113,9 @@
     <ClCompile Include="code\FileSystem\ZipArchive.cpp">
       <Filter>code\FileSsytem</Filter>
     </ClCompile>
+    <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp">
+      <Filter>code\MD3Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\resource.h">
@@ -152,6 +155,9 @@
       <Filter>code\MD3Base</Filter>
     </ClInclude>
     <ClInclude Include="code\MD3Base\MD3AnimConfig.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3SkinConfig.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
   </ItemGroup>

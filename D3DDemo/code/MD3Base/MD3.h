@@ -12,37 +12,23 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define MD3BASE_EXPORTS
-
 #include "MD3File.h"
 #include "MD3AnimConfig.h"
+#include "MD3SkinConfig.h"
 
 #ifdef D3D_MD3
 #include <d3d9.h>
 #include "MD3TexDB.h"
 #endif /* D3D_MD3 */
 
-struct md3Skin
-{
-	std::string MeshName;
-	std::string SkinPath;
-};
-
-
+class CMD3SkinFile;
+class CMD3WeaponMesh;
 
 
 /* 
 	The following is MD3 implimentation for Direct3D.
 */
 #ifdef D3D_MD3
-
-#ifdef __cplusplus
-class MD3BASE_EXPORTS CMD3Mesh;
-class MD3BASE_EXPORTS CMD3TextureDB;
-class MD3BASE_EXPORTS CMD3SkinFile;
-class MD3BASE_EXPORTS CMD3ObjectMesh;
-class MD3BASE_EXPORTS CMD3WeaponMesh;
-#endif /* __cplusplus */
 
 /*
 	The MD3 vertex format.
@@ -62,15 +48,9 @@ typedef struct tagD3DMD3VERTEX{
 
 #ifdef __cplusplus
 
-#ifdef UNICODE
-#define LoadMD3 LoadMD3W
-#else /* UNICODE */
-#define LoadMD3 LoadMD3A
-#endif /* UNICODE */
-
 #define MD3TEXRENDER_NOCULL 0x00000001l
 
-class MD3BASE_EXPORTS CMD3Mesh
+class CMD3Mesh
 {
 protected:
 	CMD3File m_md3File;
@@ -168,7 +148,7 @@ public:
 #ifdef __cplusplus
 
 /* CMD3TextureDB is not UNICODE compatible. */
-class MD3BASE_EXPORTS CMD3TextureDB
+class CMD3TextureDB
 {
 protected:
 	CMD3Texture * m_lpFirst;
@@ -207,7 +187,7 @@ public:
 
 #define S_SKINNULL 0x00000002l
 
-class MD3BASE_EXPORTS CMD3SkinFile
+class CMD3SkinFile : public CMD3SkinConfig
 {
 public:
 	CMD3SkinFile();
@@ -227,48 +207,24 @@ public:
 		DWORD dwRef, 
 		LPDIRECT3DDEVICE9 lpDevice);
 
-	void UnloadSkin();
-
 	HRESULT SetSkin(
 		LPDIRECT3DDEVICE9 lpDevice, 
 		DWORD dwRef);
 
-	void SetSkinRef(const char* Name, md3_uint32 Ref);
-
 	static void ClearTexDB();
-protected:
-	void CreateSkinFile(md3_uint32 NumSkins);
-	void DeleteSkinFile();
+
+private:
+	void ClearTextures();
 
 	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, DWORD dwFlags, LPVOID lpTexDB);
-	
-	void ReadSkins(const std::vector<std::string>& SkinLines);
-	void ParseLine(md3Skin& Out, const std::string& Line);
 
-	/* Member variables. */
-
-	std::vector<md3Skin> m_Skins; /* The MD3 skins. */
-	std::vector<md3_uint32> m_SkinRef; /* Which skin is which reference. */
-	md3_bool m_bRefsSet = false; /* Whether or not references are set. */
-	md3_uint32 m_NumSkins = 0; /* Number of skins in this file. */
-	md3_bool m_bLoaded = false; /* Whether or not a skin file is loaded. */
-
+private:
 	md3_bool m_bUseStaticDB = true; /* Whether or not to use static texture DB. */
 	static CMD3TextureDB m_md3TexDB; /* The MD3 skin texture database. */
 	std::vector<IDirect3DTexture9*> m_Textures; /* Pointers to the textures used by this file. */
 };
 
 #endif /* __cplusplus */
-
-/*
-	The animation class.  Methodes for compiling and
-	obtaining info from animation.cfg files for MD3.
-*/
-#ifdef __cplusplus
-
-
-#endif /* __cplusplus */
-
 
 /* The player mesh functionality. */
 
@@ -282,7 +238,7 @@ typedef enum tagMD3DETAIL{
 
 #define SKIN_DEFAULT 0
 
-class MD3BASE_EXPORTS CMD3PlayerMesh
+class CMD3PlayerMesh
 {
 protected:
 	CMD3Mesh m_meshHead;
@@ -364,7 +320,7 @@ typedef enum tagFRAMETRANSITIONTYPE{
 #define MD3APPLYANIM_UPPER 0x00000001l
 #define MD3APPLYANIM_LOWER 0x00000002l
 
-class MD3BASE_EXPORTS CMD3PlayerObject
+class CMD3PlayerObject
 {
 protected:
 	CMD3PlayerMesh * m_lpPlayerMesh; /* Pointer to the player mesh. */
@@ -458,7 +414,7 @@ public:
 */
 
 #ifdef __cplusplus
-class MD3BASE_EXPORTS CMD3WeaponMesh
+class CMD3WeaponMesh
 {
 protected:
 	CMD3Mesh m_meshWeapon;
@@ -508,7 +464,7 @@ public:
 */
 #ifdef __cplusplus
 
-class MD3BASE_EXPORTS CMD3ObjectMesh
+class CMD3ObjectMesh
 {
 protected:
 	CMD3Mesh m_meshObject;

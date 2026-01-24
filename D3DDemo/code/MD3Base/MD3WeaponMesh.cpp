@@ -130,7 +130,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 	sprintf(szHandPath, "%s%s_hand.md3", szPath, szWeaponName);
 	
 	//Attempt to load the weapon mesh.
-	hr=m_meshWeapon.LoadMD3A(szWeaponPath, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr=m_meshWeapon.LoadMD3(szWeaponPath, NULL, lpDevice, D3DPOOL_DEFAULT);
 	
 	if(FAILED(hr)){
 		if(nDetail!=DETAIL_HIGH)
@@ -143,8 +143,8 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 	}
 	
 	//Load the hand and flash meshes.
-	hr=m_meshHand.LoadMD3A(szHandPath, NULL, lpDevice, D3DPOOL_DEFAULT);
-	hr|=m_meshFlash.LoadMD3A(szFlashPath, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr=m_meshHand.LoadMD3(szHandPath, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr|=m_meshFlash.LoadMD3(szFlashPath, NULL, lpDevice, D3DPOOL_DEFAULT);
 
 	if(FAILED(hr)){
 		m_meshHand.ClearMD3();
@@ -155,7 +155,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 	}
 
 	//Load the barrel, if success then we set barrel to true.
-	hr=m_meshBarrel.LoadMD3A(szBarrelPath, NULL, lpDevice, D3DPOOL_DEFAULT);
+	hr=m_meshBarrel.LoadMD3(szBarrelPath, NULL, lpDevice, D3DPOOL_DEFAULT);
 
 	if(SUCCEEDED(hr)){
 		m_bBarrel=TRUE;

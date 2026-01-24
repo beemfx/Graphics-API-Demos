@@ -229,6 +229,7 @@
     <ClCompile Include="code\MD3Base\MD3PlayerMesh.cpp" />
     <ClCompile Include="code\MD3Base\MD3PlayerObject.cpp" />
     <ClCompile Include="code\MD3Base\MD3Skin.cpp" />
+    <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp" />
     <ClCompile Include="code\MD3Base\MD3TexDB.cpp" />
     <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp" />
   </ItemGroup>
@@ -243,6 +244,7 @@
     <ClInclude Include="code\MD3Base\MD3AnimConfig.h" />
     <ClInclude Include="code\MD3Base\MD3Data.h" />
     <ClInclude Include="code\MD3Base\MD3File.h" />
+    <ClInclude Include="code\MD3Base\MD3SkinConfig.h" />
     <ClInclude Include="code\MD3Base\MD3TexDB.h" />
     <ClInclude Include="code\MD3Base\MD3Types.h" />
     <ClInclude Include="code\resource.h" />

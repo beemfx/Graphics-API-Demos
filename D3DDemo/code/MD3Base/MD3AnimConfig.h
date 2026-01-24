@@ -68,7 +68,14 @@ static constexpr md3_uint32 MD3ANIM_ADJUST = (1 << 0);
 
 class CMD3AnimConfig
 {
-protected:
+public:
+	CMD3AnimConfig();
+	~CMD3AnimConfig();
+
+	md3_bool LoadAnimation(const std::filesystem::path& Filename);
+	md3AnimationConfig GetAnimation(md3_uint32 Ref, md3_uint32 Flags = MD3ANIM_ADJUST);
+
+private:
 	md3_anim_sex m_Sex = md3_anim_sex::Default;
 	md3_anim_footstep m_Footstep = md3_anim_footstep::Default;
 	md3_int16 m_HeadOffset[3] = { };
@@ -76,13 +83,8 @@ protected:
 	md3AnimationConfig m_Animations[MD3_NUM_ANIMS] = { };
 	md3_uint32 m_NumAnims = 0;
 
+private:
+
 	void ReadAnimations(const std::vector<std::string>& Lines);
 	void ParseLine(const std::string& Line);
-
-public:
-	CMD3AnimConfig();
-	~CMD3AnimConfig();
-
-	md3_bool LoadAnimation(const std::filesystem::path& Filename);
-	md3AnimationConfig GetAnimation(md3_uint32 Ref, md3_uint32 Flags = MD3ANIM_ADJUST);
 };

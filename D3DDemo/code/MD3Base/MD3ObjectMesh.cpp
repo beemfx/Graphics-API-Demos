@@ -151,7 +151,7 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	szFileName[i]=0;
 	strcat(szFileName, szExt);
 
-	if(FAILED(m_meshObject.LoadMD3A(szFileName, NULL, lpDevice, D3DPOOL_DEFAULT))){
+	if(FAILED(m_meshObject.LoadMD3(szFileName, NULL, lpDevice, D3DPOOL_DEFAULT))){
 		if(nDetail==DETAIL_MEDIUM || nDetail==DETAIL_LOW)
 			return Load(lpDevice, szFile, DETAIL_HIGH);
 		return E_FAIL;
