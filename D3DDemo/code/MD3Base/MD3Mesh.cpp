@@ -5,6 +5,7 @@
 #include "defines.h"
 #include "Functions.h"
 #include "MD3Data.h"
+#include "FileSystem/DataStream.h"
 
 ///////////////////////////////////
 ///  Constructor and Destructor ///
@@ -159,113 +160,41 @@ HRESULT CMD3Mesh::GetTagTranslation(
 	return S_OK;
 }
 
-
-HRESULT CMD3Mesh::LoadMD3A(
-	char szFilename[MAX_PATH], 
+HRESULT CMD3Mesh::LoadMD3(
+	const std::filesystem::path& Filename,
 	LPDWORD lpBytesRead, 
 	LPDIRECT3DDEVICE9 lpDevice,
 	D3DPOOL Pool)
 {
-	DWORD dwBytesRead=0;
-	HANDLE hFile=NULL;
-	HRESULT hr=0;
+	HRESULT hr = 0;
 
 	// Clear any MD3 that might exist.
 	ClearMD3();
 
-	// Load the file.
-	hFile=CreateFileA(
-		szFilename,
-		GENERIC_READ,
-		FILE_SHARE_READ,
-		(LPSECURITY_ATTRIBUTES)NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		(HANDLE)NULL);
+	CDataStream MD3Stream(Filename);
 
-
-	//If the file failed to load we return the last error.
-	if(hFile==INVALID_HANDLE_VALUE)
-		return E_FAIL;
-
-
-	//Read the MD3 File, insuring that it really is an MD3 file.
-	if(!ReadMD3File(hFile, &m_md3File, &dwBytesRead, NULL)){
-		CloseHandle(hFile);
-		return E_FAIL;
-	}
-
-	//We have the data so we can close the file, and set the number
-	//of bytes read.
-	CloseHandle(hFile);
-	if(lpBytesRead)
-		*lpBytesRead=dwBytesRead;
-
-	m_Pool=Pool;
-
-	m_lpDevice=lpDevice;
-	m_lpDevice->AddRef();
-
-	hr=CreateModel();
-	if(SUCCEEDED(hr)){
-		m_bMD3Loaded=TRUE;
-	}
-	else
+	if (MD3Stream.GetSize() == 0)
 	{
-		SAFE_RELEASE(m_lpDevice);
-	}
-
-
-	return hr;
-}
-
-HRESULT CMD3Mesh::LoadMD3W(
-	WCHAR szFilename[MAX_PATH], 
-	LPDWORD lpBytesRead, 
-	LPDIRECT3DDEVICE9 lpDevice,
-	D3DPOOL Pool)
-{
-	DWORD dwBytesRead=0;
-	HANDLE hFile=NULL;
-	HRESULT hr=0;
-
-	// Clear any MD3 that might exist.
-	ClearMD3();
-
-	// Load the file.
-	hFile=CreateFileW(
-		szFilename,
-		GENERIC_READ,
-		FILE_SHARE_READ,
-		(LPSECURITY_ATTRIBUTES)NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		(HANDLE)NULL);
-
-	//If the file failed to load we return the last error.
-	if(hFile==INVALID_HANDLE_VALUE)
 		return E_FAIL;
+	}
 
 	//Read the MD3 File, insuring that it really is an MD3 file.
-	if(!ReadMD3File(hFile, &m_md3File, &dwBytesRead, NULL)){
-		CloseHandle(hFile);
+	if (!ReadMD3File(m_md3File, MD3Stream))
+	{
 		return E_FAIL;
 	}
 
-	//We have the data so we can close the file, and set the number
-	//of bytes read.
-	CloseHandle(hFile);
-	if(lpBytesRead)
-		*lpBytesRead=dwBytesRead;
+	if (lpBytesRead)
+		*lpBytesRead = static_cast<DWORD>(MD3Stream.GetSize());
 
-	m_Pool=Pool;
+	m_Pool = Pool;
 
-	m_lpDevice=lpDevice;
+	m_lpDevice = lpDevice;
 	m_lpDevice->AddRef();
 
-	hr=CreateModel();
-	if(SUCCEEDED(hr)){
-		m_bMD3Loaded=TRUE;
+	hr = CreateModel();
+	if (SUCCEEDED(hr)) {
+		m_bMD3Loaded = TRUE;
 	}
 	else
 	{
@@ -280,7 +209,7 @@ HRESULT CMD3Mesh::ClearMD3()
 	//If an MD3 is loaded delete the model and the file.
 	if(m_bMD3Loaded){
 		DeleteModel();
-		DeleteMD3File(&m_md3File);
+		DeleteMD3File(m_md3File);
 		SAFE_RELEASE(m_lpDevice);
 	}
 

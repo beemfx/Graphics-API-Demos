@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <filesystem>
 #include <vector>
 
 using md3_bool = bool;

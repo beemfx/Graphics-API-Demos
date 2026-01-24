@@ -64,6 +64,11 @@ void CDataStream::Close()
 	m_ReadPtr = 0;
 }
 
+std::size_t CDataStream::Read(void* pBuffer, std::size_t count)
+{
+	return Read(reinterpret_cast<ds_byte*>(pBuffer), count);
+}
+
 std::size_t CDataStream::Read(ds_byte* pBuffer, std::size_t count)
 {
 	std::size_t SizeToRead = count;

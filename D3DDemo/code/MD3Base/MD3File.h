@@ -81,7 +81,7 @@ struct md3Triangle
 	md3_int32 Indexes[3] = { }; /* References to vertex objects used to described a triangle in mesh */
 };
 
-struct md3TexCoords
+struct md3TexCoord
 {
 	md3_real32 tu = 0.f;
 	md3_real32 tv = 0.f;
@@ -101,7 +101,7 @@ struct md3Mesh
 	md3MeshHeader MeshHeader; /* The Mesh Header */
 	std::vector<md3Shader> Shaders; /* Shader list */
 	std::vector<md3Triangle> Triangles; /* Triangle list */
-	std::vector<md3TexCoords> TexCoords; /* Texture coordinate list */
+	std::vector<md3TexCoord> TexCoords; /* Texture coordinate list */
 	std::vector<md3Vertex> Vertexes; /* Vertex list */
 };
 
@@ -120,7 +120,7 @@ struct md3Mesh2
 	md3MeshHeader MeshHeader;
 	md3Shader Shaders[MD3_MAX_SHADERS];
 	md3Triangle Triangles[MD3_MAX_TRIANGLES];
-	md3TexCoords TexCoords[MD3_MAX_VERTS];
+	md3TexCoord TexCoords[MD3_MAX_VERTS];
 	md3Vertex Vertexes[MD3_MAX_VERTS];
 };
 
@@ -133,29 +133,12 @@ struct md3File2
 	md3Mesh Meshes[MD3_MAX_SURFACES];
 };
 
-/* MD3 File reader functions for Windows */
+// MD3 File reader functions:
+// 
+// Read and Create an MD3 File in the MD3FILE structure.
+md3_bool ReadMD3File(md3File& Out, class CDataStream& In);
 
-#include <windows.h>
-
-/*
-	ReadMD3File and ReadMD3Mesh are more advanced than
-	simple file reading.  DeleteMD3File and DeleteMD3Mesh
-	must be used if ReadMD3File or ReadMD3Mesh successfuly
-	return.
-
-	All other functions are used to correctly read the
-	described data.
-*/
-
-/* Read and Create an MD3 File in the MD3FILE structure. */
-md3_bool ReadMD3File(
-	HANDLE hFile,
-	LPVOID lpBuffer,
-	LPDWORD lpNumBytesRead,
-	LPOVERLAPPED lpOverlapped);
-
-/* Delete an MD3FILE that has been created. */
-md3_bool DeleteMD3File(
-	LPVOID lpFile);
+// Delete an MD3FILE that has been created.
+void DeleteMD3File(md3File& In);
 
 md3Vector MD3_DecodeNormalVector(const md3Vertex& Vertex);

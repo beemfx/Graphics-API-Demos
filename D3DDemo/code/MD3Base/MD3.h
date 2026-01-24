@@ -26,7 +26,7 @@ extern "C" {
 */
 typedef struct tagMD3SKIN{
 	char szMeshName[MAX_QPATH];
-	char szSkinPath[MAX_PATH];
+	char szSkinPath[260];
 }MD3SKIN, *LPMD3SKIN;
 
 /*
@@ -48,10 +48,10 @@ typedef enum tagMD3FOOTSTEP{
 }MD3FOOTSTEP;
 
 typedef struct tagMD3ANIMATION{
-	LONG lFirstFrame;
-	LONG lNumFrames;
-	LONG lLoopingFrames;
-	LONG lFramesPerSecond;
+	md3_int32 lFirstFrame;
+	md3_int32 lNumFrames;
+	md3_int32 lLoopingFrames;
+	md3_int32 lFramesPerSecond;
 }MD3ANIMATION;
 
 /* Animation definitions. */
@@ -159,13 +159,8 @@ public:
 	CMD3Mesh();
 	~CMD3Mesh();
 
-	HRESULT LoadMD3A(
-		char szFilename[MAX_PATH], 
-		LPDWORD lpBytesRead, 
-		LPDIRECT3DDEVICE9 lpDevice,
-		D3DPOOL Pool);
-	HRESULT LoadMD3W(
-		WCHAR szFilename[MAX_PATH], 
+	HRESULT LoadMD3(
+		const std::filesystem::path& Filename, 
 		LPDWORD lpBytesRead, 
 		LPDIRECT3DDEVICE9 lpDevice,
 		D3DPOOL Pool);
