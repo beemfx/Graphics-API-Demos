@@ -199,8 +199,7 @@ static md3_bool ReadMD3Vertex(md3Vertex& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 8;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 
@@ -208,8 +207,7 @@ static md3_bool ReadMD3TexCoord(md3TexCoord& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 8;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 
@@ -217,57 +215,49 @@ static md3_bool ReadMD3Triangle(md3Triangle& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 12;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 static md3_bool ReadMD3Shader(md3Shader& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = (MAX_QPATH + 4);
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 static md3_bool ReadMD3MeshHeader(md3MeshHeader& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = (MAX_QPATH + (11 * 4));
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 static md3_bool ReadMD3Tag(md3Tag& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = (MAX_QPATH + (12 * 4));
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
-
 
 static md3_bool ReadMD3Frame(md3Frame& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = ((12 * 3) + 4 + 16);
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 static md3_bool ReadMD3Vector(md3Vector& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 3 * 4;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 static md3_bool ReadMD3Header(md3Header& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 11 * 4 + MAX_QPATH;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
-	In.Read(&Out, ReadSize);
-	return true;
+	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
 md3Vector MD3_DecodeNormalVector(const md3Vertex& Vertex)
