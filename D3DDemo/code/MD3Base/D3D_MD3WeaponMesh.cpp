@@ -1,9 +1,10 @@
-#define D3D_MD3
+// (c) Beem Media. All rights reserved.
+
+#include "D3D_MD3WeaponMesh.h"
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
 #include "Library/Functions.h"
-#include "md3.h"
 
 CMD3WeaponMesh::CMD3WeaponMesh()
 {

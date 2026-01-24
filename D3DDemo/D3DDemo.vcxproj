@@ -227,11 +227,11 @@
     <ClCompile Include="code\MD3Base\MD3Data.cpp" />
     <ClCompile Include="code\MD3Base\MD3File.cpp" />
     <ClCompile Include="code\MD3Base\D3D_MD3Mesh.cpp" />
-    <ClCompile Include="code\MD3Base\MD3ObjectMesh.cpp" />
-    <ClCompile Include="code\MD3Base\MD3PlayerMesh.cpp" />
+    <ClCompile Include="code\MD3Base\D3D_MD3ObjectMesh.cpp" />
+    <ClCompile Include="code\MD3Base\D3D_MD3PlayerMesh.cpp" />
     <ClCompile Include="code\MD3Base\MD3PlayerObject.cpp" />
     <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp" />
-    <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp" />
+    <ClCompile Include="code\MD3Base\D3D_MD3WeaponMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\3rdParty\miniz\miniz.h" />
@@ -241,15 +241,16 @@
     <ClInclude Include="code\GFX3D9\GFX3D9TextureDB.h" />
     <ClInclude Include="code\Library\Functions.h" />
     <ClInclude Include="code\MD3Base\D3D_MD3Mesh.h" />
+    <ClInclude Include="code\MD3Base\D3D_MD3PlayerMesh.h" />
     <ClInclude Include="code\MD3Base\D3D_MD3Skin.h" />
+    <ClInclude Include="code\MD3Base\D3D_MD3WeaponMesh.h" />
     <ClInclude Include="code\MD3Base\defines.h" />
     <ClInclude Include="code\MD3Base\MD3.h" />
     <ClInclude Include="code\MD3Base\MD3AnimConfig.h" />
     <ClInclude Include="code\MD3Base\MD3Data.h" />
     <ClInclude Include="code\MD3Base\MD3File.h" />
-    <ClInclude Include="code\MD3Base\MD3ObjectMesh.h" />
+    <ClInclude Include="code\MD3Base\D3D_MD3ObjectMesh.h" />
     <ClInclude Include="code\MD3Base\MD3SkinConfig.h" />
-    <ClInclude Include="code\MD3Base\MD3TexDB.h" />
     <ClInclude Include="code\MD3Base\MD3Types.h" />
     <ClInclude Include="code\resource.h" />
   </ItemGroup>

@@ -1,12 +1,15 @@
+// (c) Beem Media. All rights reserved.
+
+#include "D3D_MD3PlayerMesh.h"
+#include "D3D_MD3WeaponMesh.h"
+#include "GFX3D9.h"
+#include "md3.h"
+#include "resource.h"
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <windows.h>
-#include "GFX3D9.h"
-#define D3D_MD3
-#include "md3.h"
-#include "resource.h"
 
 LPDIRECT3DDEVICE9 g_lpDevice=NULL;
 D3DPRESENT_PARAMETERS g_SavedPP;
@@ -26,7 +29,7 @@ LPDIRECT3DVERTEXBUFFER9 g_lpTestPrimVB=NULL;
 
 #define TESTMD3
 #ifdef TESTMD3
-CMD3PlayerMesh g_lpTestHuman;
+CD3D_MD3PlayerMesh g_lpTestHuman;
 CMD3PlayerObject g_lpTestPlayer;
 
 CMD3WeaponMesh g_lpTestGun;
@@ -34,7 +37,7 @@ CMD3WeaponMesh g_lpTestGun;
 
 //#define TESTME
 #ifdef TESTME
-CMD3ObjectMesh g_lpMeTest;
+CD3D_MD3ObjectMesh g_lpMeTest;
 #endif TESTME
 
 #define TESTFONT

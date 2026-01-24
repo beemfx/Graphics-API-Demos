@@ -1,7 +1,7 @@
 // (c) Beem Media. All rights reserved.
 
 #include "MD3AnimConfig.h"
-#include "Functions.h"
+#include "Library/Functions.h"
 #include "FileSystem/DataStream.h"
 
 CMD3AnimConfig::CMD3AnimConfig()

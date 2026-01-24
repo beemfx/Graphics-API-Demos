@@ -1,11 +1,12 @@
 #define D3D_MD3
 #include <stdio.h>
 #include "md3.h"
+#include "D3D_MD3PlayerMesh.h"
 
 CMD3PlayerObject::CMD3PlayerObject()
 {
 	m_lpPlayerMesh=NULL;
-	m_dwSkinRef=SKIN_DEFAULT;
+	m_dwSkinRef = MD3_DEFAULT_INDEX;
 	m_dwUpperAnim=0;
 	m_dwLowerAnim=0;
 
@@ -201,7 +202,7 @@ HRESULT CMD3PlayerObject::SetAnimation(DWORD dwAnimRef, DWORD dwFlags, FLOAT fSp
 	return S_OK;
 }
 
-HRESULT CMD3PlayerObject::SetPlayerMesh(CMD3PlayerMesh * lpPlayerMesh)
+HRESULT CMD3PlayerObject::SetPlayerMesh(CD3D_MD3PlayerMesh * lpPlayerMesh)
 {
 	//Apply the animation.
 	m_lpPlayerMesh=lpPlayerMesh;
@@ -210,7 +211,7 @@ HRESULT CMD3PlayerObject::SetPlayerMesh(CMD3PlayerMesh * lpPlayerMesh)
 	ApplyAnimation(LEGS_IDLE, 1.0f, 0);
 	ApplyAnimation(TORSO_STAND, 1.0f, 0);
 
-	SetSkinByRef(SKIN_DEFAULT);
+	SetSkinByRef(MD3_DEFAULT_INDEX);
 
 	return S_OK;
 }

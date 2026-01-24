@@ -41,3 +41,5 @@ static_assert(sizeof(md3_uint64) == 8, "Type is the wrong size.");
 static_assert(sizeof(md3_int64) == 8, "Type is the wrong size.");
 static_assert(sizeof(md3_real32) == 4, "Type is the wrong size.");
 static_assert(sizeof(md3_real64) == 8, "Type is the wrong size.");
+
+static constexpr md3_uint32 MD3_DEFAULT_INDEX = 0;

@@ -1,25 +1,24 @@
 // (c) Beem Media. All rights reserved.
 
-#include "MD3ObjectMesh.h"
+#include "D3D_MD3ObjectMesh.h"
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
 #include "Library/Functions.h"
-#include "MD3.h"
 
-CMD3ObjectMesh::CMD3ObjectMesh()
+CD3D_MD3ObjectMesh::CD3D_MD3ObjectMesh()
 {
 	m_lppObjTex=NULL;
 
 	m_bLoaded=FALSE;
 }
 
-CMD3ObjectMesh::~CMD3ObjectMesh()
+CD3D_MD3ObjectMesh::~CD3D_MD3ObjectMesh()
 {
 	Clear();
 }
 
-HRESULT CMD3ObjectMesh::Clear()
+HRESULT CD3D_MD3ObjectMesh::Clear()
 {
 	LONG lNumMesh=0;
 	DWORD i=0;
@@ -40,7 +39,7 @@ HRESULT CMD3ObjectMesh::Clear()
 	return S_OK;
 }
 
-HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShader[MAX_PATH])
+HRESULT CD3D_MD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShader[MAX_PATH])
 {
 	size_t dwLen=0, i=0, j=0;
 	char szTemp[MAX_PATH];
@@ -117,7 +116,7 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	return E_FAIL;
 }
 
-HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_detail nDetail)
+HRESULT CD3D_MD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_detail nDetail)
 {
 	LONG lNumMesh=0;
 	DWORD i=0;
@@ -176,7 +175,7 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_
 	return S_OK;
 }
 
-void CMD3ObjectMesh::Invalidate()
+void CD3D_MD3ObjectMesh::Invalidate()
 {
 	if(!m_bLoaded)
 		return;
@@ -184,7 +183,7 @@ void CMD3ObjectMesh::Invalidate()
 	m_meshObject.Invalidate();
 }
 
-bool CMD3ObjectMesh::Validate(LPDIRECT3DDEVICE9 lpDevice)
+bool CD3D_MD3ObjectMesh::Validate(LPDIRECT3DDEVICE9 lpDevice)
 {
 	if(!m_bLoaded)
 		return false;
@@ -192,7 +191,7 @@ bool CMD3ObjectMesh::Validate(LPDIRECT3DDEVICE9 lpDevice)
 	return m_meshObject.Validate();
 }
 
-HRESULT CMD3ObjectMesh::Render(LPDIRECT3DDEVICE9 lpDevice , const D3DMATRIX& SavedWorldMatrix )
+HRESULT CD3D_MD3ObjectMesh::Render(LPDIRECT3DDEVICE9 lpDevice , const D3DMATRIX& SavedWorldMatrix )
 {
 	LONG lNumMesh=0;
 	DWORD i=0;

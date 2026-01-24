@@ -1,11 +1,12 @@
-#define D3D_MD3
-#include <d3dx9.h>
-#include <stdio.h>
-#include "defines.h"
-#include "md3.h"
-#include "D3D_MD3Skin.h"
+// (c) Beem Media. All rights reserved.
 
-CMD3PlayerMesh::CMD3PlayerMesh()
+#include "D3D_MD3PlayerMesh.h"
+#include "D3D_MD3WeaponMesh.h"
+#include "D3D_MD3Skin.h"
+#include "defines.h"
+#include <d3dx9.h>
+
+CD3D_MD3PlayerMesh::CD3D_MD3PlayerMesh()
 {
 	m_nLowerUpperTag = 0;
 	m_nUpperHeadTag = 0;
@@ -24,12 +25,12 @@ CMD3PlayerMesh::CMD3PlayerMesh()
 	m_bLoaded = FALSE;
 }
 
-CMD3PlayerMesh::~CMD3PlayerMesh()
+CD3D_MD3PlayerMesh::~CD3D_MD3PlayerMesh()
 {
 	Clear();
 }
 
-HRESULT CMD3PlayerMesh::GetSkinRef(DWORD* lpRef, char szSkinName[])
+HRESULT CD3D_MD3PlayerMesh::GetSkinRef(DWORD* lpRef, char szSkinName[])
 {
 	DWORD i = 0;
 
@@ -42,7 +43,7 @@ HRESULT CMD3PlayerMesh::GetSkinRef(DWORD* lpRef, char szSkinName[])
 	return E_FAIL;
 }
 
-HRESULT CMD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation)
+HRESULT CD3D_MD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation)
 {
 	if (lpAnimation)
 	{
@@ -51,7 +52,7 @@ HRESULT CMD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnim
 	return S_OK;
 }
 
-HRESULT CMD3PlayerMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
+HRESULT CD3D_MD3PlayerMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
 {
 	LONG i = 0;
 	LONG lNumTags = 0;
@@ -69,7 +70,7 @@ HRESULT CMD3PlayerMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], W
 	return E_FAIL;
 }
 
-HRESULT CMD3PlayerMesh::Invalidate()
+HRESULT CD3D_MD3PlayerMesh::Invalidate()
 {
 	if (m_bLoaded) {
 		m_meshHead.Invalidate();
@@ -79,7 +80,7 @@ HRESULT CMD3PlayerMesh::Invalidate()
 	return S_OK;
 }
 
-HRESULT CMD3PlayerMesh::Validate()
+HRESULT CD3D_MD3PlayerMesh::Validate()
 {
 	if (m_bLoaded) {
 		m_meshHead.Validate();
@@ -89,7 +90,7 @@ HRESULT CMD3PlayerMesh::Validate()
 	return S_OK;
 }
 
-HRESULT CMD3PlayerMesh::Render(
+HRESULT CD3D_MD3PlayerMesh::Render(
 	LONG lUpperFirstFrame,
 	LONG lUpperSecondFrame,
 	FLOAT fUpperTime,
@@ -116,7 +117,7 @@ HRESULT CMD3PlayerMesh::Render(
 		return S_FALSE;
 
 
-	if (dwSkinRef == SKIN_DEFAULT)
+	if (dwSkinRef == MD3_DEFAULT_INDEX)
 		dwSkinRef = m_dwDefaultSkin;
 
 	if ((dwSkinRef < 1) || (dwSkinRef > m_dwNumSkins))
@@ -228,7 +229,7 @@ HRESULT CMD3PlayerMesh::Render(
 	return S_OK;
 }
 
-HRESULT CMD3PlayerMesh::GetSkinsA(char szDir[])
+HRESULT CD3D_MD3PlayerMesh::GetSkinsA(char szDir[])
 {
 	WIN32_FIND_DATA FindData;
 	HANDLE hFind = NULL;
@@ -396,12 +397,12 @@ HRESULT CMD3PlayerMesh::GetSkinsA(char szDir[])
 	return S_OK;
 }
 
-HRESULT CMD3PlayerMesh::GetSkinsW(WCHAR szDir[])
+HRESULT CD3D_MD3PlayerMesh::GetSkinsW(WCHAR szDir[])
 {
 	return E_FAIL;
 }
 
-HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
+HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
 {
 	size_t dwLen = 0;
 	HRESULT hr = 0;
@@ -520,12 +521,12 @@ HRESULT CMD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_
 	return S_OK;
 }
 
-HRESULT CMD3PlayerMesh::LoadW(LPDIRECT3DDEVICE9 lpDevice, WCHAR szDir[], d3d_md3_detail nDetail)
+HRESULT CD3D_MD3PlayerMesh::LoadW(LPDIRECT3DDEVICE9 lpDevice, WCHAR szDir[], d3d_md3_detail nDetail)
 {
 	return E_FAIL;
 }
 
-HRESULT CMD3PlayerMesh::Clear()
+HRESULT CD3D_MD3PlayerMesh::Clear()
 {
 	DWORD i = 0;
 
