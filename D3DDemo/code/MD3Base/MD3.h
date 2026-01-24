@@ -15,6 +15,7 @@ extern "C" {
 #define MD3BASE_EXPORTS
 
 #include "MD3File.h"
+#include "MD3AnimConfig.h"
 
 #ifdef D3D_MD3
 #include <d3d9.h>
@@ -27,62 +28,7 @@ struct md3Skin
 	std::string SkinPath;
 };
 
-enum class md3_anim_sex
-{
-	Default,
-	Male,
-	Female,
-	Machine,
-	Other,
-};
 
-enum class md3_anim_footstep
-{
-	Default,
-	Boot,
-	Energy,
-	Other,
-};
-
-struct md3AnimationConfig
-{
-	md3_int32 lFirstFrame = 0;
-	md3_int32 lNumFrames = 0;
-	md3_int32 lLoopingFrames = 0;
-	md3_int32 lFramesPerSecond = 0;
-};
-
-/* Animation definitions. */
-#define BOTH_DEATH1   0
-#define BOTH_DEAD1    1
-#define BOTH_DEATH2   2
-#define BOTH_DEAD2    3
-#define BOTH_DEATH3   4
-#define BOTH_DEAD3    5
-
-#define TORSO_GESTURE 6
-#define TORSO_ATTACK  7
-#define TORSO_ATTACK2 8
-#define TORSO_DROP    9
-#define TORSO_RAISE   10
-#define TORSO_STAND   11
-#define TORSO_STAND2  12
-
-#define LEGS_WALKCR   13
-#define LEGS_WALK     14
-#define LEGS_RUN      15
-#define LEGS_BACK     16
-#define LEGS_SWIM     17
-#define LEGS_JUMP     18
-#define LEGS_LAND     19
-#define LEGS_JUMPB    20
-#define LEGS_LANDB    21
-#define LEGS_IDLE     22
-#define LEGS_IDLECR   23
-#define LEGS_TURN     24
-
-/* The number of MD3 animations (Quake 3 Arena specific). */
-#define MD3_NUM_ANIMS 25
 
 
 /* 
@@ -321,29 +267,6 @@ protected:
 #ifdef __cplusplus
 
 
-#define MD3ANIM_ADJUST 0x00000001l
-
-class MD3BASE_EXPORTS CMD3Animation
-{
-protected:
-	md3_anim_sex m_Sex = md3_anim_sex::Default;
-	md3_anim_footstep m_Footstep = md3_anim_footstep::Default;
-	md3_int16 m_HeadOffset[3] = { };
-	md3_int32 m_LegOffset = 0;
-	md3AnimationConfig m_Animations[MD3_NUM_ANIMS] = { };
-	md3_uint32 m_NumAnims = 0;
-
-	void ReadAnimations(const std::vector<std::string>& Lines);
-	void ParseLine(const std::string& Line);
-
-public:
-	CMD3Animation();
-	~CMD3Animation();
-
-	md3_bool LoadAnimation(const std::filesystem::path& Filename);
-	md3AnimationConfig GetAnimation(md3_uint32 Ref, md3_uint32 Flags);
-};
-
 #endif /* __cplusplus */
 
 
@@ -371,7 +294,7 @@ protected:
 	CMD3Mesh m_meshLower;
 	CMD3SkinFile * m_skinLower;
 
-	CMD3Animation m_Animation;
+	CMD3AnimConfig m_Animation;
 
 	CMD3TextureDB m_TexDB;
 

@@ -1,25 +1,20 @@
 // (c) Beem Media. All rights reserved.
 
-#define D3D_MD3
+#include "MD3AnimConfig.h"
 #include "Functions.h"
-#include "MD3.h"
 #include "FileSystem/DataStream.h"
 
-#define PERR_FAIL           0x80000000l
-#define PERR_NOLINE         0x80000001l
-#define PERR_ANIMOUTOFRANGE 0x80000002l
-
-CMD3Animation::CMD3Animation()
+CMD3AnimConfig::CMD3AnimConfig()
 {
 	
 }
 
-CMD3Animation::~CMD3Animation()
+CMD3AnimConfig::~CMD3AnimConfig()
 {
 	
 }
 
-md3_bool CMD3Animation::LoadAnimation(const std::filesystem::path& Filename)
+md3_bool CMD3AnimConfig::LoadAnimation(const std::filesystem::path& Filename)
 {
 	CDataStream AnimDataStream(Filename);
 	const std::vector<std::string> AnimDataLines = Functions::ReadLines(AnimDataStream);
@@ -39,7 +34,7 @@ md3_bool CMD3Animation::LoadAnimation(const std::filesystem::path& Filename)
 	return m_NumAnims == MD3_NUM_ANIMS;
 }
 
-md3AnimationConfig CMD3Animation::GetAnimation(md3_uint32 Ref, md3_uint32 Flags)
+md3AnimationConfig CMD3AnimConfig::GetAnimation(md3_uint32 Ref, md3_uint32 Flags /*= MD3ANIM_ADJUST*/)
 {
 	const bool bIsValidRef = 0 <= Ref && Ref < m_NumAnims;
 
@@ -72,7 +67,7 @@ md3AnimationConfig CMD3Animation::GetAnimation(md3_uint32 Ref, md3_uint32 Flags)
 // Private Functions //
 ///////////////////////
 
-void CMD3Animation::ReadAnimations(const std::vector<std::string>& Lines)
+void CMD3AnimConfig::ReadAnimations(const std::vector<std::string>& Lines)
 {
 	m_NumAnims = 0;
 
@@ -82,7 +77,7 @@ void CMD3Animation::ReadAnimations(const std::vector<std::string>& Lines)
 	}
 }
 
-void CMD3Animation::ParseLine(const std::string& Line)
+void CMD3AnimConfig::ParseLine(const std::string& Line)
 {
 	std::string Final = Line;
 

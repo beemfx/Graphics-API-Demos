@@ -56,7 +56,7 @@
     <ClCompile Include="code\MD3Base\Functions.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
-    <ClCompile Include="code\MD3Base\MD3Animation.cpp">
+    <ClCompile Include="code\MD3Base\MD3AnimConfig.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
     <ClCompile Include="code\MD3Base\MD3Data.cpp">
@@ -149,6 +149,9 @@
       <Filter>code\MD3Base</Filter>
     </ClInclude>
     <ClInclude Include="code\MD3Base\MD3Data.h">
+      <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\MD3Base\MD3AnimConfig.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
   </ItemGroup>

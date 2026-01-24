@@ -45,7 +45,7 @@ HRESULT CMD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnim
 {
 	if (lpAnimation)
 	{
-		*lpAnimation = m_Animation.GetAnimation(dwAnimRef, MD3ANIM_ADJUST);
+		*lpAnimation = m_Animation.GetAnimation(dwAnimRef);
 	}
 	return S_OK;
 }
@@ -190,9 +190,9 @@ HRESULT CMD3PlayerMesh::Render(
 
 		//Find out if the weapon should perform the flash.
 		LONG lShoot=0, lGauntlet=0;
-		md3AnimationConfig TorsoAttackAnim = m_Animation.GetAnimation(TORSO_ATTACK, MD3ANIM_ADJUST);
+		md3AnimationConfig TorsoAttackAnim = m_Animation.GetAnimation(TORSO_ATTACK);
 		lShoot= TorsoAttackAnim.lFirstFrame;
-		md3AnimationConfig TorsoMeleeAnim = m_Animation.GetAnimation(TORSO_ATTACK2, MD3ANIM_ADJUST);
+		md3AnimationConfig TorsoMeleeAnim = m_Animation.GetAnimation(TORSO_ATTACK2);
 		lGauntlet= TorsoMeleeAnim.lFirstFrame;
 
 		if(lUpperSecondFrame==(lShoot+1) || lUpperSecondFrame==(lGauntlet+2) || lUpperSecondFrame==(lGauntlet+3))

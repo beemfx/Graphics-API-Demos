@@ -221,7 +221,7 @@
     <ClCompile Include="code\GFX3D9\Vertex.cpp" />
     <ClCompile Include="code\Main.cpp" />
     <ClCompile Include="code\MD3Base\Functions.cpp" />
-    <ClCompile Include="code\MD3Base\MD3Animation.cpp" />
+    <ClCompile Include="code\MD3Base\MD3AnimConfig.cpp" />
     <ClCompile Include="code\MD3Base\MD3Data.cpp" />
     <ClCompile Include="code\MD3Base\MD3File.cpp" />
     <ClCompile Include="code\MD3Base\MD3Mesh.cpp" />
@@ -240,6 +240,7 @@
     <ClInclude Include="code\MD3Base\defines.h" />
     <ClInclude Include="code\MD3Base\Functions.h" />
     <ClInclude Include="code\MD3Base\MD3.h" />
+    <ClInclude Include="code\MD3Base\MD3AnimConfig.h" />
     <ClInclude Include="code\MD3Base\MD3Data.h" />
     <ClInclude Include="code\MD3Base\MD3File.h" />
     <ClInclude Include="code\MD3Base\MD3TexDB.h" />
