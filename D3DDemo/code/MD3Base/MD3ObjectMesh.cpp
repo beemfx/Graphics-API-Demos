@@ -42,11 +42,11 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 {
 	size_t dwLen=0, i=0, j=0;
 	char szTemp[MAX_PATH];
-	HRESULT hr=0;
 
 	//First attempt to load the name provided.
-	hr=m_TexDB.AddTexture(lpDevice, szShader);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szShader);
+	if(m_TexDB.HasTexture(szShader))
+	{
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
@@ -66,8 +66,8 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 
 	strcpy(szTemp, szShader);
 	strcat(szTemp, "JPG");
-	hr=m_TexDB.AddTexture(lpDevice, szTemp);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szTemp);
+	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
@@ -76,8 +76,8 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	
 	strcpy(szTemp, szShader);
 	strcat(szTemp, "BMP");
-	hr=m_TexDB.AddTexture(lpDevice, szTemp);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szTemp);
+	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
@@ -85,8 +85,8 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 
 	strcpy(szTemp, szShader);
 	strcat(szTemp, "PNG");
-	hr=m_TexDB.AddTexture(lpDevice, szTemp);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szTemp);
+	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
@@ -94,8 +94,8 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 
 	strcpy(szTemp, szShader);
 	strcat(szTemp, "DIB");
-	hr=m_TexDB.AddTexture(lpDevice, szTemp);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szTemp);
+	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
@@ -103,8 +103,8 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 
 	strcpy(szTemp, szShader);
 	strcat(szTemp, "DDS");
-	hr=m_TexDB.AddTexture(lpDevice, szTemp);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szTemp);
+	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
@@ -112,8 +112,8 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 
 	strcpy(szTemp, szShader);
 	strcat(szTemp, "TGA");
-	hr=m_TexDB.AddTexture(lpDevice, szTemp);
-	if(SUCCEEDED(hr)){
+	m_TexDB.AddTexture(lpDevice, szTemp);
+	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
 		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
@@ -171,7 +171,7 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 		RemoveDirectoryFromStringA(szShader, szShader);
 		sprintf(szTexName, "%s%s", szPath, szShader);
 		if(SUCCEEDED(TextureExtension(lpDevice, szTexName))){
-			m_TexDB.GetTexture(szTexName, &m_lppObjTex[i]);
+			m_lppObjTex[i] = m_TexDB.GetTexture(szTexName);
 		}else{
 			m_lppObjTex[i]=NULL;
 		}

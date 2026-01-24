@@ -66,7 +66,7 @@ void CMD3SkinFile::ClearTextures()
 	m_Textures.shrink_to_fit();
 }
 
-HRESULT CMD3SkinFile::LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CMD3TextureDB& TexDB)
+HRESULT CMD3SkinFile::LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB)
 {
 	CMD3SkinConfig::LoadSkin(Filename);
 
@@ -79,7 +79,7 @@ HRESULT CMD3SkinFile::LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem
 	return S_OK;
 }
 
-HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CMD3TextureDB& TexDB)
+HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CGFX3D9TextureDB& TexDB)
 {
 	//The name and path to the texture.
 	char szFilename[MAX_PATH];
@@ -99,16 +99,9 @@ HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::file
 
 		//If using static texture buffer create and/or obtain texture from
 		//the static buffer
-		if (SUCCEEDED(TexDB.AddTexture(lpDevice, szFilename)))
+		if (TexDB.AddTexture(lpDevice, szFilename))
 		{
-			if (SUCCEEDED(TexDB.GetTexture(m_Skins[i].SkinPath.c_str(), &m_Textures[i])))
-			{
-				
-			}
-			else 
-			{
-				m_Textures[i] = NULL;
-			}
+			m_Textures[i] = TexDB.GetTexture(szFilename);
 		}
 		else
 		{

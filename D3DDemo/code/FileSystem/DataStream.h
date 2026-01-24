@@ -41,4 +41,6 @@ public:
 	std::size_t SeekFromCurrent(signed long Distance) { return Seek(Distance, MOVE_CUR); }
 	std::size_t Tell() const;
 	bool IsEOF() const { return Tell() >= m_Data.size(); }
+	const void* GetData() const { return reinterpret_cast<const void*>(m_Data.data()); }
+	const std::size_t GetDataSize() const { return m_Data.size(); }
 };

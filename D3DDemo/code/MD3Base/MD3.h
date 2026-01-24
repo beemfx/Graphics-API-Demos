@@ -15,6 +15,7 @@ extern "C" {
 #include "MD3File.h"
 #include "MD3AnimConfig.h"
 #include "MD3SkinConfig.h"
+#include "GFX3D9/GFX3D9TextureDB.h"
 
 #ifdef D3D_MD3
 #include <d3d9.h>
@@ -26,7 +27,7 @@ class CMD3WeaponMesh;
 
 
 /* 
-	The following is MD3 implimentation for Direct3D.
+	The following is MD3 implementation for Direct3D.
 */
 #ifdef D3D_MD3
 
@@ -145,36 +146,7 @@ public:
 	The texture database functionality.
 */
 
-#ifdef __cplusplus
 
-/* CMD3TextureDB is not UNICODE compatible. */
-class CMD3TextureDB
-{
-protected:
-	CMD3Texture * m_lpFirst;
-	DWORD m_dwNumTextures;
-public:
-	CMD3TextureDB();
-	~CMD3TextureDB();
-
-	HRESULT GetNumTextures(DWORD * dwNumTex);
-
-	HRESULT AddTexture(LPDIRECT3DDEVICE9 lpDevice, const md3_char8* szTexName);
-	HRESULT AddTexture(LPDIRECT3DTEXTURE9 lpTexture, const md3_char8* szTexName);
-	
-	HRESULT GetTexture(DWORD dwRef, LPDIRECT3DTEXTURE9 * lppTexture);
-	HRESULT GetTexture(const md3_char8* szTexName, LPDIRECT3DTEXTURE9 * lppTexture);
-	
-	HRESULT SetRenderTexture(DWORD dwRef, DWORD dwStage, LPDIRECT3DDEVICE9 lpDevice);
-	HRESULT SetRenderTexture(const md3_char8* szTexName, DWORD dwStage, LPDIRECT3DDEVICE9 lpDevice);
-	
-	HRESULT DeleteTexture(DWORD dwRef);
-	HRESULT DeleteTexture(const md3_char8* szTexName);
-
-	HRESULT ClearDB();
-};
-
-#endif /* __cplusplus */
 
 /*
 	The MD3 Skin file functionality.
@@ -187,7 +159,7 @@ public:
 	CMD3SkinFile();
 	~CMD3SkinFile();
 
-	HRESULT LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CMD3TextureDB& TexDB);
+	HRESULT LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB);
 	HRESULT GetTexturePointer(DWORD dwRef, LPDIRECT3DTEXTURE9 * lppTexture);
 	HRESULT SetRenderTexture(DWORD dwRef, LPDIRECT3DDEVICE9 lpDevice);
 	HRESULT SetSkin(LPDIRECT3DDEVICE9 lpDevice, DWORD dwRef);
@@ -195,7 +167,7 @@ public:
 private:
 	void ClearTextures();
 
-	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CMD3TextureDB& TexDB);
+	HRESULT ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CGFX3D9TextureDB& TexDB);
 
 private:
 	std::vector<IDirect3DTexture9*> m_Textures;
@@ -229,7 +201,7 @@ protected:
 
 	CMD3AnimConfig m_Animation;
 
-	CMD3TextureDB m_TexDB;
+	CGFX3D9TextureDB m_TexDB;
 
 	WORD m_nLowerUpperTag;
 	WORD m_nUpperHeadTag;
@@ -399,7 +371,7 @@ protected:
 	CMD3Mesh m_meshFlash;
 	CMD3Mesh m_meshHand;
 
-	CMD3TextureDB m_TexDB;
+	CGFX3D9TextureDB m_TexDB;
 
 	LPDIRECT3DTEXTURE9 * m_lpFlashTex;
 	LPDIRECT3DTEXTURE9 * m_lpWeaponTex;
@@ -441,7 +413,7 @@ class CMD3ObjectMesh
 {
 protected:
 	CMD3Mesh m_meshObject;
-	CMD3TextureDB m_TexDB;
+	CGFX3D9TextureDB m_TexDB;
 	LPDIRECT3DTEXTURE9 * m_lppObjTex;
 
 	BOOL m_bLoaded;

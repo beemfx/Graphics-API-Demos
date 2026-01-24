@@ -218,6 +218,7 @@
     <ClCompile Include="code\GFX3D9\D3DFont.c" />
     <ClCompile Include="code\GFX3D9\D3DImage.c" />
     <ClCompile Include="code\GFX3D9\D3DInit.c" />
+    <ClCompile Include="code\GFX3D9\GFX3D9TextureDB.cpp" />
     <ClCompile Include="code\GFX3D9\Vertex.cpp" />
     <ClCompile Include="code\Main.cpp" />
     <ClCompile Include="code\MD3Base\Functions.cpp" />
@@ -230,7 +231,6 @@
     <ClCompile Include="code\MD3Base\MD3PlayerObject.cpp" />
     <ClCompile Include="code\MD3Base\MD3Skin.cpp" />
     <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp" />
-    <ClCompile Include="code\MD3Base\MD3TexDB.cpp" />
     <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +238,7 @@
     <ClInclude Include="code\FileSystem\DataStream.h" />
     <ClInclude Include="code\FileSystem\ZipArchive.h" />
     <ClInclude Include="code\GFX3D9\GFX3D9.h" />
+    <ClInclude Include="code\GFX3D9\GFX3D9TextureDB.h" />
     <ClInclude Include="code\MD3Base\defines.h" />
     <ClInclude Include="code\MD3Base\Functions.h" />
     <ClInclude Include="code\MD3Base\MD3.h" />
@@ -256,7 +257,6 @@
     <None Include="code\3rdParty\miniz\ChangeLog.md" />
     <None Include="code\3rdParty\miniz\LICENSE" />
     <None Include="code\3rdParty\miniz\readme.md" />
-    <None Include="code\GFX3D9\GFX3D9.dsp" />
     <None Include="code\GFX3D9\GFX3D9.vcproj" />
     <None Include="packages.config" />
   </ItemGroup>

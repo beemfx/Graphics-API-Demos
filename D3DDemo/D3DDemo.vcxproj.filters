@@ -80,9 +80,6 @@
     <ClCompile Include="code\MD3Base\MD3Skin.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
-    <ClCompile Include="code\MD3Base\MD3TexDB.cpp">
-      <Filter>code\MD3Base</Filter>
-    </ClCompile>
     <ClCompile Include="code\MD3Base\MD3WeaponMesh.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
@@ -115,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp">
       <Filter>code\MD3Base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GFX3D9\GFX3D9TextureDB.cpp">
+      <Filter>code\GFX3D9</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +160,9 @@
     <ClInclude Include="code\MD3Base\MD3SkinConfig.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
+    <ClInclude Include="code\GFX3D9\GFX3D9TextureDB.h">
+      <Filter>code\GFX3D9</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="code\resource.rc">
@@ -167,9 +170,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="code\GFX3D9\GFX3D9.dsp">
-      <Filter>code\GFX3D9</Filter>
-    </None>
     <None Include="code\GFX3D9\GFX3D9.vcproj">
       <Filter>code\GFX3D9</Filter>
     </None>

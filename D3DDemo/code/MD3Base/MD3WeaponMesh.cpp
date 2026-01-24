@@ -206,7 +206,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 		RemoveDirectoryFromStringA(szShaderName, szShaderName);
 		sprintf(szTexName, "%s%s", szPath, szShaderName);
 		if(SUCCEEDED(TextureExtension(szTexName))){
-			m_TexDB.GetTexture(szTexName, &m_lpWeaponTex[i]);
+			m_lpWeaponTex[i] = m_TexDB.GetTexture(szTexName);
 		}else{
 			m_lpWeaponTex[i]=NULL;
 		}
@@ -219,7 +219,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 			RemoveDirectoryFromStringA(szShaderName, szShaderName);
 			sprintf(szTexName, "%s%s", szPath, szShaderName);
 			if(SUCCEEDED(TextureExtension(szTexName))){
-				m_TexDB.GetTexture(szTexName, &m_lpBarrelTex[i]);
+				m_lpBarrelTex[i] = m_TexDB.GetTexture(szTexName);
 			}else{
 				m_lpBarrelTex[i]=NULL;
 			}
@@ -232,7 +232,7 @@ HRESULT CMD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], MD3DETAIL
 		RemoveDirectoryFromStringA(szShaderName, szShaderName);
 		sprintf(szTexName, "%s%s", szPath, szShaderName);
 		if(SUCCEEDED(TextureExtension(szTexName))){
-			m_TexDB.GetTexture(szTexName, &m_lpFlashTex[i]);
+			m_lpFlashTex[i] = m_TexDB.GetTexture(szTexName);
 		}else{
 			m_lpFlashTex[i]=NULL;
 		}
