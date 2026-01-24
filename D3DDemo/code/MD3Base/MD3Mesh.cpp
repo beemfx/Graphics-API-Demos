@@ -179,7 +179,7 @@ HRESULT CMD3Mesh::LoadMD3(
 	}
 
 	//Read the MD3 File, insuring that it really is an MD3 file.
-	if (!ReadMD3File(m_md3File, MD3Stream))
+	if (!m_md3File.Load(MD3Stream))
 	{
 		return E_FAIL;
 	}
@@ -209,7 +209,7 @@ HRESULT CMD3Mesh::ClearMD3()
 	//If an MD3 is loaded delete the model and the file.
 	if(m_bMD3Loaded){
 		DeleteModel();
-		DeleteMD3File(m_md3File);
+		m_md3File.Unload();
 		SAFE_RELEASE(m_lpDevice);
 	}
 
@@ -509,7 +509,7 @@ HRESULT CMD3Mesh::GetShader(
 HRESULT CMD3Mesh::DumpDebug()
 {
 	FILE * fout=fopen("md3dump.txt", "w");
-	DumpMD3DebugData(fout, &m_md3File, MD3DUMP_ALL);
+	DumpMD3DebugData(fout, m_md3File, MD3DUMP_ALL);
 	fclose(fout);
 	return S_OK;
 }
@@ -672,7 +672,7 @@ HRESULT CMD3Mesh::CreateNormals()
 
 		for(j=0; j<(m_md3File.Meshes[i].MeshHeader.NumVertices*m_md3File.Meshes[i].MeshHeader.NumFrames); j++)
 		{
-			m_lppNormals[i][j] = MD3_DecodeNormalVector(m_md3File.Meshes[i].Vertexes[j]);
+			m_lppNormals[i][j] = CMD3File::DecodeNormalVector(m_md3File.Meshes[i].Vertexes[j]);
 		}
 	}
 	return S_OK;

@@ -129,7 +129,7 @@ typedef struct tagD3DMD3VERTEX{
 class MD3BASE_EXPORTS CMD3Mesh
 {
 protected:
-	md3File m_md3File;
+	CMD3File m_md3File;
 
 	LPDIRECT3DVERTEXBUFFER9 * m_lppVB;
 	D3DMD3VERTEX * m_lpVertices;

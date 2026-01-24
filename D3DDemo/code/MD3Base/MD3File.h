@@ -4,6 +4,8 @@
 
 #include "MD3Types.h"
 
+class CDataStream;
+
 static const md3_int32 MD3_VERSION = 15;
 static const md3_int32 MD3_ID = (*(md3_uint32*)"IDP3");
 static const md3_int32 MAX_QPATH = 64;
@@ -106,12 +108,31 @@ struct md3Mesh
 };
 
 // Dynamic Size File
-struct md3File
+class CMD3File
 {
+public:
 	md3Header Header; /* File Header */
 	std::vector<md3Frame> Frames; /* List of md3 frames */
 	std::vector<md3Tag> Tags; /* List of md3 tag data */
 	std::vector<md3Mesh> Meshes; /* List of md3 meshes */
+
+	md3_bool Load(CDataStream& In);
+	void Unload();
+
+	static md3Vector DecodeNormalVector(const md3Vertex& Vertex);
+
+private:
+	static md3_bool ReadMD3Mesh(md3Mesh& Out, CDataStream& In);
+	static md3_int32 FindMD3Header(CDataStream& In);
+	static md3_bool ReadMD3Frame(md3Frame& Out, CDataStream& In);
+	static md3_bool ReadMD3Header(md3Header& Out, CDataStream& In);
+	static md3_bool ReadMD3MeshHeader(md3MeshHeader& Out, CDataStream& In);
+	static md3_bool ReadMD3Shader(md3Shader& Out, CDataStream& In);
+	static md3_bool ReadMD3Tag(md3Tag& Out, CDataStream& In);
+	static md3_bool ReadMD3TexCoord(md3TexCoord& Out, CDataStream& In);
+	static md3_bool ReadMD3Triangle(md3Triangle& Out, CDataStream& In);
+	static md3_bool ReadMD3Vector(md3Vector& Out, CDataStream& In);
+	static md3_bool ReadMD3Vertex(md3Vertex& Out, CDataStream& In);
 };
 
 // Fixed Size Mesh (Unused)
@@ -132,13 +153,3 @@ struct md3File2
 	md3Tag Tags[MD3_MAX_TAGS];
 	md3Mesh Meshes[MD3_MAX_SURFACES];
 };
-
-// MD3 File reader functions:
-// 
-// Read and Create an MD3 File in the MD3FILE structure.
-md3_bool ReadMD3File(md3File& Out, class CDataStream& In);
-
-// Delete an MD3FILE that has been created.
-void DeleteMD3File(md3File& In);
-
-md3Vector MD3_DecodeNormalVector(const md3Vertex& Vertex);

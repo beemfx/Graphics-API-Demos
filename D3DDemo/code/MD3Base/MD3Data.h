@@ -18,4 +18,4 @@ static const md3_uint32 MD3DUMP_MESHTEXCOORD = (1 << 5);
 static const md3_uint32 MD3DUMP_MESHVERTEX = (1 << 6);
 static const md3_uint32 MD3DUMP_ALL = 0xFFFFFFFF;
 
-void DumpMD3DebugData(FILE* fout, const md3File* lpFile, md3_uint32 dwDumpFlags);
+void DumpMD3DebugData(FILE* fout, const CMD3File& lpFile, md3_uint32 dwDumpFlags);

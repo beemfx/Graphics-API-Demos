@@ -4,83 +4,67 @@
 #include "MD3File.h"
 #include "FileSystem/DataStream.h"
 
-static md3_bool ReadMD3Mesh(md3Mesh& Out, CDataStream& In);
-static md3_int32 FindMD3Header(CDataStream& In);
-static md3_bool ReadMD3Frame(md3Frame& Out, CDataStream& In);
-static md3_bool ReadMD3Header(md3Header& Out, CDataStream& In);
-static md3_bool ReadMD3MeshHeader(md3MeshHeader& Out, CDataStream& In);
-static md3_bool ReadMD3Shader(md3Shader& Out, CDataStream& In);
-static md3_bool ReadMD3Tag(md3Tag& Out, CDataStream& In);
-static md3_bool ReadMD3TexCoord(md3TexCoord& Out, CDataStream& In);
-static md3_bool ReadMD3Triangle(md3Triangle& Out, CDataStream& In);
-static md3_bool ReadMD3Vector(md3Vector& Out, CDataStream& In);
-static md3_bool ReadMD3Vertex(md3Vertex& Out, CDataStream& In);
-
-md3_bool ReadMD3File(md3File& Out, CDataStream& In)
+md3_bool CMD3File::Load(CDataStream& In)
 {
-	md3_bool bSuccess = false;
-	std::size_t dwBytesRead = 0;
-	md3_int32 i = 0;
-
 	const md3_int32 HeaderOffset = FindMD3Header(In);
 	In.SeekFromStart(HeaderOffset);
 
-	if (!ReadMD3Header(Out.Header, In))
+	if (!ReadMD3Header(Header, In))
 	{
 		return false;
 	}
 
-	if (Out.Header.ID != MD3_ID || Out.Header.Version != MD3_VERSION)
+	if (Header.ID != MD3_ID || Header.Version != MD3_VERSION)
 	{
 		return false;
 	}
 
 	// Frames
-	Out.Frames.resize(Out.Header.NumFrames);
-	if (Out.Frames.size() != Out.Header.NumFrames)
+	Frames.resize(Header.NumFrames);
+	if (Frames.size() != Header.NumFrames)
 	{
 		return false;
 	}
 
-	In.SeekFromStart(HeaderOffset + Out.Header.FrameOffset);
+	In.SeekFromStart(HeaderOffset + Header.FrameOffset);
 	
-	for (i = 0; i < Out.Header.NumFrames; i++)
+	for (md3_int32 i = 0; i < Header.NumFrames; i++)
 	{
-		if (!ReadMD3Frame(Out.Frames[i], In))
+		if (!ReadMD3Frame(Frames[i], In))
 		{
 			return false;
 		}
 	}
 
 	// Tags
-	Out.Tags.resize(Out.Header.NumTags * Out.Header.NumFrames);
-	if (Out.Tags.size() != (Out.Header.NumTags * Out.Header.NumFrames))
+	Tags.resize(Header.NumTags * Header.NumFrames);
+	if (Tags.size() != (Header.NumTags * Header.NumFrames))
 	{
 		return false;
 	}
 
-	In.SeekFromStart(HeaderOffset + Out.Header.TagOffset);
+	In.SeekFromStart(HeaderOffset + Header.TagOffset);
 
-	for (i = 0; i < Out.Header.NumTags * Out.Header.NumFrames; i++)
+	for (md3_int32 i = 0; i < Header.NumTags * Header.NumFrames; i++)
 	{
-		if (!ReadMD3Tag(Out.Tags[i], In))
+		if (!ReadMD3Tag(Tags[i], In))
 		{
 			return false;
 		}
 	}
 
 	// Meshes
-	Out.Meshes.resize(Out.Header.NumMeshes);
-	if (Out.Meshes.size() != Out.Header.NumMeshes)
+	Meshes.resize(Header.NumMeshes);
+	if (Meshes.size() != Header.NumMeshes)
 	{
 		return false;
 	}
 
-	In.SeekFromStart(HeaderOffset + Out.Header.MeshOffset);
+	In.SeekFromStart(HeaderOffset + Header.MeshOffset);
 	
-	for (i = 0; i < Out.Header.NumMeshes; i++)
+	for (md3_int32 i = 0; i < Header.NumMeshes; i++)
 	{
-		if (!ReadMD3Mesh(Out.Meshes[i], In))
+		if (!ReadMD3Mesh(Meshes[i], In))
 		{
 			return false;
 		}
@@ -89,18 +73,35 @@ md3_bool ReadMD3File(md3File& Out, CDataStream& In)
 	return true;
 }
 
-void DeleteMD3File(md3File& In)
+void CMD3File::Unload()
 {
-	/* Free frame and tag data. */
-	In.Frames.resize(0);
-	In.Frames.shrink_to_fit();
-	In.Tags.resize(0);
-	In.Tags.shrink_to_fit();
-	In.Meshes.resize(0);
-	In.Meshes.shrink_to_fit();
+	Header = { };
+	Frames.resize(0);
+	Frames.shrink_to_fit();
+	Tags.resize(0);
+	Tags.shrink_to_fit();
+	Meshes.resize(0);
+	Meshes.shrink_to_fit();
 }
 
-static md3_bool ReadMD3Mesh(md3Mesh& Out, CDataStream& In)
+md3Vector CMD3File::DecodeNormalVector(const md3Vertex& Vertex)
+{
+	md3Vector Out;
+
+	md3_real32 lat = 0, lng = 0;
+
+	// Get the latitude and longitude.
+	lat = (Vertex.Normal & 0x00FF) * (2.0f * 3.141592654f) / 255.0f;
+	lng = ((Vertex.Normal & 0xFF00) >> 8) * (2.0f * 3.141592654f) / 255.0f;
+	// Get the x, y, z values.
+	Out.x = static_cast<md3_real32>(std::cos(lat) * std::sin(lng));
+	Out.y = static_cast<md3_real32>(std::sin(lat) * std::sin(lng));
+	Out.z = static_cast<md3_real32>(std::cos(lng));
+
+	return Out;
+}
+
+md3_bool CMD3File::ReadMD3Mesh(md3Mesh& Out, CDataStream& In)
 {
 	const md3_int32 MeshOffset = static_cast<md3_int32>(In.Tell());
 
@@ -188,14 +189,14 @@ static md3_bool ReadMD3Mesh(md3Mesh& Out, CDataStream& In)
 	return true;
 }
 
-static md3_int32 FindMD3Header(CDataStream& In)
+md3_int32 CMD3File::FindMD3Header(CDataStream& In)
 {
 	/* This function should search through the file byte
 	by byte until "IDP3", and MD3_VERSION are found. */
 	return 0;
 }
 
-static md3_bool ReadMD3Vertex(md3Vertex& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Vertex(md3Vertex& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 8;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
@@ -203,7 +204,7 @@ static md3_bool ReadMD3Vertex(md3Vertex& Out, CDataStream& In)
 }
 
 
-static md3_bool ReadMD3TexCoord(md3TexCoord& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3TexCoord(md3TexCoord& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 8;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
@@ -211,68 +212,51 @@ static md3_bool ReadMD3TexCoord(md3TexCoord& Out, CDataStream& In)
 }
 
 
-static md3_bool ReadMD3Triangle(md3Triangle& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Triangle(md3Triangle& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 12;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
-static md3_bool ReadMD3Shader(md3Shader& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Shader(md3Shader& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = (MAX_QPATH + 4);
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
-static md3_bool ReadMD3MeshHeader(md3MeshHeader& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3MeshHeader(md3MeshHeader& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = (MAX_QPATH + (11 * 4));
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
-static md3_bool ReadMD3Tag(md3Tag& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Tag(md3Tag& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = (MAX_QPATH + (12 * 4));
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
-static md3_bool ReadMD3Frame(md3Frame& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Frame(md3Frame& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = ((12 * 3) + 4 + 16);
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
-static md3_bool ReadMD3Vector(md3Vector& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Vector(md3Vector& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 3 * 4;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
 }
 
-static md3_bool ReadMD3Header(md3Header& Out, CDataStream& In)
+md3_bool CMD3File::ReadMD3Header(md3Header& Out, CDataStream& In)
 {
 	static constexpr std::size_t ReadSize = 11 * 4 + MAX_QPATH;
 	static_assert(sizeof(Out) == ReadSize, "Wrong Size, may need packing or manual read.");
 	return In.Read(&Out, ReadSize) == ReadSize;
-}
-
-md3Vector MD3_DecodeNormalVector(const md3Vertex& Vertex)
-{
-	md3Vector Out;
-
-	md3_real32 lat = 0, lng = 0;
-
-	// Get the latitude and longitude.
-	lat = (Vertex.Normal & 0x00FF) * (2.0f * 3.141592654f) / 255.0f;
-	lng = ((Vertex.Normal & 0xFF00) >> 8) * (2.0f * 3.141592654f) / 255.0f;
-	// Get the x, y, z values.
-	Out.x = static_cast<md3_real32>(std::cos(lat) * std::sin(lng));
-	Out.y = static_cast<md3_real32>(std::sin(lat) * std::sin(lng));
-	Out.z = static_cast<md3_real32>(std::cos(lng));
-
-	return Out;
 }
