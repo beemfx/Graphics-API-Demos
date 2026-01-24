@@ -3,6 +3,7 @@
 #pragma once
 
 #include "D3D_MD3Mesh.h"
+#include "D3D_MD3Skin.h"
 #include "MD3AnimConfig.h"
 #include "GFX3D9/GFX3D9TextureDB.h"
 
@@ -11,15 +12,22 @@ class CD3D_MD3WeaponMesh;
 
 class CD3D_MD3PlayerMesh
 {
+private:
+	struct CSkinSet
+	{
+		std::string Name;
+		CD3D_MD3Skin Head;
+		CD3D_MD3Skin Upper;
+		CD3D_MD3Skin Lower;
+	};
+
 protected:
 	CD3D_MD3Mesh m_meshHead;
-	CD3D_MD3Skin* m_skinHead;
-
 	CD3D_MD3Mesh m_meshUpper;
-	CD3D_MD3Skin* m_skinUpper;
-
 	CD3D_MD3Mesh m_meshLower;
-	CD3D_MD3Skin* m_skinLower;
+
+	std::vector<CSkinSet> m_SkinSets;
+	md3_uint32 m_DefaultSkin = 0;
 
 	CMD3AnimConfig m_Animation;
 
@@ -29,10 +37,6 @@ protected:
 	WORD m_nUpperHeadTag;
 	WORD m_nUpperWeaponTag;
 
-	DWORD m_dwNumSkins;
-	DWORD m_dwDefaultSkin;
-	char** m_szSkinName;
-
 	LPDIRECT3DDEVICE9 m_lpDevice;
 
 	BOOL m_bLoaded;
@@ -40,15 +44,14 @@ protected:
 	HRESULT GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef);
 
 	HRESULT GetSkinsA(char szDir[]);
-	HRESULT GetSkinsW(WCHAR szDir[]);
+
 public:
 	CD3D_MD3PlayerMesh();
 	~CD3D_MD3PlayerMesh();
 
 	HRESULT GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation);
 
-	HRESULT GetSkinRef(DWORD* lpRef, char szSkinName[]);
-
+	md3_uint32 GetSkinRef(const md3_char8* SkinName) const;
 
 	HRESULT Render(
 		LONG lUpperFirstFrame,
@@ -62,7 +65,6 @@ public:
 		const D3DMATRIX& SavedWorldMatrix);
 
 	HRESULT LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail);
-	HRESULT LoadW(LPDIRECT3DDEVICE9 lpDevice, WCHAR szDir[], d3d_md3_detail nDetail);
 
 	HRESULT Clear();
 

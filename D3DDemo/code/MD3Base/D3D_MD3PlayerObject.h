@@ -111,7 +111,7 @@ public:
 	HRESULT Render( const D3DMATRIX& WorldMatrix ); /* Renders the mesh with appropriate animation. */
 
 	HRESULT SetSkinByRef(DWORD dwSkinRef); /* Sets the skin. */
-	HRESULT SetSkinByName(char szSkinName[MAX_QPATH]); /* Sets the skin based on it's name. */
+	HRESULT SetSkinByName(const md3_char8* SkinName); /* Sets the skin based on it's name. */
 
 	HRESULT SetWeapon(CD3D_MD3WeaponMesh * lpWeapon);
 };

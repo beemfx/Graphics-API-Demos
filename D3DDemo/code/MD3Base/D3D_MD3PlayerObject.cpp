@@ -63,18 +63,14 @@ HRESULT CD3D_MD3PlayerObject::GetAnimation(DWORD * lpUpper, DWORD * lpLower)
 	return S_OK;
 };
 
-HRESULT CD3D_MD3PlayerObject::SetSkinByName(char szSkinName[])
+HRESULT CD3D_MD3PlayerObject::SetSkinByName(const md3_char8* SkinName)
 {
 	DWORD dwRef=0;
 	if(!m_lpPlayerMesh)
 		return E_FAIL;
 
-	if(FAILED(m_lpPlayerMesh->GetSkinRef(&dwRef, szSkinName))){
-		return E_FAIL;
-	}else{
-		m_dwSkinRef=dwRef;
-		return S_OK;
-	}
+	m_dwSkinRef = m_lpPlayerMesh->GetSkinRef(SkinName);
+	return S_OK;
 }
 
 HRESULT CD3D_MD3PlayerObject::SetSkinByRef(DWORD dwSkinRef)

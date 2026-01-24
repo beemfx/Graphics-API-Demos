@@ -12,14 +12,6 @@ CD3D_MD3PlayerMesh::CD3D_MD3PlayerMesh()
 	m_nUpperHeadTag = 0;
 	m_nUpperWeaponTag = 0;
 
-	m_skinUpper = NULL;
-	m_skinLower = NULL;
-	m_skinHead = NULL;
-
-	m_dwNumSkins = 0;
-	m_dwDefaultSkin = 0;
-	m_szSkinName = NULL;
-
 	m_lpDevice = NULL;
 
 	m_bLoaded = FALSE;
@@ -30,17 +22,19 @@ CD3D_MD3PlayerMesh::~CD3D_MD3PlayerMesh()
 	Clear();
 }
 
-HRESULT CD3D_MD3PlayerMesh::GetSkinRef(DWORD* lpRef, char szSkinName[])
+md3_uint32 CD3D_MD3PlayerMesh::GetSkinRef(const md3_char8* SkinName) const
 {
 	DWORD i = 0;
 
-	for (i = 0; i < m_dwNumSkins; i++) {
-		if (_strnicmp(szSkinName, m_szSkinName[i], strlen(m_szSkinName[i])) == 0) {
-			*lpRef = i + 1;
-			return S_OK;
+	for (md3_uint32 i = 0; i < m_SkinSets.size(); i++)
+	{
+		if (m_SkinSets[i].Name == SkinName)
+		{
+			return i + 1;
 		}
 	}
-	return E_FAIL;
+
+	return MD3_DEFAULT_INDEX;
 }
 
 HRESULT CD3D_MD3PlayerMesh::GetAnimation(DWORD dwAnimRef, md3AnimationConfig* lpAnimation)
@@ -118,9 +112,9 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 
 
 	if (dwSkinRef == MD3_DEFAULT_INDEX)
-		dwSkinRef = m_dwDefaultSkin;
+		dwSkinRef = m_DefaultSkin;
 
-	if ((dwSkinRef < 1) || (dwSkinRef > m_dwNumSkins))
+	if ((dwSkinRef < 1) || (dwSkinRef > m_SkinSets.size()))
 		return E_FAIL;
 
 	if (fUpperTime > 1.0f)
@@ -143,7 +137,7 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 
 	//Render the lower mesh.
 	m_meshLower.Render(
-		&m_skinLower[dwSkinRef - 1],
+		&m_SkinSets[dwSkinRef - 1].Lower,
 		fLowerTime,
 		lLowerFirstFrame,
 		lLowerSecondFrame,
@@ -162,7 +156,7 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 
 	//Render the upper mesh.
 	m_meshUpper.Render(
-		&m_skinUpper[dwSkinRef - 1],
+		&m_SkinSets[dwSkinRef - 1].Upper,
 		fUpperTime,
 		lUpperFirstFrame,
 		lUpperSecondFrame,
@@ -217,7 +211,7 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 
 	//Render the head mesh (time, and frame must be set to zero).
 	m_meshHead.Render(
-		&m_skinHead[dwSkinRef - 1],
+		&m_SkinSets[dwSkinRef - 1].Head,
 		0.0f,
 		0,
 		0,
@@ -231,12 +225,10 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 
 HRESULT CD3D_MD3PlayerMesh::GetSkinsA(char szDir[])
 {
-	WIN32_FIND_DATA FindData;
-	HANDLE hFind = NULL;
+	
 	DWORD dwNumSkins = 0;
 	HRESULT hr = 0;
 
-	DWORD i = 0, j = 0, k = 0;
 	size_t dwLen = 0;
 	BOOL bFoundName = FALSE;
 
@@ -247,139 +239,89 @@ HRESULT CD3D_MD3PlayerMesh::GetSkinsA(char szDir[])
 	char szFindString[MAX_PATH];
 	char szTemp[MAX_PATH];
 
+	std::vector<std::string> SkinFiles;
 
-	//Basically my intent is to find out how many skins there
-	//are.  This can be done by finding out how many files with names
-	//skin file begining with upper_ exist.  We could use any bone
-	//of the body, but upper will do nicely.
-	ZeroMemory(&FindData, sizeof(WIN32_FIND_DATA));
-	strcpy(szFindString, szDir);
-	strcat(szFindString, "upper_*.skin");
-	hFind = FindFirstFile(
-		szFindString,
-		&FindData);
+	{
+		WIN32_FIND_DATA FindData = { };
 
-	if (hFind == INVALID_HANDLE_VALUE)
-		return E_FAIL;
+		//Basically my intent is to find out how many skins there
+		//are. This can be done by finding out how many files with names
+		//skin file beginning with upper_ exist.  We could use any bone
+		//of the body, but upper will do nicely.
+		strcpy(szFindString, szDir);
+		strcat(szFindString, "upper_*.skin");
+		HANDLE hFind = FindFirstFile(
+			szFindString,
+			&FindData);
 
-	do {
-		dwNumSkins++;
-	} while (FindNextFile(hFind, &FindData));
-
-	FindClose(hFind);
-
-	m_dwNumSkins = dwNumSkins;
-
-	//Allocate memory to all of the skin files.
-	m_skinHead = new CD3D_MD3Skin[m_dwNumSkins];
-	if (m_skinHead == NULL)
-		return E_FAIL;
-	m_skinUpper = new CD3D_MD3Skin[m_dwNumSkins];
-	if (m_skinUpper == NULL) {
-		SAFE_DELETE_ARRAY(m_skinHead);
-		return E_FAIL;
-	}
-	m_skinLower = new CD3D_MD3Skin[m_dwNumSkins];
-	if (m_skinLower == NULL) {
-		SAFE_DELETE_ARRAY(m_skinHead);
-		SAFE_DELETE_ARRAY(m_skinUpper);
-		return E_FAIL;
-	}
-
-	//Allocate memory for the string names.
-	m_szSkinName = (char**)malloc(sizeof(char*) * m_dwNumSkins);
-
-	if (m_szSkinName == NULL) {
-		SAFE_DELETE_ARRAY(m_skinHead);
-		SAFE_DELETE_ARRAY(m_skinLower);
-		SAFE_DELETE_ARRAY(m_skinUpper);
-		return E_FAIL;
-	}
-
-	for (i = 0; i < m_dwNumSkins; i++) {
-		m_szSkinName[i] = (char*)malloc(MAX_PATH * sizeof(char));
-		if (m_szSkinName[i] == NULL) {
-			SAFE_DELETE_ARRAY(m_skinHead);
-			SAFE_DELETE_ARRAY(m_skinLower);
-			SAFE_DELETE_ARRAY(m_skinUpper);
-
-			for (j = 0; j < i; j++) {
-				SAFE_DELETE_ARRAY(m_szSkinName[i]);
-			}
-
-			SAFE_DELETE_ARRAY(m_szSkinName);
-
+		if (hFind == INVALID_HANDLE_VALUE)
 			return E_FAIL;
-		}
+
+		do {
+			SkinFiles.push_back(FindData.cFileName);
+			dwNumSkins++;
+		} while (FindNextFile(hFind, &FindData));
+
+		FindClose(hFind);
 	}
 
-	//Obtain the names of all the skins.
-	hFind = FindFirstFile(szFindString, &FindData);
+	m_SkinSets.reserve(SkinFiles.size());
 
-	if (hFind == INVALID_HANDLE_VALUE) {
-		SAFE_DELETE_ARRAY(m_skinHead);
-		SAFE_DELETE_ARRAY(m_skinLower);
-		SAFE_DELETE_ARRAY(m_skinUpper);
-
-		for (i = 0; i < m_dwNumSkins; i++) {
-			SAFE_DELETE_ARRAY(m_szSkinName[i]);
-		}
-		SAFE_DELETE_ARRAY(m_szSkinName);
-		return E_FAIL;
-	}
-
-	for (i = 0; i < m_dwNumSkins; i++) {
-		strcpy(szTemp, FindData.cFileName);
-
-		dwLen = strlen(szTemp);
-		bFoundName = FALSE;
-		//Find the first occurence of '_'.
-		for (j = 0, k = 0; j < dwLen; j++) {
-			if (szTemp[j] == '.') {
-				m_szSkinName[i][k] = 0;
-				if (strncmp(m_szSkinName[i], "default", 7) == 0) {
-					m_dwDefaultSkin = i + 1;
+	std::vector<md3_char8> Temp;
+	for (auto& UpperName : SkinFiles)
+	{
+		auto& NewSkin = m_SkinSets.emplace_back();
+		// The name is everything after the first '_' and before ".skin":
+		Temp.clear();
+		bool bFoundUnderscore = false;
+		for (md3_uint32 i = 0; i <UpperName.size(); i++)
+		{
+			const md3_char8 c = UpperName[i];
+			if (!bFoundUnderscore)
+			{
+				if (c == '_')
+				{
+					bFoundUnderscore = true;
 				}
-				break;
 			}
-			if (bFoundName) {
-				m_szSkinName[i][k] = szTemp[j];
-				k++;
+			else
+			{
+				if (c == '.')
+				{
+					break;
+				}
+				else
+				{
+					Temp.push_back(c);
+				}
 			}
-			if (szTemp[j] == '_')
-				bFoundName = TRUE;
 		}
-
-		FindNextFile(hFind, &FindData);
+		Temp.push_back('\0');
+		NewSkin.Name = Temp.data();
+		if (NewSkin.Name == "default")
+		{
+			m_DefaultSkin = m_SkinSets.size();
+		}
 	}
 
 	//We'll now go ahead and load all the skins.
-	for (i = 0; i < m_dwNumSkins; i++)
+	for (md3_uint32 i = 0; i < m_SkinSets.size(); i++)
 	{
-		sprintf(szHeadSkin, "%s%s%s%s", szDir, "head_", m_szSkinName[i], ".skin");
-		sprintf(szUpperSkin, "%s%s%s%s", szDir, "upper_", m_szSkinName[i], ".skin");
-		sprintf(szLowerSkin, "%s%s%s%s", szDir, "lower_", m_szSkinName[i], ".skin");
+		sprintf(szHeadSkin, "%s%s%s%s", szDir, "head_", m_SkinSets[i].Name.c_str(), ".skin");
+		sprintf(szUpperSkin, "%s%s%s%s", szDir, "upper_", m_SkinSets[i].Name.c_str(), ".skin");
+		sprintf(szLowerSkin, "%s%s%s%s", szDir, "lower_", m_SkinSets[i].Name.c_str(), ".skin");
 
 		const bool bSkinLoaded 
 			=
-			m_skinHead[i].LoadSkin(m_lpDevice, szHeadSkin, m_TexDB)
+			m_SkinSets[i].Head.LoadSkin(m_lpDevice, szHeadSkin, m_TexDB)
 			&&
-			m_skinUpper[i].LoadSkin(m_lpDevice, szUpperSkin, m_TexDB)
+			m_SkinSets[i].Upper.LoadSkin(m_lpDevice, szUpperSkin, m_TexDB)
 			&&
-			m_skinLower[i].LoadSkin(m_lpDevice, szLowerSkin, m_TexDB);
+			m_SkinSets[i].Lower.LoadSkin(m_lpDevice, szLowerSkin, m_TexDB);
 
 		if (!bSkinLoaded)
 		{
-			for (j = 0; j < i; j++)
-			{
-				m_skinHead[j].UnloadSkin();
-				m_skinUpper[j].UnloadSkin();
-				m_skinLower[j].UnloadSkin();
-			}
-			for (j = 0; j < m_dwNumSkins; j++) {
-				SAFE_DELETE_ARRAY(m_szSkinName[i]);
-			}
-			SAFE_DELETE_ARRAY(m_szSkinName);
+			m_SkinSets.resize(0);
 
 			return E_FAIL;
 		}
@@ -387,19 +329,14 @@ HRESULT CD3D_MD3PlayerMesh::GetSkinsA(char szDir[])
 
 
 	//Set all the skin references for the model.
-	for (i = 0; i < m_dwNumSkins; i++)
+	for (md3_uint32 i = 0; i < m_SkinSets.size(); i++)
 	{
-		m_meshHead.SetSkinRefs(m_skinHead[i]);
-		m_meshUpper.SetSkinRefs(m_skinUpper[i]);
-		m_meshLower.SetSkinRefs(m_skinLower[i]);
+		m_meshHead.SetSkinRefs(m_SkinSets[i].Head);
+		m_meshUpper.SetSkinRefs(m_SkinSets[i].Upper);
+		m_meshLower.SetSkinRefs(m_SkinSets[i].Lower);
 	}
 
 	return S_OK;
-}
-
-HRESULT CD3D_MD3PlayerMesh::GetSkinsW(WCHAR szDir[])
-{
-	return E_FAIL;
 }
 
 HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
@@ -502,7 +439,7 @@ HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_
 
 
 	if (FAILED(hr)) {
-		m_dwNumSkins = 0;
+		m_SkinSets.resize(0);
 
 		m_meshHead.ClearMD3();
 		m_meshUpper.ClearMD3();
@@ -521,38 +458,19 @@ HRESULT CD3D_MD3PlayerMesh::LoadA(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_
 	return S_OK;
 }
 
-HRESULT CD3D_MD3PlayerMesh::LoadW(LPDIRECT3DDEVICE9 lpDevice, WCHAR szDir[], d3d_md3_detail nDetail)
-{
-	return E_FAIL;
-}
-
 HRESULT CD3D_MD3PlayerMesh::Clear()
 {
 	DWORD i = 0;
-
-	if (!m_bLoaded)return S_FALSE;
 
 	m_meshHead.ClearMD3();
 	m_meshUpper.ClearMD3();
 	m_meshLower.ClearMD3();
 	m_TexDB.ClearDB();
-	for (i = 0; i < m_dwNumSkins; i++) {
-		m_skinHead[i].UnloadSkin();
-		m_skinUpper[i].UnloadSkin();
-		m_skinLower[i].UnloadSkin();
-
-		SAFE_FREE(m_szSkinName[i]);
-	}
-	SAFE_FREE(m_szSkinName);
-
-	SAFE_DELETE_ARRAY(m_skinHead);
-	SAFE_DELETE_ARRAY(m_skinLower);
-	SAFE_DELETE_ARRAY(m_skinUpper);
-
+	m_SkinSets.resize(0);
+	m_DefaultSkin = 0;
+	
 	SAFE_RELEASE(m_lpDevice);
 
-	m_dwNumSkins = 0;
-	m_dwDefaultSkin = 0;
 	m_bLoaded = FALSE;
 	return S_OK;
 }
