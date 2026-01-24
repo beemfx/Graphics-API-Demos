@@ -354,7 +354,7 @@ void CD3D_MD3Mesh::Render(
 
 	//Loop for each mesh, interpolate the frames, and render the mesh.
 	for (i = 0; i < m_md3File.Header.NumMeshes; i++) {
-		lpSkin->GetTexturePointer(i, &lpTexture);
+		lpTexture = lpSkin->GetTexturePointer(i);
 		if (lpTexture)
 		{
 			RenderWithTexture(

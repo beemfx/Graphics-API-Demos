@@ -4,55 +4,50 @@
 #include "Library/Functions.h"
 #include "GFX3D9/GFX3D9TextureDB.h"
 
-HRESULT CMD3SkinFile::GetTexturePointer(
-	DWORD dwRef,
-	LPDIRECT3DTEXTURE9* lppTexture)
-{
-	if ((dwRef < 0) || (dwRef >= m_NumSkins)) {
-		*lppTexture = NULL;
-		return E_FAIL;
-	}
-
-	if (m_bRefsSet)
-	{
-		*lppTexture = m_Textures[m_SkinRef[dwRef]];
-	}
-	else
-	{
-		*lppTexture = m_Textures[dwRef];
-	}
-	if ((*lppTexture))
-		(*lppTexture)->AddRef();
-	return S_OK;
-}
-
-HRESULT CMD3SkinFile::SetSkin(
-	LPDIRECT3DDEVICE9 lpDevice,
-	DWORD dwRef)
-{
-	if ((dwRef < 0) || (dwRef >= m_NumSkins))return E_FAIL;
-	if (m_bRefsSet)
-		lpDevice->SetTexture(0, m_Textures[m_SkinRef[dwRef]]);
-	else {
-		lpDevice->SetTexture(0, NULL);
-		return S_FALSE;
-	}
-
-	if (m_Textures[m_SkinRef[dwRef]] == NULL)
-		return S_OK;
-	else
-		return S_OK;
-}
-
-
 CMD3SkinFile::CMD3SkinFile()
 {
-
+	
 }
 
 CMD3SkinFile::~CMD3SkinFile()
 {
 	ClearTextures();
+}
+
+bool CMD3SkinFile::LoadSkin(IDirect3DDevice9* lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB)
+{
+	CMD3SkinConfig::LoadSkin(Filename);
+
+	ClearTextures();
+	m_Textures.resize(m_NumSkins);
+	ObtainTextures(lpDevice, Functions::RemoveFilenameFromString(Filename.string()) + "\\", TexDB);
+
+	return true;
+}
+
+IDirect3DTexture9* CMD3SkinFile::GetTexturePointer(md3_uint32 Ref)
+{
+	if ((Ref < 0) || (Ref >= m_NumSkins))
+	{
+		return nullptr;
+	}
+
+	IDirect3DTexture9* Out = nullptr;
+	if (m_bRefsSet)
+	{
+		Out = m_Textures[m_SkinRef[Ref]];
+	}
+	else
+	{
+		Out = m_Textures[Ref];
+	}
+
+	if (Out)
+	{
+		Out->AddRef();
+	}
+
+	return Out;
 }
 
 void CMD3SkinFile::ClearTextures()
@@ -69,18 +64,7 @@ void CMD3SkinFile::ClearTextures()
 	m_Textures.shrink_to_fit();
 }
 
-HRESULT CMD3SkinFile::LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, CGFX3D9TextureDB& TexDB)
-{
-	CMD3SkinConfig::LoadSkin(Filename);
-
-	ClearTextures();
-	m_Textures.resize(m_NumSkins);
-	ObtainTextures(lpDevice, Functions::RemoveFilenameFromString(Filename.string()) + "\\", TexDB);
-
-	return S_OK;
-}
-
-HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& TexPath, CGFX3D9TextureDB& TexDB)
+void CMD3SkinFile::ObtainTextures(IDirect3DDevice9* Dev, const std::filesystem::path& TexPath, CGFX3D9TextureDB& TexDB)
 {
 	//The name and path to the texture.
 	char szFilename[MAX_PATH];
@@ -100,7 +84,7 @@ HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::file
 
 		//If using static texture buffer create and/or obtain texture from
 		//the static buffer
-		if (TexDB.AddTexture(lpDevice, szFilename))
+		if (TexDB.AddTexture(Dev, szFilename))
 		{
 			m_Textures[i] = TexDB.GetTexture(szFilename);
 		}
@@ -109,6 +93,4 @@ HRESULT CMD3SkinFile::ObtainTextures(LPDIRECT3DDEVICE9 lpDevice, const std::file
 			m_Textures[i] = NULL;
 		}
 	}
-
-	return S_OK;
 }
