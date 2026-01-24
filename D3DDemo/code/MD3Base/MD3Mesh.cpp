@@ -3,7 +3,7 @@
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
-#include "Functions.h"
+#include "Library/Functions.h"
 #include "MD3Data.h"
 #include "FileSystem/DataStream.h"
 

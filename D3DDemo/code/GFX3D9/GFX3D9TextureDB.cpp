@@ -2,7 +2,7 @@
 
 #include "GFX3D9TextureDB.h"
 #include "FileSystem/DataStream.h"
-#include "MD3Base/Functions.h"
+#include "Library/Functions.h"
 #include <d3d9.h>
 #include <d3dx9.h>
 

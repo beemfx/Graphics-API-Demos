@@ -2,7 +2,7 @@
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
-#include "functions.h"
+#include "Library/Functions.h"
 #include "md3.h"
 
 CMD3WeaponMesh::CMD3WeaponMesh()

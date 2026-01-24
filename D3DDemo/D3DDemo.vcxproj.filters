@@ -19,8 +19,11 @@
     <Filter Include="code\3rdParty\miniz\examples">
       <UniqueIdentifier>{4aa93669-8568-46e2-bc80-3282c2cfddb8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\FileSsytem">
+    <Filter Include="code\FileSystem">
       <UniqueIdentifier>{0174cf8f-eb48-4a02-9dae-ffbbca31e3a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\Library">
+      <UniqueIdentifier>{178d2b29-a29e-4c49-b772-6ad698ed9aad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -52,9 +55,6 @@
     </ClCompile>
     <ClCompile Include="code\GFX3D9\Vertex.cpp">
       <Filter>code\GFX3D9</Filter>
-    </ClCompile>
-    <ClCompile Include="code\MD3Base\Functions.cpp">
-      <Filter>code\MD3Base</Filter>
     </ClCompile>
     <ClCompile Include="code\MD3Base\MD3AnimConfig.cpp">
       <Filter>code\MD3Base</Filter>
@@ -105,16 +105,19 @@
       <Filter>code\3rdParty\miniz\examples</Filter>
     </ClCompile>
     <ClCompile Include="code\FileSystem\DataStream.cpp">
-      <Filter>code\FileSsytem</Filter>
+      <Filter>code\FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="code\FileSystem\ZipArchive.cpp">
-      <Filter>code\FileSsytem</Filter>
+      <Filter>code\FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="code\MD3Base\MD3SkinConfig.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
     <ClCompile Include="code\GFX3D9\GFX3D9TextureDB.cpp">
       <Filter>code\GFX3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Library\Functions.cpp">
+      <Filter>code\Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +128,6 @@
       <Filter>code\GFX3D9</Filter>
     </ClInclude>
     <ClInclude Include="code\MD3Base\defines.h">
-      <Filter>code\MD3Base</Filter>
-    </ClInclude>
-    <ClInclude Include="code\MD3Base\Functions.h">
       <Filter>code\MD3Base</Filter>
     </ClInclude>
     <ClInclude Include="code\MD3Base\MD3.h">
@@ -143,10 +143,10 @@
       <Filter>code\3rdParty\miniz</Filter>
     </ClInclude>
     <ClInclude Include="code\FileSystem\DataStream.h">
-      <Filter>code\FileSsytem</Filter>
+      <Filter>code\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="code\FileSystem\ZipArchive.h">
-      <Filter>code\FileSsytem</Filter>
+      <Filter>code\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="code\MD3Base\MD3Types.h">
       <Filter>code\MD3Base</Filter>
@@ -162,6 +162,9 @@
     </ClInclude>
     <ClInclude Include="code\GFX3D9\GFX3D9TextureDB.h">
       <Filter>code\GFX3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="code\Library\Functions.h">
+      <Filter>code\Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

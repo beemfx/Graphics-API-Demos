@@ -2,7 +2,7 @@
 #include <d3dx9.h>
 #include <stdio.h>
 #include "defines.h"
-#include "functions.h"
+#include "Library/Functions.h"
 #include "MD3.h"
 
 CMD3ObjectMesh::CMD3ObjectMesh()
@@ -162,7 +162,7 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	for(i=0; i<(DWORD)lNumMesh; i++){
 		m_meshObject.GetShader(i+1, 1, szShader, NULL);
 		std::filesystem::path ShaderPath = Functions::RemoveDirectoryFromString(szShader);
-		sprintf(szTexName, "%s%s", szPath, ShaderPath.c_str());
+		sprintf(szTexName, "%s%s", szPath.string().c_str(), ShaderPath.c_str());
 		if(SUCCEEDED(TextureExtension(lpDevice, szTexName))){
 			m_lppObjTex[i] = m_TexDB.GetTexture(szTexName);
 		}else{
