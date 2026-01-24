@@ -72,9 +72,7 @@ HRESULT CMD3SkinFile::LoadSkin(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem
 
 	ClearTextures();
 	m_Textures.resize(m_NumSkins);
-	wchar_t szTexPath[MAX_PATH];
-	GetDirectoryFromStringW(szTexPath, Filename.c_str());
-	ObtainTextures(lpDevice, szTexPath, TexDB);
+	ObtainTextures(lpDevice, Functions::RemoveFilenameFromString(Filename.string()) + "\\", TexDB);
 
 	return S_OK;
 }

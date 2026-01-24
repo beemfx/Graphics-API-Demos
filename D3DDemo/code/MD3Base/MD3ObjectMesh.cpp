@@ -47,7 +47,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szShader);
 	if(m_TexDB.HasTexture(szShader))
 	{
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -69,7 +68,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szTemp);
 	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -79,7 +77,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szTemp);
 	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -88,7 +85,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szTemp);
 	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -97,7 +93,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szTemp);
 	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -106,7 +101,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szTemp);
 	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -115,7 +109,6 @@ HRESULT CMD3ObjectMesh::TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShad
 	m_TexDB.AddTexture(lpDevice, szTemp);
 	if(m_TexDB.HasTexture(szTemp)){
 		strcpy(szShader, szTemp);
-		RemoveDirectoryFromStringA(szShader, szShader);
 		return S_OK;
 	}
 
@@ -128,12 +121,12 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	DWORD i=0;
 	char szShader[MAX_QPATH];
 	char szTexName[MAX_PATH];
-	char szPath[MAX_PATH];
 	char szExt[7];
 	char szFileName[MAX_PATH];
 	size_t dwLen=0;
 
-	GetDirectoryFromStringA(szPath, szFile);
+	const std::filesystem::path szPath = Functions::RemoveDirectoryFromString(szFile);
+
 	strcpy(szFileName, szFile);
 
 	if(nDetail==DETAIL_LOW)
@@ -168,8 +161,8 @@ HRESULT CMD3ObjectMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], MD3DETAI
 	//Get the textures.
 	for(i=0; i<(DWORD)lNumMesh; i++){
 		m_meshObject.GetShader(i+1, 1, szShader, NULL);
-		RemoveDirectoryFromStringA(szShader, szShader);
-		sprintf(szTexName, "%s%s", szPath, szShader);
+		std::filesystem::path ShaderPath = Functions::RemoveDirectoryFromString(szShader);
+		sprintf(szTexName, "%s%s", szPath, ShaderPath.c_str());
 		if(SUCCEEDED(TextureExtension(lpDevice, szTexName))){
 			m_lppObjTex[i] = m_TexDB.GetTexture(szTexName);
 		}else{

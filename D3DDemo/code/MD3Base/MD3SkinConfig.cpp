@@ -77,7 +77,6 @@ void CMD3SkinConfig::CreateSkinFile(md3_uint32 NumSkins)
 
 void CMD3SkinConfig::DeleteSkinFile()
 {
-	DWORD i = 0;
 	m_Skins.resize(0);
 	m_Skins.shrink_to_fit();
 	m_SkinRef.resize(0);
@@ -87,8 +86,7 @@ void CMD3SkinConfig::DeleteSkinFile()
 void CMD3SkinConfig::ParseLine(md3Skin& Out, const std::string& Line)
 {
 	size_t dwLineLen = 0;
-	BOOL bSecondPart = FALSE;
-	DWORD i = 0;
+	bool bSecondPart = false;
 	std::size_t nStringPos = 0;
 	const std::size_t LineLen = Line.size();
 
@@ -101,7 +99,7 @@ void CMD3SkinConfig::ParseLine(md3Skin& Out, const std::string& Line)
 		{
 			i++;
 			nStringPos = 0;
-			bSecondPart = TRUE;
+			bSecondPart = true;
 		}
 
 		if (!bSecondPart)
