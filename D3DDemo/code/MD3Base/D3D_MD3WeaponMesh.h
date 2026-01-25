@@ -30,7 +30,6 @@ protected:
 	BOOL m_bLoaded;
 
 	HRESULT GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef);
-	bool TextureExtension(const std::filesystem::path& Shader);
 
 public:
 	CD3D_MD3WeaponMesh();

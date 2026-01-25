@@ -188,24 +188,25 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesyst
 		m_meshWeapon.GetShader(i + 1, 1, szShaderName, NULL);
 		const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
 		const std::filesystem::path ShaderPath = Dir / ShaderName;
-		if (TextureExtension(ShaderPath))
+		if (m_TexDB.AddTexture(m_lpDevice, ShaderPath))
 		{
 			m_lpWeaponTex[i] = m_TexDB.GetTexture(ShaderPath);
 		}
 		else
 		{
-			m_lpWeaponTex[i] = NULL;
+			m_lpWeaponTex[i] = nullptr;
 		}
 	}
 	//Get the barrel textures if it exists.
-	if (m_bBarrel) {
+	if (m_bBarrel)
+	{
 		m_meshBarrel.GetNumMeshes(&lNumMesh);
 		for (LONG i = 0; i < lNumMesh; i++)
 		{
 			m_meshBarrel.GetShader(i + 1, 1, szShaderName, NULL);
 			const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
 			const std::filesystem::path ShaderPath = Dir / ShaderName;
-			if (TextureExtension(ShaderPath))
+			if (m_TexDB.AddTexture(m_lpDevice, ShaderPath))
 			{
 				m_lpBarrelTex[i] = m_TexDB.GetTexture(ShaderPath);
 			}
@@ -217,12 +218,12 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesyst
 	}
 	//Get the flash textures.
 	m_meshFlash.GetNumMeshes(&lNumMesh);
-	for (LONG i = 0; i < lNumMesh; i++) {
+	for (LONG i = 0; i < lNumMesh; i++)
+	{
 		m_meshFlash.GetShader(i + 1, 1, szShaderName, NULL);
 		const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
 		const std::filesystem::path ShaderPath = Dir / ShaderName;
-
-		if (TextureExtension(ShaderPath))
+		if (m_TexDB.AddTexture(m_lpDevice, ShaderPath))
 		{
 			m_lpFlashTex[i] = m_TexDB.GetTexture(ShaderPath);
 		}
@@ -239,50 +240,6 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesyst
 	m_bLoaded = TRUE;
 
 	return S_OK;
-}
-
-bool CD3D_MD3WeaponMesh::TextureExtension(const std::filesystem::path& Shader)
-{
-	//First attempt to load the name provided.
-	if (m_TexDB.AddTexture(m_lpDevice, Shader)) {
-		return true;
-	}
-
-	std::filesystem::path ShaderNoExt = Shader;
-
-	//Attempt to replace the extension till we successfully load.
-	ShaderNoExt.replace_extension("JPG");
-	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
-		return true;
-	}
-
-
-	ShaderNoExt.replace_extension("BMP");
-	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
-		return S_OK;
-	}
-
-	ShaderNoExt.replace_extension("PNG");
-	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
-		return true;
-	}
-
-	ShaderNoExt.replace_extension("DIB");
-	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
-		return true;
-	}
-
-	ShaderNoExt.replace_extension("DDS");
-	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
-		return true;
-	}
-
-	ShaderNoExt.replace_extension("TGA");
-	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
-		return true;
-	}
-
-	return false;
 }
 
 HRESULT CD3D_MD3WeaponMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)

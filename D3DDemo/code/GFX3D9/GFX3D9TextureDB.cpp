@@ -27,11 +27,28 @@ bool CGFX3D9TextureDB::AddTexture(IDirect3DDevice9* Dev, const std::filesystem::
 
 	const std::string TexName = FilenameToID(Filename);
 
-	CDataStream Data(Filename);
+	CDataStream Data;
+	
+	// Textures tend to have the wrong extension and Q3 supports that so we'll
+	// see if we can open an actual file.
+	const std::vector<std::string> ExtsToTry = { "tga" , "bmp" , "dds" , "dib" , "jpg" , "png" };
+
+	for (auto& Ext : ExtsToTry)
+	{
+		std::filesystem::path FilenameToTry = Filename;
+		FilenameToTry.replace_extension(Ext);
+		Data.Open(FilenameToTry);
+		if (Data.GetSize() > 0)
+		{
+			break;
+		}
+	}
+
 	if (Data.GetSize() == 0)
 	{
 		return false;
 	}
+
 
 	IDirect3DTexture9* NewTexture = nullptr;
 	const HRESULT Res = D3DXCreateTextureFromFileInMemory(Dev, Data.GetData(), static_cast<UINT>(Data.GetDataSize()), &NewTexture);
@@ -80,6 +97,5 @@ void CGFX3D9TextureDB::ClearDB()
 
 std::string CGFX3D9TextureDB::FilenameToID(const std::filesystem::path& Filename)
 {
-	// TODO: Set case to lower.
-	return Functions::RemoveDirectoryFromString(Filename.string());
+	return Filename.stem().string();
 }
