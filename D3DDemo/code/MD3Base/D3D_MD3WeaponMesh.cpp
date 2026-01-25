@@ -44,7 +44,8 @@ HRESULT CD3D_MD3WeaponMesh::Clear()
 	m_meshWeapon.ClearMD3();
 
 	//Delete the barrel.
-	if (m_bBarrel) {
+	if (m_bBarrel)
+	{
 		m_meshBarrel.GetNumMeshes(&lNumMesh);
 		for (i = 0; i < (DWORD)lNumMesh; i++) {
 			SAFE_RELEASE(m_lpBarrelTex[i]);
@@ -54,12 +55,15 @@ HRESULT CD3D_MD3WeaponMesh::Clear()
 	}
 
 	//Delete the flash.
-	m_meshFlash.GetNumMeshes(&lNumMesh);
-	for (i = 0; i < (DWORD)lNumMesh; i++) {
-		SAFE_RELEASE(m_lpFlashTex[i]);
+	if (m_bFlash)
+	{
+		m_meshFlash.GetNumMeshes(&lNumMesh);
+		for (i = 0; i < (DWORD)lNumMesh; i++) {
+			SAFE_RELEASE(m_lpFlashTex[i]);
+		}
+		SAFE_FREE(m_lpFlashTex);
+		m_meshFlash.ClearMD3();
 	}
-	SAFE_FREE(m_lpFlashTex);
-	m_meshFlash.ClearMD3();
 
 	//Delete the hand.
 	m_meshHand.ClearMD3();
@@ -67,6 +71,7 @@ HRESULT CD3D_MD3WeaponMesh::Clear()
 	m_bLoaded = FALSE;
 
 	m_bBarrel = FALSE;
+	m_bFlash = false;
 
 	m_nTagWeapon = m_nTagBarrel = m_nTagFlash = 0;
 
@@ -119,20 +124,18 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesyst
 		return E_FAIL;
 	}
 
-	//Load the hand and flash meshes.
-	const md3_bool bLoadedHandAndFlash
-		=
-		m_meshHand.LoadMD3(HandPath, lpDevice, D3DPOOL_DEFAULT)
-		&&
-		m_meshFlash.LoadMD3(FlashPath, lpDevice, D3DPOOL_DEFAULT);
-
-	if (!bLoadedHandAndFlash)
+	if (!m_meshHand.LoadMD3(HandPath, lpDevice, D3DPOOL_DEFAULT))
 	{
 		m_meshHand.ClearMD3();
 		m_meshFlash.ClearMD3();
 		m_meshWeapon.ClearMD3();
 		SAFE_RELEASE(m_lpDevice);
 		return E_FAIL;
+	}
+
+	if (m_meshFlash.LoadMD3(FlashPath, lpDevice, D3DPOOL_DEFAULT))
+	{
+		m_bFlash = true;
 	}
 
 	//Load the barrel, if success then we set barrel to true.
@@ -165,19 +168,22 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesyst
 			return E_FAIL;
 		}
 	}
-	m_meshFlash.GetNumMeshes(&lNumMesh);
-	m_lpFlashTex = (LPDIRECT3DTEXTURE9*)malloc(lNumMesh * sizeof(LPDIRECT3DTEXTURE9));
-	if (m_lpFlashTex == NULL) {
-		SAFE_DELETE_ARRAY(m_lpWeaponTex);
-		if (m_bBarrel) {
-			SAFE_DELETE_ARRAY(m_lpBarrelTex);
+	if (m_bFlash)
+	{
+		m_meshFlash.GetNumMeshes(&lNumMesh);
+		m_lpFlashTex = (LPDIRECT3DTEXTURE9*)malloc(lNumMesh * sizeof(LPDIRECT3DTEXTURE9));
+		if (m_lpFlashTex == NULL) {
+			SAFE_DELETE_ARRAY(m_lpWeaponTex);
+			if (m_bBarrel) {
+				SAFE_DELETE_ARRAY(m_lpBarrelTex);
+			}
+			m_meshHand.ClearMD3();
+			m_meshFlash.ClearMD3();
+			m_meshWeapon.ClearMD3();
+			m_meshBarrel.ClearMD3();
+			SAFE_RELEASE(m_lpDevice);
+			return E_FAIL;
 		}
-		m_meshHand.ClearMD3();
-		m_meshFlash.ClearMD3();
-		m_meshWeapon.ClearMD3();
-		m_meshBarrel.ClearMD3();
-		SAFE_RELEASE(m_lpDevice);
-		return E_FAIL;
 	}
 
 	//Get the weapon textures.
@@ -217,19 +223,22 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesyst
 		}
 	}
 	//Get the flash textures.
-	m_meshFlash.GetNumMeshes(&lNumMesh);
-	for (LONG i = 0; i < lNumMesh; i++)
+	if (m_bFlash)
 	{
-		m_meshFlash.GetShader(i + 1, 1, szShaderName, NULL);
-		const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
-		const std::filesystem::path ShaderPath = Dir / ShaderName;
-		if (m_TexDB.AddTexture(m_lpDevice, ShaderPath))
+		m_meshFlash.GetNumMeshes(&lNumMesh);
+		for (LONG i = 0; i < lNumMesh; i++)
 		{
-			m_lpFlashTex[i] = m_TexDB.GetTexture(ShaderPath);
-		}
-		else
-		{
-			m_lpFlashTex[i] = NULL;
+			m_meshFlash.GetShader(i + 1, 1, szShaderName, NULL);
+			const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
+			const std::filesystem::path ShaderPath = Dir / ShaderName;
+			if (m_TexDB.AddTexture(m_lpDevice, ShaderPath))
+			{
+				m_lpFlashTex[i] = m_TexDB.GetTexture(ShaderPath);
+			}
+			else
+			{
+				m_lpFlashTex[i] = NULL;
+			}
 		}
 	}
 	//Get the tags.
@@ -265,10 +274,14 @@ HRESULT CD3D_MD3WeaponMesh::Invalidate()
 	if (!m_bLoaded)
 		return S_FALSE;
 
-	m_meshFlash.Invalidate();
+	if (m_bFlash)
+	{
+		m_meshFlash.Invalidate();
+	}
 	m_meshHand.Invalidate();
 	m_meshWeapon.Invalidate();
-	if (m_bBarrel) {
+	if (m_bBarrel)
+	{
 		m_meshBarrel.Invalidate();
 	}
 	return S_OK;
@@ -279,10 +292,14 @@ HRESULT CD3D_MD3WeaponMesh::Validate()
 	if (!m_bLoaded)
 		return S_FALSE;
 
-	m_meshFlash.Validate();
+	if (m_bFlash)
+	{
+		m_meshFlash.Validate();
+	}
 	m_meshHand.Validate();
 	m_meshWeapon.Validate();
-	if (m_bBarrel) {
+	if (m_bBarrel)
+	{
 		m_meshBarrel.Validate();
 	}
 	return S_OK;
@@ -330,7 +347,8 @@ HRESULT CD3D_MD3WeaponMesh::Render(BOOL bFlash, const D3DMATRIX& SavedWorldMatri
 	WorldMatrix = Temp;
 
 	//Render the barrel if there is one.
-	if (m_bBarrel) {
+	if (m_bBarrel)
+	{
 		Temp = WorldMatrix;
 		m_meshWeapon.GetTagTranslation(m_nTagBarrel, 0.0f, 0, 0, &Translation);
 		WorldMatrix = Translation * WorldMatrix;
@@ -348,7 +366,8 @@ HRESULT CD3D_MD3WeaponMesh::Render(BOOL bFlash, const D3DMATRIX& SavedWorldMatri
 		WorldMatrix = Temp;
 	}
 
-	if (bFlash) {
+	if (m_bFlash && bFlash)
+	{
 		Temp = WorldMatrix;
 		m_meshWeapon.GetTagTranslation(m_nTagFlash, 0.0f, 0, 0, &Translation);
 		WorldMatrix = Translation * WorldMatrix;

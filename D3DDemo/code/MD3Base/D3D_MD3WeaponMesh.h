@@ -22,6 +22,7 @@ protected:
 	LPDIRECT3DDEVICE9 m_lpDevice;
 
 	BOOL m_bBarrel;
+	bool m_bFlash = false;
 
 	WORD m_nTagWeapon;
 	WORD m_nTagBarrel;
