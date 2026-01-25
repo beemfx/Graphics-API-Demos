@@ -16,7 +16,7 @@ public:
 			return;
 		}
 
-		const std::size_t FileSize = std::filesystem::file_size(Path);
+		const std::uintmax_t FileSize = std::filesystem::file_size(Path);
 
 		std::ifstream InStream(Path, std::ios::binary);
 		if (!InStream)
@@ -24,7 +24,7 @@ public:
 			return;
 		}
 
-		m_ArchiveData.resize(FileSize);
+		m_ArchiveData.resize(static_cast<std::size_t>(FileSize));
 		if (m_ArchiveData.size() != FileSize)
 		{
 			return;
@@ -72,7 +72,7 @@ public:
 		}
 
 		Out.Filename = FileStat.m_filename;
-		Out.FileSize = FileStat.m_uncomp_size;
+		Out.FileSize = static_cast<std::size_t>(FileStat.m_uncomp_size);
 
 		return Out;
 	}
@@ -100,7 +100,7 @@ public:
 			return Out;
 		}
 
-		Out.resize(FileStat.m_uncomp_size);
+		Out.resize(static_cast<std::size_t>(FileStat.m_uncomp_size));
 		if (Out.size() != FileStat.m_uncomp_size)
 		{
 			// Couldn't allocate memory.

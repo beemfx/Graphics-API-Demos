@@ -1,14 +1,14 @@
 The files in this folder may not be licensed with this software release. The licenses are as follows:
 
-## laracroft/
+## laracroft
 
-License: laracroft/md3-laracroft.txt
+License: pk3/md3-laracroft.txt
 
 Download: https://ws.q3df.org/model/laracroft/skin/lara/
 
-## machinegun/
+## Minigun
 
-License: machinegun/wep2-M134-Minigun-REAMDME.txt
+License: pk3/wep2-M134-Minigun-REAMDME.txt
 
 Download: https://www.lonebullet.com/file/models/q3wep-m134-minigun/2142
 
