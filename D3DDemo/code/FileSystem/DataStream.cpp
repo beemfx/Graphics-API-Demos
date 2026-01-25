@@ -1,6 +1,8 @@
 // (c) 2025 Beem Media. All rights reserved.
 
 #include "DataStream.h"
+#include "FileSystem.h"
+#include <cassert>
 #include <fstream>
 
 CDataStream::CDataStream(const std::filesystem::path& Filename)
@@ -23,33 +25,9 @@ bool CDataStream::Open(const std::filesystem::path& Filename)
 	//If a file is already open, close it.
 	Close();
 
-	std::filesystem::path FileToOpen = Filename;
+	m_Data = CFileSystem::Get().LoadFile(Filename);
 
-	bool bIsFile = std::filesystem::is_regular_file(FileToOpen);
-
-	// We might be running a debug build, in which case, we'll search the data
-	// directory for the file.
-	if (!bIsFile)
-	{
-		FileToOpen = std::filesystem::path("..") / "DATA" / Filename;
-		bIsFile = std::filesystem::is_regular_file(FileToOpen);
-	}
-
-	if (!bIsFile)
-	{
-		return false;
-	}
-
-	const std::uintmax_t FileSize = std::filesystem::file_size(FileToOpen);
-	m_Data.resize(static_cast<std::size_t>(FileSize));
-	if (m_Data.size() == FileSize)
-	{
-		std::ifstream File(FileToOpen, std::ios::binary);
-		File.read(reinterpret_cast<char*>(m_Data.data()), m_Data.size());
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 bool CDataStream::Open(const std::vector<ds_byte>& SourceBytes)

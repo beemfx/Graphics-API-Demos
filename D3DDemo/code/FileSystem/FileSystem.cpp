@@ -48,8 +48,10 @@ void CFileSystem::AutoMount()
 
 void CFileSystem::MountFile(const std::filesystem::path& Filename)
 {
-	SMountData& NewMountData = m_MountData[Filename];
-	NewMountData.Filename = Filename;
+	const std::filesystem::path AdjFilename = GetAdjustedFilename(Filename);
+
+	SMountData& NewMountData = m_MountData[AdjFilename];
+	NewMountData.Filename = AdjFilename;
 	NewMountData.DiskFile = Filename;
 	NewMountData.MountType = mount_type::DiskFile;
 	NewMountData.SubIndex = 0;
@@ -68,8 +70,10 @@ void CFileSystem::MountPK3(const std::filesystem::path& Filename)
 		SZipFileMetaData MetaData = A.GetFileMetaData(ZipRef);
 		if (MetaData.IsValid())
 		{
-			SMountData& NewMountData = m_MountData[Filename];
-			NewMountData.Filename = (Dir / MetaData.Filename).lexically_normal();
+			const std::filesystem::path AdjFilename = GetAdjustedFilename(Dir / MetaData.Filename);
+
+			SMountData& NewMountData = m_MountData[AdjFilename];
+			NewMountData.Filename = AdjFilename;
 			NewMountData.DiskFile = Filename;
 			NewMountData.MountType = mount_type::PackageFile;
 			NewMountData.SubIndex = ZipRef;
@@ -79,7 +83,7 @@ void CFileSystem::MountPK3(const std::filesystem::path& Filename)
 
 std::vector<CFileSystem::fs_byte> CFileSystem::LoadFile(const std::filesystem::path& Filename) const
 {
-	const std::filesystem::path AdjFilename = Filename.lexically_normal();
+	const std::filesystem::path AdjFilename = GetAdjustedFilename(Filename);
 
 	std::vector<CFileSystem::fs_byte> Out;
 
@@ -111,4 +115,13 @@ std::vector<CFileSystem::fs_byte> CFileSystem::LoadFile(const std::filesystem::p
 	}
 
 	return Out;
+}
+
+std::filesystem::path CFileSystem::GetAdjustedFilename(const std::filesystem::path& In)
+{
+	std::string TempString = In.string();
+
+	std::transform(TempString.begin(), TempString.end(), TempString.begin(), [](unsigned char c) { return std::tolower(c); });
+
+	return std::filesystem::path(TempString).lexically_normal();
 }

@@ -43,4 +43,7 @@ private:
 	};
 
 	std::map<std::filesystem::path, SMountData> m_MountData;
+
+private:
+	static std::filesystem::path GetAdjustedFilename(const std::filesystem::path& In);
 };

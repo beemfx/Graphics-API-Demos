@@ -1,8 +1,7 @@
 // (c) Beem Media. All rights reserved.
 
 #include "ZipArchive.h"
-#include "../3rdParty/miniz/miniz.h"
-
+#include "3rdParty/miniz/miniz.h"
 #include <fstream>
 
 class CZipArchive::CInternal
