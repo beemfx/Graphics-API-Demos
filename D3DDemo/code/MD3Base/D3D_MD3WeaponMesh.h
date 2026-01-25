@@ -30,7 +30,7 @@ protected:
 	BOOL m_bLoaded;
 
 	HRESULT GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef);
-	HRESULT TextureExtension(char szShader[MAX_PATH]);
+	bool TextureExtension(const std::filesystem::path& Shader);
 
 public:
 	CD3D_MD3WeaponMesh();
@@ -40,7 +40,7 @@ public:
 
 	HRESULT Render(BOOL bFlash, const D3DMATRIX& WorldMatrix);
 
-	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail);
+	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Dir, d3d_md3_detail nDetail);
 	HRESULT Invalidate();
 	HRESULT Validate();
 };

@@ -74,80 +74,57 @@ HRESULT CD3D_MD3WeaponMesh::Clear()
 	return S_OK;
 }
 
-HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_md3_detail nDetail)
+HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Dir, d3d_md3_detail nDetail)
 {
-	char szPath[MAX_PATH];
-	char szWeaponPath[MAX_PATH];
-	char szBarrelPath[MAX_PATH];
-	char szFlashPath[MAX_PATH];
-	char szHandPath[MAX_PATH];
-	char szDetailLevel[3];
-
-	char szShaderName[MAX_QPATH];
-	char szTexName[MAX_PATH];
-	LONG lNumMesh = 0;
-	DWORD i = 0;
-
-	size_t dwLen = 0;
-
 	Clear();
+
+	if (!lpDevice)
+	{
+		return E_FAIL;
+	}
 
 	m_lpDevice = lpDevice;
 	m_lpDevice->AddRef();
 
-	//Get the weapon's name.
-	strcpy(szPath, szDir);
-	dwLen = strlen(szPath);
-	if (szPath[dwLen - 1] != '\\') {
-		szPath[dwLen] = '\\';
-		szPath[dwLen + 1] = 0;
-	}
 	const std::string WeaponName = [&]() -> std::string
 		{
-			char szWeaponName[MAX_QPATH];
-			strcpy(szWeaponName, szPath);
-			dwLen = strlen(szWeaponName);
-			szWeaponName[dwLen - 1] = 0;
-			return Functions::RemoveDirectoryFromString(szWeaponName);
+			return Dir.filename().string();
 		}();
 
-	//Prepare each of the path names.
 
-	//Set the detail level.
-	if (nDetail == d3d_md3_detail::Low)
-		strcpy(szDetailLevel, "_2");
-	else if (nDetail == d3d_md3_detail::Medium)
-		strcpy(szDetailLevel, "_1");
-	else
-		strcpy(szDetailLevel, "");
+	const std::string DetailLevel = [&]() -> std::string
+		{
+			if (nDetail == d3d_md3_detail::Low)
+				return "_2";
+			else if (nDetail == d3d_md3_detail::Medium)
+				return "_1";
+			else
+				return "";
+		}();
 
-	//The weapon path.
-	sprintf(szWeaponPath, "%s%s%s.md3", szPath, WeaponName.c_str(), szDetailLevel);
-	//The barrel path.
-	sprintf(szBarrelPath, "%s%s_barrel%s.md3", szPath, WeaponName.c_str(), szDetailLevel);
-	//The flash path.
-	sprintf(szFlashPath, "%s%s_flash.md3", szPath, WeaponName.c_str());
-	//The hand path.
-	sprintf(szHandPath, "%s%s_hand.md3", szPath, WeaponName.c_str());
+	const std::filesystem::path WeaponPath = Dir / std::string(WeaponName + DetailLevel + ".md3");
+	const std::filesystem::path BarrelPath = Dir / std::string(WeaponName + "_barrel" + DetailLevel + ".md3");
+	const std::filesystem::path FlashPath = Dir / std::string(WeaponName + "_flash" + DetailLevel + ".md3");
+	const std::filesystem::path HandPath = Dir / std::string(WeaponName + "_hand" + DetailLevel + ".md3");
 
 	//Attempt to load the weapon mesh.
-	if (!m_meshWeapon.LoadMD3(szWeaponPath, lpDevice, D3DPOOL_DEFAULT))
+	if (!m_meshWeapon.LoadMD3(WeaponPath, lpDevice, D3DPOOL_DEFAULT))
 	{
 		if (nDetail != d3d_md3_detail::High)
 		{
 			SAFE_RELEASE(m_lpDevice);
-			return Load(lpDevice, szDir, d3d_md3_detail::High);
+			return Load(lpDevice, Dir, d3d_md3_detail::High);
 		}
 		SAFE_RELEASE(m_lpDevice);
 		return E_FAIL;
 	}
 
 	//Load the hand and flash meshes.
-	const md3_bool bLoadedHandAndFlash 
-		= 
-		m_meshHand.LoadMD3(szHandPath, lpDevice, D3DPOOL_DEFAULT)
+	const md3_bool bLoadedHandAndFlash
+		=
+		m_meshHand.LoadMD3(HandPath, lpDevice, D3DPOOL_DEFAULT)
 		&&
-		m_meshFlash.LoadMD3(szFlashPath, lpDevice, D3DPOOL_DEFAULT);
+		m_meshFlash.LoadMD3(FlashPath, lpDevice, D3DPOOL_DEFAULT);
 
 	if (!bLoadedHandAndFlash)
 	{
@@ -159,11 +136,12 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_m
 	}
 
 	//Load the barrel, if success then we set barrel to true.
-	if (m_meshBarrel.LoadMD3(szBarrelPath, lpDevice, D3DPOOL_DEFAULT))
+	if (m_meshBarrel.LoadMD3(BarrelPath, lpDevice, D3DPOOL_DEFAULT))
 	{
 		m_bBarrel = TRUE;
 	}
 	//Load the textures.
+	LONG lNumMesh = 0;
 	m_meshWeapon.GetNumMeshes(&lNumMesh);
 	m_lpWeaponTex = (LPDIRECT3DTEXTURE9*)malloc(lNumMesh * sizeof(LPDIRECT3DTEXTURE9));
 	if (m_lpWeaponTex == NULL) {
@@ -203,43 +181,53 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_m
 	}
 
 	//Get the weapon textures.
+
+	char szShaderName[MAX_QPATH];
 	m_meshWeapon.GetNumMeshes(&lNumMesh);
-	for (i = 0; i < (DWORD)lNumMesh; i++) {
+	for (LONG i = 0; i < lNumMesh; i++) {
 		m_meshWeapon.GetShader(i + 1, 1, szShaderName, NULL);
 		const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
-		sprintf(szTexName, "%s%s", szPath, ShaderName.c_str());
-		if (SUCCEEDED(TextureExtension(szTexName))) {
-			m_lpWeaponTex[i] = m_TexDB.GetTexture(szTexName);
+		const std::filesystem::path ShaderPath = Dir / ShaderName;
+		if (TextureExtension(ShaderPath))
+		{
+			m_lpWeaponTex[i] = m_TexDB.GetTexture(ShaderPath);
 		}
-		else {
+		else
+		{
 			m_lpWeaponTex[i] = NULL;
 		}
 	}
 	//Get the barrel textures if it exists.
 	if (m_bBarrel) {
 		m_meshBarrel.GetNumMeshes(&lNumMesh);
-		for (i = 0; i < (DWORD)lNumMesh; i++) {
+		for (LONG i = 0; i < lNumMesh; i++)
+		{
 			m_meshBarrel.GetShader(i + 1, 1, szShaderName, NULL);
 			const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
-			sprintf(szTexName, "%s%s", szPath, ShaderName.c_str());
-			if (SUCCEEDED(TextureExtension(szTexName))) {
-				m_lpBarrelTex[i] = m_TexDB.GetTexture(szTexName);
+			const std::filesystem::path ShaderPath = Dir / ShaderName;
+			if (TextureExtension(ShaderPath))
+			{
+				m_lpBarrelTex[i] = m_TexDB.GetTexture(ShaderPath);
 			}
-			else {
+			else
+			{
 				m_lpBarrelTex[i] = NULL;
 			}
 		}
 	}
 	//Get the flash textures.
 	m_meshFlash.GetNumMeshes(&lNumMesh);
-	for (i = 0; i < (DWORD)lNumMesh; i++) {
+	for (LONG i = 0; i < lNumMesh; i++) {
 		m_meshFlash.GetShader(i + 1, 1, szShaderName, NULL);
 		const std::string ShaderName = Functions::RemoveDirectoryFromString(szShaderName);
-		sprintf(szTexName, "%s%s", szPath, ShaderName.c_str());
-		if (SUCCEEDED(TextureExtension(szTexName))) {
-			m_lpFlashTex[i] = m_TexDB.GetTexture(szTexName);
+		const std::filesystem::path ShaderPath = Dir / ShaderName;
+
+		if (TextureExtension(ShaderPath))
+		{
+			m_lpFlashTex[i] = m_TexDB.GetTexture(ShaderPath);
 		}
-		else {
+		else
+		{
 			m_lpFlashTex[i] = NULL;
 		}
 	}
@@ -253,73 +241,48 @@ HRESULT CD3D_MD3WeaponMesh::Load(LPDIRECT3DDEVICE9 lpDevice, char szDir[], d3d_m
 	return S_OK;
 }
 
-HRESULT CD3D_MD3WeaponMesh::TextureExtension(char szShader[MAX_PATH])
+bool CD3D_MD3WeaponMesh::TextureExtension(const std::filesystem::path& Shader)
 {
-	size_t dwLen = 0, i = 0, j = 0;
-	char szTemp[MAX_PATH];
-
 	//First attempt to load the name provided.
-	if (m_TexDB.AddTexture(m_lpDevice, szShader)) {
-		return S_OK;
+	if (m_TexDB.AddTexture(m_lpDevice, Shader)) {
+		return true;
 	}
 
-	dwLen = strlen(szShader);
-	for (i = 0, j = 0; i < dwLen; i++, j++) {
-		if (szShader[i] == '.') {
-			szTemp[j] = szShader[i];
-			szTemp[j + 1] = 0;
-			break;
-		}
-		szTemp[j] = szShader[i];
-	}
+	std::filesystem::path ShaderNoExt = Shader;
 
 	//Attempt to replace the extension till we successfully load.
-	strcpy(szShader, szTemp);
-
-	strcpy(szTemp, szShader);
-	strcat(szTemp, "JPG");
-	if (m_TexDB.AddTexture(m_lpDevice, szTemp)) {
-		strcpy(szShader, szTemp);
-		return S_OK;
+	ShaderNoExt.replace_extension("JPG");
+	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
+		return true;
 	}
 
 
-	strcpy(szTemp, szShader);
-	strcat(szTemp, "BMP");
-	if (m_TexDB.AddTexture(m_lpDevice, szTemp)) {
-		strcpy(szShader, szTemp);
+	ShaderNoExt.replace_extension("BMP");
+	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
 		return S_OK;
 	}
 
-	strcpy(szTemp, szShader);
-	strcat(szTemp, "PNG");
-	if (m_TexDB.AddTexture(m_lpDevice, szTemp)) {
-		strcpy(szShader, szTemp);
-		return S_OK;
+	ShaderNoExt.replace_extension("PNG");
+	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
+		return true;
 	}
 
-	strcpy(szTemp, szShader);
-	strcat(szTemp, "DIB");
-	if (m_TexDB.AddTexture(m_lpDevice, szTemp)) {
-		strcpy(szShader, szTemp);
-		return S_OK;
+	ShaderNoExt.replace_extension("DIB");
+	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
+		return true;
 	}
 
-	strcpy(szTemp, szShader);
-	strcat(szTemp, "DDS");
-	if (m_TexDB.AddTexture(m_lpDevice, szTemp)) {
-		strcpy(szShader, szTemp);
-		return S_OK;
+	ShaderNoExt.replace_extension("DDS");
+	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
+		return true;
 	}
 
-	strcpy(szTemp, szShader);
-	strcat(szTemp, "TGA");
-	if (m_TexDB.AddTexture(m_lpDevice, szTemp)) {
-		strcpy(szShader, szTemp);
-		return S_OK;
+	ShaderNoExt.replace_extension("TGA");
+	if (m_TexDB.AddTexture(m_lpDevice, ShaderNoExt)) {
+		return true;
 	}
 
-	return E_FAIL;
+	return false;
 }
 
 HRESULT CD3D_MD3WeaponMesh::GetLink(CD3D_MD3Mesh* lpFirst, const char szTagName[], WORD* lpTagRef)
