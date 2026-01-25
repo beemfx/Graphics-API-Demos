@@ -213,6 +213,7 @@
     </ClCompile>
     <ClCompile Include="code\3rdParty\miniz\miniz.c" />
     <ClCompile Include="code\FileSystem\DataStream.cpp" />
+    <ClCompile Include="code\FileSystem\FileSystem.cpp" />
     <ClCompile Include="code\FileSystem\ZipArchive.cpp" />
     <ClCompile Include="code\GFX3D9\BeemConsole.c" />
     <ClCompile Include="code\GFX3D9\D3DFont.c" />
@@ -236,6 +237,7 @@
   <ItemGroup>
     <ClInclude Include="code\3rdParty\miniz\miniz.h" />
     <ClInclude Include="code\FileSystem\DataStream.h" />
+    <ClInclude Include="code\FileSystem\FileSystem.h" />
     <ClInclude Include="code\FileSystem\ZipArchive.h" />
     <ClInclude Include="code\GFX3D9\GFX3D9.h" />
     <ClInclude Include="code\GFX3D9\GFX3D9TextureDB.h" />

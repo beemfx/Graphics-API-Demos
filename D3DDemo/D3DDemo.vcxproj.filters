@@ -119,6 +119,9 @@
     <ClCompile Include="code\MD3Base\D3D_MD3Skin.cpp">
       <Filter>code\MD3Base</Filter>
     </ClCompile>
+    <ClCompile Include="code\FileSystem\FileSystem.cpp">
+      <Filter>code\FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\resource.h">
@@ -177,6 +180,9 @@
     </ClInclude>
     <ClInclude Include="code\MD3Base\D3D_MD3WeaponMesh.h">
       <Filter>code\MD3Base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\FileSystem\FileSystem.h">
+      <Filter>code\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

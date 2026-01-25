@@ -3,6 +3,7 @@
 #include "D3D_MD3PlayerMesh.h"
 #include "D3D_MD3PlayerObject.h"
 #include "D3D_MD3WeaponMesh.h"
+#include "FileSystem/FileSystem.h"
 #include "GFX3D9.h"
 #include "resource.h"
 #include <d3d9.h>
@@ -1065,7 +1066,11 @@ int WINAPI WinMain(
 	if(hwnd==NULL)
 		return -1;
 
+	CFileSystem::InitFileSystem();
+
 	SetCurrentDirectory( TEXT( "data" ) );
+
+	CFileSystem::Get().AutoMount();
 
 	ShowWindow(hwnd, nShowCmd);
 	UpdateWindow(hwnd);
@@ -1091,5 +1096,8 @@ int WINAPI WinMain(
 		}
 	}
 	GameShutdown();
+
+	CFileSystem::DeinitFileSystem();
+
 	return 0;
 }
