@@ -117,6 +117,33 @@ std::vector<CFileSystem::fs_byte> CFileSystem::LoadFile(const std::filesystem::p
 	return Out;
 }
 
+std::vector<std::filesystem::path> CFileSystem::GetAllFilesMatching(const std::filesystem::path& Filename, const std::string& Ext) const
+{
+	const std::filesystem::path AdjFilename = GetAdjustedFilename(Filename);
+	const std::string AdjExt = GetAdjustedFilename(Ext).string();
+	const std::filesystem::path AdjParent = AdjFilename.parent_path();
+	const std::string AdjRootName = AdjFilename.stem().string();
+
+	std::vector<std::filesystem::path> Out;
+
+	for (auto& Item : m_MountData)
+	{
+		const std::filesystem::path& ItemPath = Item.first;
+		if (ItemPath.parent_path() == AdjParent)
+		{
+			if (ItemPath.extension().string() == AdjExt)
+			{
+				if (ItemPath.filename().string().rfind(AdjRootName, 0) == 0)
+				{
+					Out.push_back(ItemPath);
+				}
+			}
+		}
+	}
+
+	return Out;
+}
+
 std::filesystem::path CFileSystem::GetAdjustedFilename(const std::filesystem::path& In)
 {
 	std::string TempString = In.string();

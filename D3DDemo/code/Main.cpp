@@ -731,9 +731,8 @@ BOOL GameInit(HWND hwnd, BOOL bWindowed, HINSTANCE hInstance)
 	SendBeemConsoleMessage(BeemConsole, "CreateBeemConsole()");
 
 	#ifdef TESTMD3
-	SendBeemConsoleCommand(BeemConsole, R"(loadmd3 "laracroft")");
+	SendBeemConsoleCommand(BeemConsole, R"(loadmd3 "pk3\models\players\laracroft")");
 	SendBeemConsoleCommand(BeemConsole, R"(loadweapon "pk3\models\weapons2\machinegun")");
-	// SendBeemConsoleCommand(BeemConsole, R"(loadweapon "machinegun")");
 	#endif //TESTMD3
 
 	#ifdef TESTME

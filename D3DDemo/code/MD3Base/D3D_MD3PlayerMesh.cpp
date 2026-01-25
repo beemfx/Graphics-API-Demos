@@ -1,9 +1,10 @@
 // (c) Beem Media. All rights reserved.
 
 #include "D3D_MD3PlayerMesh.h"
-#include "D3D_MD3WeaponMesh.h"
 #include "D3D_MD3Skin.h"
+#include "D3D_MD3WeaponMesh.h"
 #include "defines.h"
+#include "FileSystem/FileSystem.h"
 #include <d3dx9.h>
 
 CD3D_MD3PlayerMesh::CD3D_MD3PlayerMesh()
@@ -221,42 +222,24 @@ HRESULT CD3D_MD3PlayerMesh::Render(
 
 bool CD3D_MD3PlayerMesh::GetSkins(const std::filesystem::path& Dir)
 {
-	std::vector<std::string> SkinFiles;
-
-	{
-		WIN32_FIND_DATAA FindData = { };
-
-		//Basically my intent is to find out how many skins there
-		//are. This can be done by finding out how many files with names
-		//skin file beginning with upper_ exist.  We could use any bone
-		//of the body, but upper will do nicely.
-		std::filesystem::path SearchPath = Dir / "upper_*.skin";
-
-		HANDLE hFind = FindFirstFileA(
-			SearchPath.string().c_str(),
-			&FindData);
-
-		if (hFind == INVALID_HANDLE_VALUE)
-			return false;
-
-		do
-		{
-			SkinFiles.push_back(FindData.cFileName);
-		} while (FindNextFile(hFind, &FindData));
-
-		FindClose(hFind);
-	}
+	// Basically my intent is to find out how many skins there
+	// are. This can be done by finding out how many files with names
+	// skin file beginning with upper_ exist. We could use any bone
+	// of the body, but upper will do nicely.
+	const std::filesystem::path SearchPath = Dir / "upper_";
+	std::vector<std::filesystem::path> SkinFiles = CFileSystem::Get().GetAllFilesMatching(Dir / "upper_", ".skin");
 
 	m_SkinSets.reserve(SkinFiles.size());
 
 	std::vector<md3_char8> Temp;
-	for (auto& UpperName : SkinFiles)
+	for (auto& UpperNameFile : SkinFiles)
 	{
+		const std::string UpperName = UpperNameFile.string();
 		auto& NewSkin = m_SkinSets.emplace_back();
 		// The name is everything after the first '_' and before ".skin":
 		Temp.clear();
 		bool bFoundUnderscore = false;
-		for (md3_uint32 i = 0; i <UpperName.size(); i++)
+		for (md3_uint32 i = 0; i < UpperName.size(); i++)
 		{
 			const md3_char8 c = UpperName[i];
 			if (!bFoundUnderscore)
@@ -298,7 +281,7 @@ bool CD3D_MD3PlayerMesh::GetSkins(const std::filesystem::path& Dir)
 		const std::filesystem::path LowerPath = Dir / LowerFilename;
 
 
-		const bool bSkinLoaded 
+		const bool bSkinLoaded
 			=
 			m_SkinSets[i].Head.LoadSkin(m_lpDevice, HeadPath, m_TexDB)
 			&&
@@ -360,12 +343,12 @@ bool CD3D_MD3PlayerMesh::Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem:
 	};
 
 	const md3_bool bLoadedMeshes
-	=
-	m_meshHead.LoadMD3(HeadPath, lpDevice, D3DPOOL_DEFAULT)
-	&&
-	m_meshUpper.LoadMD3(UpperPath, lpDevice, D3DPOOL_DEFAULT)
-	&&
-	m_meshLower.LoadMD3(LowerPath, lpDevice, D3DPOOL_DEFAULT);
+		=
+		m_meshHead.LoadMD3(HeadPath, lpDevice, D3DPOOL_DEFAULT)
+		&&
+		m_meshUpper.LoadMD3(UpperPath, lpDevice, D3DPOOL_DEFAULT)
+		&&
+		m_meshLower.LoadMD3(LowerPath, lpDevice, D3DPOOL_DEFAULT);
 
 	if (!bLoadedMeshes)
 	{
@@ -428,7 +411,7 @@ HRESULT CD3D_MD3PlayerMesh::Clear()
 	m_TexDB.ClearDB();
 	m_SkinSets.resize(0);
 	m_DefaultSkin = 0;
-	
+
 	SAFE_RELEASE(m_lpDevice);
 
 	m_bLoaded = FALSE;

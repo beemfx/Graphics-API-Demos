@@ -26,6 +26,7 @@ public:
 	void MountFile(const std::filesystem::path& Filename);
 	void MountPK3(const std::filesystem::path& Filename);
 	std::vector<fs_byte> LoadFile(const std::filesystem::path& Filename) const;
+	std::vector<std::filesystem::path> GetAllFilesMatching(const std::filesystem::path& Filename, const std::string& Ext) const;
 
 private:
 	enum class mount_type
