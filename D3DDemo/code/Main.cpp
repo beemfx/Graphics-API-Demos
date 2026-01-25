@@ -35,7 +35,7 @@ CD3D_MD3PlayerObject g_lpTestPlayer;
 CD3D_MD3WeaponMesh g_lpTestGun;
 #endif //TESTMD3
 
-//#define TESTME
+// #define TESTME
 #ifdef TESTME
 CD3D_MD3ObjectMesh g_lpMeTest;
 #endif TESTME

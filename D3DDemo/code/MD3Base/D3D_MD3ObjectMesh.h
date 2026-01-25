@@ -14,14 +14,13 @@ protected:
 
 	BOOL m_bLoaded;
 
-	HRESULT TextureExtension(LPDIRECT3DDEVICE9 lpDevice, char szShader[MAX_PATH]);
 public:
 	CD3D_MD3ObjectMesh();
 	~CD3D_MD3ObjectMesh();
 
 	HRESULT Render(LPDIRECT3DDEVICE9 lpDevice, const D3DMATRIX& WorldMatrix);
 
-	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, char szFile[], d3d_md3_detail nDetail);
+	HRESULT Load(LPDIRECT3DDEVICE9 lpDevice, const std::filesystem::path& Filename, d3d_md3_detail nDetail);
 
 	HRESULT Clear();
 
