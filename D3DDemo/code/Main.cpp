@@ -3,6 +3,7 @@
 #include "D3D_MD3PlayerMesh.h"
 #include "D3D_MD3PlayerObject.h"
 #include "D3D_MD3WeaponMesh.h"
+#include "FileSystem/DataStream.h"
 #include "FileSystem/FileSystem.h"
 #include "GFX3D9.h"
 #include "resource.h"
@@ -747,10 +748,14 @@ BOOL GameInit(HWND hwnd, BOOL bWindowed, HINSTANCE hInstance)
 	#endif //TESTPRIM
 
 	#ifdef TESTIMAGE
-	TestImage=CreateD3DImageFromFile(g_lpDevice, "TestImage2.bmp", 100, 100, 0xFFFF00FF);
-	SendBeemConsoleMessage(BeemConsole, "CreateD3DImageFromeFile(): TestImage2.bmp");
-	TestBG=CreateD3DImageFromFile(g_lpDevice, "bg.bmp", 256, 256, 0xFFFF00FF);
-	SendBeemConsoleMessage(BeemConsole, "CreateD3DImageFromFile(): bg.bmp");
+	{
+		CDataStream TestImageData("TestImage2.bmp");
+		TestImage= CreateD3DImageFromMemory(g_lpDevice, TestImageData.GetData(), static_cast<UINT>(TestImageData.GetDataSize()), 100, 100, 0xFFFF00FF);
+		SendBeemConsoleMessage(BeemConsole, "CreateD3DImageFromeFile(): TestImage2.bmp");
+		CDataStream TestBGData("bg.bmp");
+		TestBG= CreateD3DImageFromMemory(g_lpDevice, TestBGData.GetData(), static_cast<UINT>(TestBGData.GetDataSize()), 256, 256, 0xFFFF00FF);
+		SendBeemConsoleMessage(BeemConsole, "CreateD3DImageFromFile(): bg.bmp");
+	}
 	#endif //TESTIMAGE
 
 	#ifdef TESTFONT

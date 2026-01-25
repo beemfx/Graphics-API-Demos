@@ -232,6 +232,83 @@ HD3DIMAGE CreateD3DImageFromFileW(
 	return (HD3DIMAGE)lpImage;
 }
 
+HD3DIMAGE CreateD3DImageFromMemory(
+	LPDIRECT3DDEVICE9 lpDevice,
+	const void* Data,
+	UINT DataSize,
+	DWORD dwWidth,
+	DWORD dwHeight,
+	D3DCOLOR dwTransparent)
+{
+	HRESULT hr = 0;
+	D3DSURFACE_DESC TexDesc;
+	LPD3DIMAGE lpImage = NULL;
+
+	if (!lpDevice)
+		return NULL;
+
+	lpImage = malloc(sizeof(D3DIMAGE));
+	if (lpImage == NULL)
+		return NULL;
+	ZeroMemory(&TexDesc, sizeof(D3DSURFACE_DESC));
+	lpImage->lpTexture = NULL;
+	lpImage->lpVB = NULL;
+
+
+	/* Load the texture. */
+	hr = D3DXCreateTextureFromFileInMemoryEx(
+		lpDevice,
+		Data,
+		DataSize,
+		D3DX_DEFAULT,
+		D3DX_DEFAULT,
+		D3DX_DEFAULT,
+		0,
+		D3DFMT_UNKNOWN,
+		D3DPOOL_MANAGED,
+		D3DX_FILTER_POINT,
+		D3DX_FILTER_POINT,
+		dwTransparent,
+		NULL,
+		NULL,
+		&lpImage->lpTexture);
+	if (FAILED(hr)) {
+		SAFE_FREE(lpImage);
+		return NULL;
+	}
+
+	lpImage->lpDevice = lpDevice;
+	lpImage->lpDevice->lpVtbl->AddRef(lpImage->lpDevice);
+
+	lpImage->lpTexture->lpVtbl->GetLevelDesc(lpImage->lpTexture, 0, &TexDesc);
+
+	if (dwHeight == -1)
+		dwHeight = TexDesc.Height;
+	lpImage->dwHeight = dwHeight;
+
+
+	if (dwWidth == -1)
+		dwWidth = TexDesc.Width;
+	lpImage->dwWidth = dwWidth;
+
+
+	lpImage->bIsColor = FALSE;
+
+	SetVertices(lpImage, dwWidth, dwHeight);
+
+	/* Create the vertex buffer by validate image. */
+	if (!ValidateD3DImage(
+		(HD3DIMAGE)lpImage))
+	{
+		SAFE_RELEASE((lpImage->lpTexture));
+		SAFE_RELEASE((lpImage->lpDevice));
+		SAFE_FREE(lpImage);
+		return NULL;
+	}
+
+	return (HD3DIMAGE)lpImage;
+}
+
 
 HD3DIMAGE CreateD3DImageFromTexture(
 	LPDIRECT3DDEVICE9 lpDevice,

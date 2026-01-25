@@ -104,6 +104,13 @@ GFX3D9_EXPORTS HD3DIMAGE CreateD3DImageFromFileW(
 	DWORD dwHeight,
 	D3DCOLOR dwTransparent);
 
+GFX3D9_EXPORTS HD3DIMAGE CreateD3DImageFromMemory(
+	LPDIRECT3DDEVICE9 lpDevice,
+	const void* Data,
+	UINT DataSize,
+	DWORD dwWidth,
+	DWORD dwHeight,
+	D3DCOLOR dwTransparent);
 
 GFX3D9_EXPORTS HD3DIMAGE CreateD3DImageFromTexture(
 	LPDIRECT3DDEVICE9 lpDevice,

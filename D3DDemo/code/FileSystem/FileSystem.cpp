@@ -34,7 +34,7 @@ void CFileSystem::AutoMount()
 		if (Item.is_regular_file())
 		{
 			const std::filesystem::path Path = Item.path().lexically_relative(RootDir);
-			if (Path.extension() == ".pk3")
+			if (Path.extension() == ".pk3" || Path.extension() == ".zip")
 			{
 				MountPK3(Path);
 			}
